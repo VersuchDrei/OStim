@@ -2101,9 +2101,9 @@ Function OnAnimationChange()
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
 
-	Rescale()
-
 	if sceneChange
+		Rescale()
+		
 		SendModEvent("ostim_scenechanged")
 
 		SendModEvent("ostim_scenechanged_" + CurrAnimClass) ;register to scenes by class
