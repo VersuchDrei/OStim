@@ -452,18 +452,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 				SubActor = playerpartner  
 			endif 
 		endif 
-	endif 
-
-	; Disable Precision mod collisions for the actors involved to prevent misalignments and teleports to (0,0) cell
-	TogglePrecisionForActor(DomActor, false)
-
-	If SubActor
-		TogglePrecisionForActor(SubActor, false)
-	EndIf
-
-	If ThirdActor
-		TogglePrecisionForActor(ThirdActor, false)
-	EndIf
+	endif
 
 	; set actor properties
 	If ThirdActor
@@ -489,6 +478,8 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	int i = Actors.Length
 	While i
 		i -= 1
+
+		TogglePrecisionForActor(Actors[i], false)
 
 		If nioverride.HasNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")
 			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")[2]
@@ -582,31 +573,12 @@ Event OnUpdate() ;OStim main logic loop
 	SpankMax = osanative.RandomInt(1, 6)
 	FirstAnimate = true
 
-
-	Actor[] Actro
-
-	
-
-	If (ThirdActor)
-		Actro = New Actor[3]
-		Actro[2] = ThirdActor
-		Actro[1] = SubActor
-	ElseIf SubActor
-		Actro = New Actor[2]
-		Actro[1] = SubActor
-	Else
-		Actro = new Actor[1]
-	EndIf
-
-	Actro[0] = DomActor
-
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
 	; OBarsScript already registers for the ostim_orgasm event and is attacked to the same quest
 	; so this registration will not work, but renaming the listener to OstimOrgasm will, as that is what OBarsScript registered it to
 	; if we ever split the scripts up on different quests we have to register for the event here again
 	;RegisterForModEvent("ostim_orgasm", "OnOrgasm")
 	
-
 	String DomFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor))
 	RegisterForModEvent("0SSO" + DomFormID + "_Sound", "OnSoundDom")
 	If (SubActor)
@@ -619,8 +591,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	If (!UsingBed && UseBed)
-		Currentbed = FindBed(DomActor)
-
+		Currentbed = FindBed(Actors[0])
 		If (CurrentBed)
 			If !ConfirmBed || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
 				UsingBed = True
@@ -643,7 +614,11 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	If ThirdActor && (StartingAnimation == "")
-		startinganimation = "0M2F|Sy6!Sy9!Sy9|Ho|DoubleTrouble+22Enter"
+		If UsingBed
+			startinganimation = "OpS|LyB!Kne!Kne|Ho|3PLyingIdle"
+		Else
+			startinganimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
+		EndIf
 	endif 
 
 	If (UsingBed)
@@ -669,7 +644,7 @@ Event OnUpdate() ;OStim main logic loop
 	;profile()
 
 	CurrScene = OSA.MakeStage()
-	OSA.SetActorsStim(currScene, Actro)
+	OSA.SetActorsStim(currScene, Actors)
 	OSA.SetModule(CurrScene, "0Sex", StartingAnimation, "")
 	OSA.StimStart(CurrScene)
 
@@ -686,12 +661,10 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	
-
 	if !ThirdActor
-		CurrentAnimation = "0Sx0MF_Ho-St6RevCud+01T180"
+		CurrentAnimation = "0MF|Sy6!Sy9|Ho|St9Adore"
 	elseIf SubActor
-		CurrentAnimation = "0Sx0M2F_Ho-DoubleTrouble"
+		CurrentAnimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
 	Else
 		CurrentAnimation = startingAnimation
 	endif 
@@ -717,7 +690,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Password = DomActor.GetFactionRank(OsaFactionStage)
-	OSANative.StartScene(Password, Actro)
+	OSANative.StartScene(Password, Actors)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
@@ -785,7 +758,7 @@ Event OnUpdate() ;OStim main logic loop
 		FadeFromBlack()
 	EndIf
 
-	While (IsActorActive(DomActor)) && !ForceCloseOStimThread ; Main OStim logic loop
+	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
 		If (LoopTimeTotal > 1)
 			;Console("Loop took: " + loopTimeTotal + " seconds")
 			LoopTimeTotal = 0
@@ -869,6 +842,7 @@ Event OnUpdate() ;OStim main logic loop
 			OUtils.RestoreOffset(Actors[i], Offsets[i])
 		EndIf
 
+		TogglePrecisionForActor(Actors[i], true)
 		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
 
@@ -939,17 +913,6 @@ Event OnUpdate() ;OStim main logic loop
 	oldscenemetadata = scenemetadata
 	scenemetadata = PapyrusUtil.StringArray(0)
 
-	; Enable Precision mod collisions for the actors involved again
-	TogglePrecisionForActor(DomActor, true)
-
-	If (SubActor)
-		TogglePrecisionForActor(SubActor, true)
-	EndIf
-
-	If (ThirdActor)
-		TogglePrecisionForActor(ThirdActor, true)
-	EndIf
-
 	SceneRunning = False
 	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
@@ -998,8 +961,9 @@ Bool Function IsActorInvolved(actor act)
 	; Generally isactoractive is preferred, since it will always return false if no ostim scene is running
 	if act == none 
 		return false 
-	endif 
-	return (act == DomActor) || (act == subactor) || (act == ThirdActor)
+	endif
+
+	Return Actors.Find(act) != -1
 EndFunction
 
 Bool Function IsPlayerInvolved()
@@ -1186,23 +1150,21 @@ Function WarpToAnimation(String Animation)
 EndFunction
 
 Function ToggleActorAI(bool enable)
-	DomActor.EnableAI(enable)
-	if SubActor
-		SubActor.EnableAI(enable)
-		if ThirdActor 
-			ThirdActor.EnableAI(enable)
-		endif 
-	endif 
+	int i = Actors.Length
+	While i
+		i -= 1
+		Actors[i].EnableAI(enable)
+	EndWhile
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (UseFades && SmoothEnding && ((DomActor == PlayerRef) || (SubActor == PlayerRef)))
+	If (UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
 	Console("Trying to end scene")	
 
-	If (IsNPCScene() && (DomActor.GetParentCell() != playerref.GetParentCell()))
+	If (IsNPCScene() && (Actors[0].GetParentCell() != playerref.GetParentCell()))
 		; Attempting to end the scene when the actors are not loaded will fail
 		;console("game loaded")
 		SendModEvent("0SA_GameLoaded")
@@ -1281,12 +1243,8 @@ EndFunction
 
 ;/
 Function SwapActorOrder() ; Swaps dom position in animation for sub. Only effects the animation scene. 2p scenes only
-    if ThirdActor == none 
+    if Actors.Length == 2
         UI.Invoke("HUD Menu", diasa + ".arrangeActra")
-
-       ; actor temp = domactor ; experimental, please check for the side effects of this before using the function
-       ; DomActor = subactor 
-       ; SubActor = temp
     endif
 EndFunction
 /;
@@ -1393,10 +1351,7 @@ EndFunction
 Actor Function GetCurrentLeadingActor()
 	{in a blowjob type animation, it would be the female, while in most sex animations, it will be the male}
 	Int ActorNum = ODatabase.GetMainActor(CurrentOID)
-	If (ActorNum == 0)
-		Return DomActor
-	EndIf
-	Return SubActor
+	Return GetActor(ActorNum)
 EndFunction
 
 Bool Function AnimationRunning()
@@ -1420,11 +1375,11 @@ EndFunction
 Function Realign()
 	AllowVehicleReset()
 	Utility.Wait(0.1)
-	SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor)) + "_AlignStage")
-	SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor)) + "_AlignStage")
-	If (ThirdActor)
-		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) + "_AlignStage")
-	EndIf
+	int i = Actors.Length
+	While i
+		i -= 1
+		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actors[i])) + "_AlignStage")
+	EndWhile
 EndFunction
 
 Function AlternateRealign() ; may work better than the above function, or worse. Try testing.
@@ -1435,11 +1390,11 @@ EndFunction
 
 Function AllowVehicleReset()
 	Console("Allowing vehicle reset...")
-	SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor)) + "_AllowAlignStage")
-	SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor)) + "_AllowAlignStage")
-	If (ThirdActor)
-		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) + "_AllowAlignStage")
-	EndIf
+	int i = Actors.Length
+	While i
+		i -= 1
+		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actors[i])) + "_AllowAlignStage")
+	EndWhile
 EndFunction
 
 float function GetEstimatedTimeUntilEnd()
@@ -1729,11 +1684,11 @@ Bool Function IsBedRoll(objectReference Bed)
 EndFunction
 
 Function AllignActorsWithCurrentBed()
-	DomActor.SetDontMove(True)
-	SubActor.SetDontMove(True)
-	If ThirdActor
-		ThirdActor.SetDontMove(true)
-	EndIf
+	int i = Actors.Length
+	While i
+		i -= 1
+		Actors[i].SetDontMove(True)
+	EndWhile
 
 	Bool BedRoll = IsBedRoll(Currentbed)
 	Bool Flip = !BedRoll
@@ -1743,7 +1698,7 @@ Function AllignActorsWithCurrentBed()
 		FlipFloat = 180
 	EndIf
 
-	Float DomSpeed = CurrentBed.GetDistance(DomActor) * 100
+	Float DomSpeed = CurrentBed.GetDistance(Actors[0]) * 100
 	Float BedOffsetX = 0
 	Float BedOffsetY = 0
 	Float BedOffsetZ = 0
@@ -1772,42 +1727,40 @@ Function AllignActorsWithCurrentBed()
 	Float BedAngleY = Currentbed.GetAngleY()
 	Float BedAngleZ = Currentbed.GetAngleZ()
 
-	DomActor.TranslateTo(bedCoords[0], bedCoords[1], bedCoords[2], BedAngleX, BedAngleY, BedAngleZ, DomSpeed, afMaxRotationSpeed = 100)
-	DomActor.SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
+	Actors[0].TranslateTo(bedCoords[0], bedCoords[1], bedCoords[2], BedAngleX, BedAngleY, BedAngleZ, DomSpeed, afMaxRotationSpeed = 100)
+	Actors[0].SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
 	If (UseFades && IsPlayerInvolved())
 		Game.FadeOutGame(False, True, 25.0, 25.0) ; keep the screen black
 	EndIf
 
-	Utility.Wait(0.05)
 
-	Float OffsetY = Math.Sin(OUtils.TrigAngleZ(DomActor.GetAngleZ())) * 30
-	Float OffsetX = Math.Cos(OUtils.TrigAngleZ(DomActor.GetAngleZ())) * 30
 
-	SubActor.MoveTo(DomActor, OffsetX, OffsetY, 0)
-	SubActor.SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
 
-	If (UseFades && ((DomActor == PlayerRef) || (SubActor == PlayerRef)))
+	i = 1
+	While i < Actors.Length
+		Utility.Wait(0.05)
+		Float OffsetY = Math.Sin(OUtils.TrigAngleZ(Actors[0].GetAngleZ())) * 30
+		Float OffsetX = Math.Cos(OUtils.TrigAngleZ(Actors[0].GetAngleZ())) * 30
+
+		Actors[i].MoveTo(Actors[0], OffsetX, OffsetY, 0)
+		Actors[i].SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
+
+		i += 1
+	EndWhile
+
+	If UseFades && Actors.Find(PlayerRef) != -1
 		Game.FadeOutGame(False, True, 10.0, 5) ; keep the screen black
 	EndIf
 
-	If ThirdActor
-		Utility.Wait(0.05)
-
-		OffsetY = Math.Sin(OUtils.TrigAngleZ(DomActor.GetAngleZ())) * 30
-		OffsetX = Math.Cos(OUtils.TrigAngleZ(DomActor.GetAngleZ())) * 30
-
-		ThirdActor.MoveTo(DomActor, OffsetX, OffsetY, 0)
-		ThirdActor.SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
-
-		ThirdActor.SetDontMove(false)
-	EndIf
-
-	DomActor.SetDontMove(False)
-	SubActor.SetDontMove(False)
+	i = Actors.Length
+	While i
+		i -= 1
+		Actors[i].SetDontMove(False)
+	EndWhile
 EndFunction
 
 ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are alligned on
-	Int StageID = DomActor.GetFactionRank(OSAOmni.OFaction[1])
+	Int StageID = Actors[0].GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
 	Return Stage
 EndFunction
@@ -1929,11 +1882,6 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 		ranOnce = true 
 		Console("Skipping first actra sync event")
 		return 
-	endif 
-	Console("Dom was " + DomActor.GetDisplayName())
-	Console("Sub was " + SubActor.GetDisplayName())
-	if(ThirdActor)
-		Console("Third was " + ThirdActor.GetDisplayName())
 	endif
 	
 	string[] newPositions = PapyrusUtil.StringSplit(strArg,",")
@@ -1970,11 +1918,6 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 		i = i+1
 	endWhile
 
-	Console("Dom is now " + DomActor.GetDisplayName())
-	Console("Sub is now " + SubActor.GetDisplayName())
-	if(ThirdActor)
-		Console("Third is now " + ThirdActor.GetDisplayName())
-	endif
 	bool changed = false
 	int j = 0
 	while(j < originalPositions.length)
@@ -2036,13 +1979,14 @@ Function OnAnimationChange()
 	If (!ThirdActor && (CorrectActorCount == 3)) ; no third actor, but there should be
 		Console("Third actor has joined scene ")
 
+		Actor[] NearbyActors = MiscUtil.ScanCellNPCs(Actors[0], Radius = 64.0) ;epic hackjob time
 		int max = OControl.ActraInRange.Length
 		int i = 0
 
 		While (i < max)
 			Actor Act = OControl.ActraInRange[i]
 
-			If (Act) && (Act != DomActor) && (Act != SubActor) && (IsActorActive(Act))
+			If (Act) && Actors.Find(Act) == -1 && (IsActorActive(Act))
 				ThirdActor = Act
 				OSANative.AddThirdActor(Password, ThirdActor)
 				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
@@ -2138,21 +2082,24 @@ EndFunction
 
 
 Event OnActorHit(String EventName, String zAnimation, Float NumArg, Form Sender)
-	If (EndAfterActorHit) && (DomActor.IsInCombat() || SubActor.IsInCombat())
-		EndAnimation(False)
+	If (EndAfterActorHit)
+		int i = Actors.Length
+		While i
+			i -= 1
+			If Actors[i].IsInCombat()
+				EndAnimation(False)
+				Return
+			EndIf
+		EndWhile
 	EndIf
 EndEvent
 
 Function RestoreScales()
-	If (DomActor)
-		DomActor.SetScale(1.0)
-	endif
-	If (SubActor)
-		SubActor.SetScale(1.0)
-	endif
-	If (ThirdActor)
-		ThirdActor.SetScale(1.0)
-	endif
+	int i = Actors.Length
+	While i
+		i -= 1
+		Actors[i].SetScale(1.0)
+	EndWhile
 EndFunction
 
 Function Rescale()
@@ -2433,7 +2380,7 @@ Function Orgasm(Actor Act)
 			SetGameSpeed("1")
 		EndIf
 
-		If ((DomActor == PlayerRef) || (SubActor == PlayerRef))
+		If Actors.Find(PlayerRef) != -1
 			ShakeCamera(1.00, 2.0)
 		EndIf
 
