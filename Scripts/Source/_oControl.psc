@@ -92,8 +92,8 @@ Event OnKeyDown(Int KeyPress)
         Return
     EndIf
 
-    If (KeyPress == OKey[0])
-        ostim.EndAnimation(true)        
+    If (KeyPress == OKey[0] && ostim.AnimationRunning())
+        ostim.EndAnimation(true)
     ElseIf disableControl
         If !Utility.IsInMenuMode()
             OsexIntegrationMain.Console("OSA controls disabled by OStim property")
