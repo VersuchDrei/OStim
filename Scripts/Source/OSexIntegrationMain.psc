@@ -2371,7 +2371,7 @@ EndFunction
 
 Function Orgasm(Actor Act)
 	SetActorExcitement(Act, -3.0)
-	Act.SendModEvent("ostim_orgasm")
+	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
 		NutEffect.Apply()
 		If (SlowMoOnOrgasm)
@@ -2407,13 +2407,25 @@ Function Orgasm(Actor Act)
 	Act.DamageActorValue("stamina", 250.0)
 EndFunction
 
-Event OstimOrgasm(String EventName, String Args, Float Nothing, Form Sender)
+Event OstimOrgasm(String EventName, String sceneId, Float index, Form Sender)
 	Actor Act = Sender As Actor
-	If Act.IsInFaction(NVCustomOrgasmFaction)
-		Return
+
+	; Fertility Mode compatibility
+	int actionIndex = OMetadata.FindActionForActor(sceneId, index as int, "vaginalsex")
+	If  actionIndex != -1
+		Actor impregnated = GetActor(OMetadata.GetActionTarget(sceneId, actionIndex))
+		If impregnated
+			int handle = ModEvent.Create("FertilityModeAddSperm")
+			If handle
+				ModEvent.PushForm(handle, impregnated)
+				ModEvent.PushString(handle, Act.GetDisplayName())
+				ModEvent.PushForm(handle, Act)
+				ModEvent.Send(handle)
+			EndIf
+		EndIf
 	EndIf
 
-	If !FaceDataIsMuted(Act)
+	If !Act.IsInFaction(NVCustomOrgasmFaction) && !FaceDataIsMuted(Act)
 		; if we don't mute FaceData here OSAs constant sound spamming will override the climax face after 1-2 seconds
 		MuteFaceData(Act)
 		SendExpressionEvent(Act, "climax")
