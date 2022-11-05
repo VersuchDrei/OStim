@@ -8,6 +8,7 @@ Int SetEndAfterActorHit
 Int SetUseRumble
 Int SetUseScreenShake
 Int SetScaling
+Int SetSchlongBending
 int SetResetPosition
 int SetOnlyGayAnimsInGayScenes
 
@@ -282,6 +283,7 @@ Event OnPageReset(String Page)
 		SetUseScreenShake = AddToggleOption("$ostim_screenshake", Main.UseScreenShake)
 		SetForceFirstPerson = AddToggleOption("$ostim_force_first", Main.ForceFirstPersonAfter)
 		SetScaling = AddToggleOption("$ostim_scaling", Main.DisableScaling)
+		SetSchlongBending = AddToggleOption("$ostim_schlong_bending", Main.DisableSchlongBending)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
 		AddEmptyOption()
 
@@ -592,6 +594,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetScaling)
 		Main.DisableScaling = !Main.DisableScaling
 		SetToggleOptionValue(Option, Main.DisableScaling)
+	ElseIf (Option == SetSchlongBending)
+		Main.DisableSchlongBending = !Main.DisableSchlongBending
+		SetToggleOptionValue(Option, Main.DisableSchlongBending)
 	ElseIf (Option == SetUseRumble)
 		Main.UseRumble = !Main.UseRumble
 		SetToggleOptionValue(Option, Main.UseRumble)
@@ -781,6 +786,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_fades")
 	ElseIf (Option == SetScaling)
 		SetInfoText("$ostim_tooltip_scaling")
+	ElseIf (Option == SetSchlongBending)
+		SetInfoText("$ostim_tooltip_schlong_bending")
 	ElseIf (Option == SetUseCosaveWorkaround)
 		SetInfoText("$ostim_tooltip_cosave")
 	ElseIf (Option == SetFreeCamFOV)
@@ -1234,6 +1241,7 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetUseRumble", Main.UseRumble as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseScreenShake", Main.UseScreenShake as Int)
 	JMap.SetInt(OstimSettingsFile, "SetScaling", Main.DisableScaling as Int)
+	JMap.SetInt(OstimSettingsFile, "SetSchlongBending", Main.DisableSchlongBending As Int)
 	JMap.SetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes", Main.OnlyGayAnimsInGayScenes as Int)
 
 	; Player roles settings.
@@ -1432,6 +1440,7 @@ Function ImportSettings(bool default = false)
 	Main.UseRumble = JMap.GetInt(OstimSettingsFile, "SetUseRumble")
 	Main.UseScreenShake = JMap.GetInt(OstimSettingsFile, "SetUseScreenShake")
 	Main.DisableScaling = JMap.GetInt(OstimSettingsFile, "SetScaling")
+	Main.DisableSchlongBending = JMap.GetInt(OstimSettingsFile, "SetSchlongBending")
 	Main.OnlyGayAnimsInGayScenes = JMap.GetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes")
 
 	;Player Roles settings

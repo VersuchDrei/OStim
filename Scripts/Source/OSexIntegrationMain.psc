@@ -184,6 +184,20 @@ bool Property DisableScaling
 	EndFunction
 EndProperty
 
+GlobalVariable Property OStimDisableSchlongBending Auto
+bool Property DisableSchlongBending
+	bool Function Get()
+		Return OStimDisableSchlongBending.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimDisableSchlongBending.value = 1
+		Else
+			OStimDisableSchlongBending.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
@@ -2473,7 +2487,7 @@ Function UnMuteFaceData(Actor Act)
 
 	int i = Actors.Find(Act)
 	If i != -1
-		OSANative.UpdateExpression(CurrentAnimation, i, Act)
+		OSANative.UpdateExpression(CurrentSceneID, i, Act)
 	EndIf
 EndFunction
 
