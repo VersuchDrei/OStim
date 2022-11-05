@@ -92,7 +92,7 @@ Event OnKeyDown(Int KeyPress)
         Return
     EndIf
 
-    If (KeyPress == OKey[0] && ostim.AnimationRunning())
+    If (KeyPress == OKey[0])
         ostim.EndAnimation(true)
     ElseIf disableControl
         If !Utility.IsInMenuMode()

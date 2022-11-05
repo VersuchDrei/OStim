@@ -1158,7 +1158,7 @@ Function ToggleActorAI(bool enable)
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
+	If (AnimationRunning() && UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
