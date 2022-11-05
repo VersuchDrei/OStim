@@ -1634,7 +1634,9 @@ EndFunction
 
 ObjectReference Function FindBed(ObjectReference CenterRef, Float Radius = 0.0)
 	If !(Radius > 0.0)
-		Radius = BedSearchDistance * 64.0
+		; we are searching from the center of the bed
+		; center to edge of the bed is about 1 meter / 100 units
+		Radius = (BedSearchDistance + 1) * 100.0
 	EndIf
 
 	ObjectReference[] Beds = OSANative.FindBed(CenterRef, Radius, 96.0)
