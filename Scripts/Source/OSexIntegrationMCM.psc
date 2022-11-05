@@ -188,12 +188,6 @@ string SUOSAllowTransitory = "osearch.allowTransitory"
 int SetOSAllowSex
 string SUOSAllowSex = "osearch.allowSex"
 
-string ovirginity = "OVirginity.esp"
-int SetOVShowEffects
-string SUOVShowEffects = "ovirginity.showhymen"
-int SetOVVirginChance
-string SUOVVirginChance = "ovirginity.virginityChance"
-
 string OProstitution = "OProstitution.esp"
 int SetOPFreq
 string SUOPFreq = "oprostitution.freqmod"
@@ -399,7 +393,7 @@ Event OnPageReset(String Page)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		UnloadCustomContent()
 		SetThanks = AddTextOption("", "")
-		SetCursorPosition(1)
+		SetCursorPosition(0)
 		AddTextOption("$ostim_addon_settings_text", "")
 		SetCursorPosition(2)
 
@@ -428,12 +422,6 @@ Event OnPageReset(String Page)
 			SetOSAllowSex = AddToggleOption("$ostim_addon_os_sex", StorageUtil.GetIntValue(none, SUOSAllowSex))
 			SetOSAllowHub = AddToggleOption("$ostim_addon_os_hub", StorageUtil.GetIntValue(none, SUOSAllowHub))
 			SetOSAllowTransitory = AddToggleOption("$ostim_addon_os_transitory", StorageUtil.GetIntValue(none, SUOSAllowTransitory))
-		endif 
-
-		if main.IsModLoaded(ovirginity)
-			AddColoredHeader("OVirginity")
-			SetOVShowEffects = AddToggleOption("$ostim_addon_ov_fx", StorageUtil.GetIntValue(none, SUOVShowEffects))
-			SetOVVirginChance = AddSliderOption("$ostim_addon_ov_chance", StorageUtil.GetIntValue(none, SUOVVirginChance), "{0} %")
 		endif 
 
 		if main.IsModLoaded(OProstitution)
@@ -561,9 +549,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetOSAllowHub
 			StorageUtil.SetIntValue(none, SUOSAllowHub, (!(StorageUtil.GetIntValue(none, SUOSAllowHub) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowHub, StorageUtil.GetIntValue(none, SUOSAllowHub))
-		elseif option == SetOVShowEffects
-			StorageUtil.SetIntValue(none, SUOVShowEffects, (!(StorageUtil.GetIntValue(none, SUOVShowEffects) as bool)) as int)
-			SetToggleOptionValue(SetOVShowEffects, StorageUtil.GetIntValue(none, SUOVShowEffects))
 		elseif option == SetOAStatBuffs
 			StorageUtil.SetIntValue(none, SUOAStatBuffs, (!(StorageUtil.GetIntValue(none, SUOAStatBuffs) as bool)) as int)
 			SetToggleOptionValue(SetOAStatBuffs, StorageUtil.GetIntValue(none, SUOAStatBuffs))
@@ -754,8 +739,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_on_freq_mult")
 		ElseIf (Option == SetOCBounty)
 			SetInfoText("$ostim_tooltip_oc_bounty")
-		ElseIf (Option == SetOVVirginChance)
-			SetInfoText("$ostim_tooltip_ov_chance")
 		ElseIf (Option == SetOPFreq)
 			SetInfoText("$ostim_tooltip_op_freq")
 		Elseif (Option == SetONStopWhenFound)
@@ -764,8 +747,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
 			SetInfoText("$ostim_tooltip_os_hub")
-		Elseif (Option == SetOVShowEffects)
-			SetInfoText("$ostim_tooltip_ov_fx")
 		Elseif (Option == SetOSAllowTransitory)
 			SetInfoText("$ostim_tooltip_os_transitory")
 		Elseif (Option == SetOSAllowSex)
@@ -1022,11 +1003,6 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(200)
 		SetSliderDialogRange(1, 2000)
 		SetSliderDialogInterval(1)
-	elseif (option == SetOVVirginChance)
-		SetSliderDialogStartValue(StorageUtil.GetIntValue(none, SUOVVirginChance))
-		SetSliderDialogDefaultValue(30)
-		SetSliderDialogRange(0, 100)
-		SetSliderDialogInterval(1)
 	elseif (option == SetOPFreq)
 		SetSliderDialogStartValue(StorageUtil.GetIntValue(none, SUOPFreq))
 		SetSliderDialogDefaultValue(0)
@@ -1049,9 +1025,6 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 	Elseif (option == SetOCBounty)
 		StorageUtil.SetIntValue(none, SUOCBounty, value as int)
 		SetSliderOptionValue(SetOCBounty, Value, "{0} Gold")
-	Elseif (option == SetOVVirginChance)
-		StorageUtil.SetIntValue(none, SUOVVirginChance, value as int)
-		SetSliderOptionValue(SetOVVirginChance, Value, "{0} %")
 	Elseif (option == SetOPFreq)
 		StorageUtil.SetIntValue(none, SUOPFreq, value as int)
 		SetSliderOptionValue(SetOPFreq, Value, "{0}")
@@ -1167,6 +1140,8 @@ function DrawSlotPage()
 	names[47] = "$ostim_slot_47"
 	names[48] = "$ostim_slot_48"
 	names[49] = "$ostim_slot_49"
+	names[50] = "$ostim_slot_50"
+	names[51] = "$ostim_slot_51"
 	names[52] = "$ostim_slot_52"
 	names[53] = "$ostim_slot_53"
 	names[54] = "$ostim_slot_54"
@@ -1379,15 +1354,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "savedOSearch", 0)
 	endif
 
-	if main.IsModLoaded(ovirginity)
-		osexintegrationmain.Console("Saving oVirginity settings.")
-		JMap.setInt(OstimSettingsFile, "savedoVirginity", 1)
-		JMap.SetInt(OstimSettingsFile, "SetOVShowEffects", StorageUtil.GetIntValue(none, SUOVShowEffects))
-		JMap.SetInt(OstimSettingsFile, "SetOVVirginChance", StorageUtil.GetIntValue(none, SUOVVirginChance))
-	Else
-		JMap.setInt(OstimSettingsFile, "savedoVirginity", 0)
-	endif
-
 	if main.IsModLoaded(OCrime)
 		osexintegrationmain.Console("Saving OCrime settings.")
 		JMap.setInt(OstimSettingsFile, "savedOCrime", 1)
@@ -1582,12 +1548,6 @@ Function ImportSettings(bool default = false)
 			 StorageUtil.SetIntValue(none, SUOSAllowSex, JMap.getInt(OstimSettingsFile, "SetOSAllowSex"))
 			 StorageUtil.SetIntValue(none, SUOSAllowHub, JMap.getInt(OstimSettingsFile, "SetOSAllowHub"))
 			 StorageUtil.SetIntValue(none, SUOSAllowTransitory, JMap.getInt(OstimSettingsFile, "SetOSAllowTransitory"))
-		endif
-
-		if main.IsModLoaded(ovirginity) && JMap.getInt(OstimSettingsFile, "savedovirginity") == 1
-			osexintegrationmain.Console("Loading oVirginity settings.")
-			StorageUtil.SetIntValue(none, SUOVShowEffects, JMap.GetInt(OstimSettingsFile, "SetOVShowEffects"))
-			StorageUtil.SetIntValue(none, SUOVVirginChance, JMap.GetInt(OstimSettingsFile, "SetOVVirginChance"))
 		endif
 
 		if main.IsModLoaded(OCrime) && JMap.getInt(OstimSettingsFile, "savedOCrime") == 1
