@@ -2319,7 +2319,7 @@ Float Function GetCurrentStimulation(Actor Act) ; how much an Actor is being sti
 			Ret += 0.4
 		EndIf
 
-		If ((Speed == 0) && CurrAnimHasIdleSpeed)
+		If (Speed == 0 && NumSpeeds > 1 && CurrAnimHasIdleSpeed)
 			Ret = 0.0
 		EndIf
 	EndIf
