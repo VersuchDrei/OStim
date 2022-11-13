@@ -779,7 +779,7 @@ int[] Function FindAllActionsForMate(string Id, int Position, string[] Types) Gl
 */;
 int[] Function FindAllActionsForMateCSV(string Id, int Position, string Types) Global Native
 
-;/* FindActionForAnyMate
+;/* FindActionForMatesAny
 * * returns the first occurance of an action from a list of mates in a scene
 * * 
 * * @param: Id, the id of the scene
@@ -788,10 +788,10 @@ int[] Function FindAllActionsForMateCSV(string Id, int Position, string Types) G
 * *
 * * @return: the index of the first occurance of the action type if it occurs, otherwise -1
 */;
-int Function FindActionForAnyMate(string Id, int[] Positions, string Type) Global Native
+int Function FindActionForMatesAny(string Id, int[] Positions, string Type) Global Native
 
-;/* FindActionForAnyMateCSV
-* * same as FindActionForAnyMate, except positions are passed as a csv-string
+;/* FindActionForMatesAnyCSV
+* * same as FindActionForMatesAny, except positions are passed as a csv-string
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the mates in the scene
@@ -799,9 +799,9 @@ int Function FindActionForAnyMate(string Id, int[] Positions, string Type) Globa
 * *
 * * @return: the index of the first occurance of the action type if it occurs, otherwise -1
 */;
-int Function FindActionForAnyMateCSV(string Id, string Positions, string Type) Global Native
+int Function FindActionForMatesAnyCSV(string Id, string Positions, string Type) Global Native
 
-;/* FindAnyActionForAnyMate
+;/* FindAnyActionForMatesAny
 * * returns the first occurance of any of a list of actions from a list of mates in a scene
 * *
 * * @param: Id, the id of the scene
@@ -810,10 +810,10 @@ int Function FindActionForAnyMateCSV(string Id, string Positions, string Type) G
 * * 
 * * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
 */;
-int Function FindAnyActionForAnyMate(string Id, int[] Positions, string[] Types) Global Native
+int Function FindAnyActionForMatesAny(string Id, int[] Positions, string[] Types) Global Native
 
-;/* FindAnyActionForAnyMateCSV
-* * same as FindAnyActionForAnyMate, except positions and types are passed as a csv-string
+;/* FindAnyActionForMatesAnyCSV
+* * same as FindAnyActionForMatesAny, except positions and types are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the mates in the scene
@@ -821,9 +821,9 @@ int Function FindAnyActionForAnyMate(string Id, int[] Positions, string[] Types)
 * * 
 * * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
 */;
-int Function FindAnyActionForAnyMateCSV(string Id, string Positions, string Types) Global Native
+int Function FindAnyActionForMatesAnyCSV(string Id, string Positions, string Types) Global Native
 
-;/* FindActionsForAnyMate
+;/* FindActionsForMatesAny
 * * returns all occurances of an action from a list of mates in a scene
 * * 
 * * @param: Id, the id of the scene
@@ -832,10 +832,10 @@ int Function FindAnyActionForAnyMateCSV(string Id, string Positions, string Type
 * *
 * * @return: an array of the indices of all occurances of the action type
 */;
-int[] Function FindActionsForAnyMate(string Id, int[] Positions, string Type) Global Native
+int[] Function FindActionsForMatesAny(string Id, int[] Positions, string Type) Global Native
 
-;/* FindActionsForAnyMateCSV
-* * same as FindActionsForAnyMate, except positions are passed as a csv-string
+;/* FindActionsForMatesAnyCSV
+* * same as FindActionsForMatesAny, except positions are passed as a csv-string
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the mates in the scene
@@ -843,9 +843,9 @@ int[] Function FindActionsForAnyMate(string Id, int[] Positions, string Type) Gl
 * *
 * * @return: an array of the indices of all occurances of the action type
 */;
-int[] Function FindActionsForAnyMateCSV(string Id, string Positions, string Type) Global Native
+int[] Function FindActionsForMatesAnyCSV(string Id, string Positions, string Type) Global Native
 
-;/* FindAllActionsForAnyMate
+;/* FindAllActionsForMatesAny
 * * returns all occurances of any of a list of actions from a list of mates in a scene
 * *
 * * @param: Id, the id of the scene
@@ -854,10 +854,10 @@ int[] Function FindActionsForAnyMateCSV(string Id, string Positions, string Type
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForAnyMate(string Id, int[] Positions, string[] Types) Global Native
+int[] Function FindAllActionsForMatesAny(string Id, int[] Positions, string[] Types) Global Native
 
-;/* FindAllActionsForAnyMateCSV
-* * same as FindAllActionsForAnyMate, except positions and types are passed as a csv-string
+;/* FindAllActionsForMatesAnyCSV
+* * same as FindAllActionsForMatesAny, except positions and types are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the mates in the scene
@@ -865,7 +865,7 @@ int[] Function FindAllActionsForAnyMate(string Id, int[] Positions, string[] Typ
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForAnyMateCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForMatesAnyCSV(string Id, string Positions, string Types) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗    ██████╗ ██╗   ██╗    ██████╗  █████╗ ██████╗ ████████╗██╗ ██████╗██╗██████╗  █████╗ ███╗   ██╗████████╗
@@ -943,7 +943,7 @@ int[] Function FindAllActionsForParticipant(string Id, int Position, string[] Ty
 */;
 int[] Function FindAllActionsForParticipantCSV(string Id, int Position, string Types) Global Native
 
-;/* FindActionForAnyParticipant
+;/* FindActionForParticipantsAny
 * * returns the first occurance of an action from a list of participants in a scene
 * * 
 * * @param: Id, the id of the scene
@@ -952,10 +952,10 @@ int[] Function FindAllActionsForParticipantCSV(string Id, int Position, string T
 * *
 * * @return: the index of the first occurance of the action type if it occurs, otherwise -1
 */;
-int Function FindActionForAnyParticipant(string Id, int[] Positions, string Type) Global Native
+int Function FindActionForParticipantsAny(string Id, int[] Positions, string Type) Global Native
 
-;/* FindActionForAnyParticipantCSV
-* * same as FindActionForAnyParticipant, except positions are passed as a csv-string
+;/* FindActionForParticipantsAnyCSV
+* * same as FindActionForParticipantsAny, except positions are passed as a csv-string
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the participants in the scene
@@ -963,9 +963,9 @@ int Function FindActionForAnyParticipant(string Id, int[] Positions, string Type
 * *
 * * @return: the index of the first occurance of the action type if it occurs, otherwise -1
 */;
-int Function FindActionForAnyParticipantCSV(string Id, string Positions, string Type) Global Native
+int Function FindActionForParticipantsAnyCSV(string Id, string Positions, string Type) Global Native
 
-;/* FindAnyActionForAnyParticipant
+;/* FindAnyActionForParticipantsAny
 * * returns the first occurance of any of a list of actions from a list of participants in a scene
 * *
 * * @param: Id, the id of the scene
@@ -974,10 +974,10 @@ int Function FindActionForAnyParticipantCSV(string Id, string Positions, string 
 * * 
 * * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
 */;
-int Function FindAnyActionForAnyParticipant(string Id, int[] Positions, string[] Types) Global Native
+int Function FindAnyActionForParticipantsAny(string Id, int[] Positions, string[] Types) Global Native
 
-;/* FindAnyActionForAnyParticipantCSV
-* * same as FindAnyActionForAnyParticipant, except positions and types are passed as a csv-string
+;/* FindAnyActionForParticipantsAnyCSV
+* * same as FindAnyActionForParticipantsAny, except positions and types are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the participants in the scene
@@ -985,9 +985,9 @@ int Function FindAnyActionForAnyParticipant(string Id, int[] Positions, string[]
 * * 
 * * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
 */;
-int Function FindAnyActionForAnyParticipantCSV(string Id, string Positions, string Types) Global Native
+int Function FindAnyActionForParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
 
-;/* FindActionsForAnyParticipant
+;/* FindActionsForParticipantsAny
 * * returns all occurances of an action from a list of participants in a scene
 * * 
 * * @param: Id, the id of the scene
@@ -996,10 +996,10 @@ int Function FindAnyActionForAnyParticipantCSV(string Id, string Positions, stri
 * *
 * * @return: an array of the indices of all occurances of the action type
 */;
-int[] Function FindActionsForAnyParticipant(string Id, int[] Positions, string Type) Global Native
+int[] Function FindActionsForParticipantsAny(string Id, int[] Positions, string Type) Global Native
 
-;/* FindActionsForAnyParticipantCSV
-* * same as FindActionsForAnyParticipant, except positions are passed as a csv-string
+;/* FindActionsForParticipantsAnyCSV
+* * same as FindActionsForParticipantsAny, except positions are passed as a csv-string
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the participants in the scene
@@ -1007,9 +1007,9 @@ int[] Function FindActionsForAnyParticipant(string Id, int[] Positions, string T
 * *
 * * @return: an array of the indices of all occurances of the action type
 */;
-int[] Function FindActionsForAnyParticipantCSV(string Id, string Positions, string Type) Global Native
+int[] Function FindActionsForParticipantsAnyCSV(string Id, string Positions, string Type) Global Native
 
-;/* FindAllActionsForAnyParticipant
+;/* FindAllActionsForParticipantsAny
 * * returns all occurances of any of a list of actions from a list of participants in a scene
 * *
 * * @param: Id, the id of the scene
@@ -1018,10 +1018,10 @@ int[] Function FindActionsForAnyParticipantCSV(string Id, string Positions, stri
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForAnyParticipant(string Id, int[] Positions, string[] Types) Global Native
+int[] Function FindAllActionsForParticipantsAny(string Id, int[] Positions, string[] Types) Global Native
 
-;/* FindAllActionsForAnyParticipantCSV
-* * same as FindAllActionsForAnyParticipant, except positions and types are passed as a csv-string
+;/* FindAllActionsForParticipantsAnyCSV
+* * same as FindAllActionsForParticipantsAny, except positions and types are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, a csv-string of indices of the participants in the scene
@@ -1029,7 +1029,7 @@ int[] Function FindAllActionsForAnyParticipant(string Id, int[] Positions, strin
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForAnyParticipantCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForsParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗    ███████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 

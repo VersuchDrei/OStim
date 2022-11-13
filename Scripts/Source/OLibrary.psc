@@ -28,7 +28,7 @@ string Function GetRandomSceneWithAnyTagCSV(Actor[] Actors, string Tags) Global 
 
 string Function GetRandomSceneWithAllTags(Actor[] Actors, string[] Tags) Global Native
 
-string Function GetRnadomSceneWithAllTagsCSV(Actor[] Actors, string Tags) Global Native
+string Function GetRandomSceneWithAllTagsCSV(Actor[] Actors, string Tags) Global Native
 
 
 string Function GetRandomFurnitureSceneWithTag(Actor[] Actors, string FurnitureType, string Tag) Global Native
@@ -39,7 +39,7 @@ string Function GetRandomFurnitureSceneWithAnyTagCSV(Actor[] Actors, string Furn
 
 string Function GetRandomFurnitureSceneWithAllTags(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
 
-string Function GetRandomFurnitureSceneWithAllTagsCSV(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
+string Function GetRandomFurnitureSceneWithAllTagsCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
 
 
 string Function GetRandomSceneWithSingleActorTag(Actor[] Actors, int Position, string Tag) Global Native
