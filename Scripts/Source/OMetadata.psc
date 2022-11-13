@@ -780,7 +780,7 @@ int[] Function FindAllActionsForMate(string Id, int Position, string[] Types) Gl
 int[] Function FindAllActionsForMateCSV(string Id, int Position, string Types) Global Native
 
 ;/* FindActionForMatesAny
-* * returns the first occurance of an action from a list of mates in a scene
+* * returns the first occurance of an action with at least one mate in a given list
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the mates in the scene
@@ -802,7 +802,7 @@ int Function FindActionForMatesAny(string Id, int[] Positions, string Type) Glob
 int Function FindActionForMatesAnyCSV(string Id, string Positions, string Type) Global Native
 
 ;/* FindAnyActionForMatesAny
-* * returns the first occurance of any of a list of actions from a list of mates in a scene
+* * returns the first occurance of any of a list of actions with at least one mate in a given list
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the mates in the scene
@@ -824,7 +824,7 @@ int Function FindAnyActionForMatesAny(string Id, int[] Positions, string[] Types
 int Function FindAnyActionForMatesAnyCSV(string Id, string Positions, string Types) Global Native
 
 ;/* FindActionsForMatesAny
-* * returns all occurances of an action from a list of mates in a scene
+* * returns all occurances of an action with at least one mate in a given list
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the mates in the scene
@@ -846,7 +846,7 @@ int[] Function FindActionsForMatesAny(string Id, int[] Positions, string Type) G
 int[] Function FindActionsForMatesAnyCSV(string Id, string Positions, string Type) Global Native
 
 ;/* FindAllActionsForMatesAny
-* * returns all occurances of any of a list of actions from a list of mates in a scene
+* * returns all occurances of any of a list of actions with at least one mate in a given list
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the mates in the scene
@@ -944,7 +944,7 @@ int[] Function FindAllActionsForParticipant(string Id, int Position, string[] Ty
 int[] Function FindAllActionsForParticipantCSV(string Id, int Position, string Types) Global Native
 
 ;/* FindActionForParticipantsAny
-* * returns the first occurance of an action from a list of participants in a scene
+* * returns the first occurance of an action with at least one participant in a given list
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the participants in the scene
@@ -966,7 +966,7 @@ int Function FindActionForParticipantsAny(string Id, int[] Positions, string Typ
 int Function FindActionForParticipantsAnyCSV(string Id, string Positions, string Type) Global Native
 
 ;/* FindAnyActionForParticipantsAny
-* * returns the first occurance of any of a list of actions from a list of participants in a scene
+* * returns the first occurance of any of a list of actions with at least one participant in a given list
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the participants in the scene
@@ -988,7 +988,7 @@ int Function FindAnyActionForParticipantsAny(string Id, int[] Positions, string[
 int Function FindAnyActionForParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
 
 ;/* FindActionsForParticipantsAny
-* * returns all occurances of an action from a list of participants in a scene
+* * returns all occurances of an action with at least one participant in a given list
 * * 
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the participants in the scene
@@ -1010,7 +1010,7 @@ int[] Function FindActionsForParticipantsAny(string Id, int[] Positions, string 
 int[] Function FindActionsForParticipantsAnyCSV(string Id, string Positions, string Type) Global Native
 
 ;/* FindAllActionsForParticipantsAny
-* * returns all occurances of any of a list of actions from a list of participants in a scene
+* * returns all occurances of any of a list of actions with at least one participant in a given list
 * *
 * * @param: Id, the id of the scene
 * * @param: Positions, an array of indices of the participants in the scene
