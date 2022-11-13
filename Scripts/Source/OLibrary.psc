@@ -43,6 +43,7 @@ string Function GetRandomScene(Actor[] Actors) Global Native
 */;
 string Function GetRandomFurnitureScene(Actor[] Actors, string FurnitureType) Global Native
 
+
 ; ██████╗ ██╗   ██╗    ███████╗ ██████╗███████╗███╗   ██╗███████╗    ████████╗ █████╗  ██████╗ 
 ; ██╔══██╗╚██╗ ██╔╝    ██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝    ╚══██╔══╝██╔══██╗██╔════╝ 
 ; ██████╔╝ ╚████╔╝     ███████╗██║     █████╗  ██╔██╗ ██║█████╗         ██║   ███████║██║  ███╗
@@ -155,6 +156,7 @@ string Function GetRandomFurnitureSceneWithAllTags(Actor[] Actors, string Furnit
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
 string Function GetRandomFurnitureSceneWithAllTagsCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
+
 
 ; ██████╗ ██╗   ██╗    ███████╗██╗███╗   ██╗ ██████╗ ██╗     ███████╗     █████╗  ██████╗████████╗ ██████╗ ██████╗     ████████╗ █████╗  ██████╗ 
 ; ██╔══██╗╚██╗ ██╔╝    ██╔════╝██║████╗  ██║██╔════╝ ██║     ██╔════╝    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ╚══██╔══╝██╔══██╗██╔════╝ 
@@ -278,6 +280,7 @@ string Function GetRandomFurnitureSceneWithAllSingleActorTags(Actor[] Actors, st
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
 string Function GetRandomFurnitureSceneWithAllSingleActorTagsCSV(Actor[] Actors, string FurnitureType, int Position, string Tags) Global Native
+
 
 ; ██████╗ ██╗   ██╗    ███╗   ███╗██╗   ██╗██╗  ████████╗██╗     █████╗  ██████╗████████╗ ██████╗ ██████╗     ████████╗ █████╗  ██████╗ 
 ; ██╔══██╗╚██╗ ██╔╝    ████╗ ████║██║   ██║██║  ╚══██╔══╝██║    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ╚══██╔══╝██╔══██╗██╔════╝ 
@@ -459,6 +462,7 @@ string Function GetRandomFurnitureSceneWithAllMultiActorTagsForAnyCSV(Actor[] Ac
 */;
 string Function GetRandomFurnitureSceneWithAllMultiActorTagsForAllCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
 
+
 ; ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗
 ; ██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║
 ; ██████╔╝ ╚████╔╝     ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║
@@ -571,6 +575,7 @@ string Function GetRandomFurnitureSceneWithAllActions(Actor[] Actors, string Fur
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
 string Function GetRandomFurnitureSceneWithAllActionsCSV(Actor[] Actors, string FurnitureType, string Types) Global Native
+
 
 ; ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗     █████╗  ██████╗████████╗ ██████╗ ██████╗ 
 ; ██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗
@@ -695,6 +700,7 @@ string Function GetRandomFurnitureSceneWithAllActionsForActor(Actor[] Actors, st
 */;
 string Function GetRandomFurnitureSceneWithAllActionsForActorCSV(Actor[] Actors, string FurnitureType, int Position, string Types) Global Native
 
+
 ; ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗    ████████╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
 ; ██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
 ; ██████╔╝ ╚████╔╝     ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║       ██║   ███████║██████╔╝██║  ███╗█████╗     ██║   
@@ -817,6 +823,7 @@ string Function GetRandomFurnitureSceneWithAllActionsForTarget(Actor[] Actors, s
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
 string Function GetRandomFurnitureSceneWithAllActionsForTargetCSV(Actor[] Actors, string FurnitureType, int Position, string Types) Global Native
+
 
 ; ██████╗ ██╗   ██╗    ███████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 
 ; ██╔══██╗╚██╗ ██╔╝    ██╔════╝██║   ██║██╔══██╗██╔════╝██╔══██╗██║     ██╔═══██╗██╔══██╗██╔══██╗
