@@ -39,7 +39,7 @@ Dummy events do nothing on the graph end, they are intended to be used as a pigg
 
 
 ## Graph Variables
-Use [SetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=SetAnimationVariableInt_-_ObjectReference) to set variables, and [GetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=GetAnimationVariableInt_-_ObjectReference) to get them. All the animation related variables need to be binded to the anim clips they want to control via behaviour, this can be done with the Nemesis Transition Tool.
+Use [SetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=SetAnimationVariableInt_-_ObjectReference) to set variables, and [GetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=GetAnimationVariableInt_-_ObjectReference) to get them. The first five variables need to be binded to the anim clips they want to control via behaviour, this can be done with the Nemesis Transition Tool.
   
 All variables are actor specific, persistent and only reset alongside the graph reset(usually race/sex change). 
   
