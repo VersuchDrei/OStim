@@ -18,7 +18,7 @@ OSex Overhaul & API - ![OStim Build Status](https://github.com/Sairion350/OStim/
 
 * [OSex](https://www.nexusmods.com/skyrimspecialedition/mods/17209)
 
-* [Nemesis Behaviour Engine (launch engine, no patch needed)](https://www.nexusmods.com/skyrimspecialedition/mods/60033)
+* [Nemesis Behaviour Engine (launch engine, no tick needed)](https://www.nexusmods.com/skyrimspecialedition/mods/60033)
 
 ### Optional
 
