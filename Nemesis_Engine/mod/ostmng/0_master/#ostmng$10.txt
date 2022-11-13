@@ -1,0 +1,7 @@
+		<hkobject name="#ostmng$10" class="hkbEvaluateExpressionModifier" signature="0xf900f6be">
+			<hkparam name="variableBindingSet">null</hkparam>
+			<hkparam name="userData">2</hkparam>
+			<hkparam name="name">OST_DoubleSpeedModifier</hkparam>
+			<hkparam name="enable">true</hkparam>
+			<hkparam name="expressions">#ostmng$9</hkparam>
+		</hkobject>
