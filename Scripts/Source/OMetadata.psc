@@ -223,7 +223,6 @@ int[] Function FindAllActionsCSV(string Id, string Types) Global Native
 ; ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║    ██╔══██╗  ╚██╔╝      ██╔══██║██║        ██║   ██║   ██║██╔══██╗
 ; ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║    ██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║
 ; ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝    ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
-                                                                                                                          
 
 ;/* FindActionForActor
 * * returns the first occurance of an action from an actor in a scene
@@ -705,6 +704,183 @@ int[] Function FindAllActionsForPerformers(string Id, int[] Positions, string[] 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
 int[] Function FindAllActionsForPerformersCSV(string Id, string Positions, string Types) Global Native
+
+
+;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗    ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗ ██████╗ ██████╗      █████╗ ███╗   ██╗██████╗     ████████╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
+; ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝    ██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ██╔══██╗████╗  ██║██╔══██╗    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+; ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗    ██████╔╝ ╚████╔╝     ███████║██║        ██║   ██║   ██║██████╔╝    ███████║██╔██╗ ██║██║  ██║       ██║   ███████║██████╔╝██║  ███╗█████╗     ██║   
+; ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║    ██╔══██╗  ╚██╔╝      ██╔══██║██║        ██║   ██║   ██║██╔══██╗    ██╔══██║██║╚██╗██║██║  ██║       ██║   ██╔══██║██╔══██╗██║   ██║██╔══╝     ██║   
+; ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║    ██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║    ██║  ██║██║ ╚████║██████╔╝       ██║   ██║  ██║██║  ██║╚██████╔╝███████╗   ██║   
+; ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝    ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝        ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
+
+;/* FindActionForActorAndTarget
+* * returns the first occurance of an action from an actor and a target in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForActorAndTarget(string Id, int ActorPosition, int TargetPosition, string Type) Global Native
+
+;/* FindAnyActionForActorAndTarget
+* * returns the first occurance of any of a list of actions from an actor and a target in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForActorAndTarget(string Id, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* FindAnyActionForActorAndTargetCSV
+* * same es FindAnyActionForActorAndTarget, except types are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Types, a csv-string of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForActorAndTargetCSV(string Id, int ActorPosition, int TargetPosition, string Types) Global Native
+
+;/* FindActionsForActorAndTarget
+* * returns all occurances of an action from an actor and a target in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForActorAndTarget(string Id, int ActorPosition, int TargetPosition, string Type) Global Native
+
+;/* FindAllActionsForActorAndTarget
+* * returns all occurances of any of a list of actions from an actor and a target in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForActorAndTarget(string Id, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* FindAllActionsForActorAndTargetCSV
+* * same es FindAllActionsForActorAndTarget, except types are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPosition, the index of the actor in the scene
+* * @param: TargetPosition, the index of the target in the scene
+* * @param: Types, a csv-string of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForActorAndTargetCSV(string Id, int ActorPosition, int TargetPosition, string Types) Global Native
+
+
+;/* FindActionForActorsAndTargets
+* * returns the first occurance of an action from a list of actors and a list of targets in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, an array of indices of the actors in the scene
+* * @param: TargetPositions, an array of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForActorsAndTargets(string Id, int[] ActorPositions, int[] TargetPositions, string Type) Global Native
+
+;/* FindActionForActorsAndTargetsCSV
+* * same es FindActionForActorsAndTargets, except positions are passed as a csv-string
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, a csv-string of indices of the actors in the scene
+* * @param: TargetPositions, a csv-string of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForActorsAndTargetsCSV(string Id, string ActorPositions, string TargetPositions, string Type) Global Native
+
+;/* FindAnyActionForActorsAndTargets
+* * returns the first occurance of any of a list of actions from a list of actors and a list of targets in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, an array of indices of the actors in the scene
+* * @param: TargetPositions, an array of indices of the targets in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForActorsAndTargets(string Id, int[] ActorPositions, int[] TargetPositions, string[] Types) Global Native
+
+;/* FindAnyActionForActorsAndTargetsCSV
+* * same es FindAnyActionForActorsAndTargets, except positions and types are passed as a csv-string
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, a csv-string of indices of the actors in the scene
+* * @param: TargetPositions, a csv-string of indices of the targets in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindAnyActionForActorsAndTargetsCSV(string Id, string ActorPositions, string TargetPositions, string Types) Global Native
+
+;/* FindActionsForActorsAndTargets
+* * returns all occurances of an action from a list of actors and a list of targets in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, an array of indices of the actors in the scene
+* * @param: TargetPositions, an array of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForActorsAndTargets(string Id, int[] ActorPositions, int[] TargetPositions, string Type) Global Native
+
+;/* FindActionsForActorsAndTargetsCSV
+* * same es FindActionsForActorsAndTargets, except positions are passed as a csv-string
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, a csv-string of indices of the actors in the scene
+* * @param: TargetPositions, a csv-string of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForActorsAndTargetsCSV(string Id, string ActorPositions, string TargetPositions, string Type) Global Native
+
+;/* FindAllActionsForActorsAndTargets
+* * returns all occurances of any of a list of actions from a list of actors and a list of targets in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, an array of indices of the actors in the scene
+* * @param: TargetPositions, an array of indices of the targets in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForActorsAndTargets(string Id, int[] ActorPositions, int[] TargetPositions, string[] Types) Global Native
+
+;/* FindAllActionsForActorsAndTargetsCSV
+* * same es FindAllActionsForActorsAndTargets, except positions and types are passed as a csv-string
+* * 
+* * @param: Id, the id of the scene
+* * @param: ActorPositions, a csv-string of indices of the actors in the scene
+* * @param: TargetPositions, a csv-string of indices of the targets in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForActorsAndTargetsCSV(string Id, string ActorPositions, string TargetPositions, string Types) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗    ██████╗ ██╗   ██╗    ███╗   ███╗ █████╗ ████████╗███████╗███████╗

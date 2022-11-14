@@ -463,12 +463,12 @@ string Function GetRandomFurnitureSceneWithAllMultiActorTagsForAnyCSV(Actor[] Ac
 string Function GetRandomFurnitureSceneWithAllMultiActorTagsForAllCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
 
 
-; ██████╗ ██╗   ██╗    ████████╗ █████╗  ██████╗ ███████╗
-; ██╔══██╗╚██╗ ██╔╝    ╚══██╔══╝██╔══██╗██╔════╝ ██╔════╝
-; ██████╔╝ ╚████╔╝        ██║   ███████║██║  ███╗███████╗
-; ██╔══██╗  ╚██╔╝         ██║   ██╔══██║██║   ██║╚════██║
-; ██████╔╝   ██║          ██║   ██║  ██║╚██████╔╝███████║
-; ╚═════╝    ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+; ██████╗ ██╗   ██╗    ███████╗ ██████╗███████╗███╗   ██╗███████╗     █████╗ ███╗   ██╗██████╗      █████╗  ██████╗████████╗ ██████╗ ██████╗     ████████╗ █████╗  ██████╗ 
+; ██╔══██╗╚██╗ ██╔╝    ██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝    ██╔══██╗████╗  ██║██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ╚══██╔══╝██╔══██╗██╔════╝ 
+; ██████╔╝ ╚████╔╝     ███████╗██║     █████╗  ██╔██╗ ██║█████╗      ███████║██╔██╗ ██║██║  ██║    ███████║██║        ██║   ██║   ██║██████╔╝       ██║   ███████║██║  ███╗
+; ██╔══██╗  ╚██╔╝      ╚════██║██║     ██╔══╝  ██║╚██╗██║██╔══╝      ██╔══██║██║╚██╗██║██║  ██║    ██╔══██║██║        ██║   ██║   ██║██╔══██╗       ██║   ██╔══██║██║   ██║
+; ██████╔╝   ██║       ███████║╚██████╗███████╗██║ ╚████║███████╗    ██║  ██║██║ ╚████║██████╔╝    ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║       ██║   ██║  ██║╚██████╔╝
+; ╚═════╝    ╚═╝       ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝     ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
 
 ;/* GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAnyCSV
 * * returns a random scene applicable for the actors with any of a list of scene tags and at least one actor having at least one of the respective actor tags
@@ -1016,6 +1016,140 @@ string Function GetRandomFurnitureSceneWithAllActionsForTarget(Actor[] Actors, s
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
 string Function GetRandomFurnitureSceneWithAllActionsForTargetCSV(Actor[] Actors, string FurnitureType, int Position, string Types) Global Native
+
+
+; ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗     █████╗  ██████╗████████╗ ██████╗ ██████╗      █████╗ ███╗   ██╗██████╗     ████████╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
+; ██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ██╔══██╗████╗  ██║██╔══██╗    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+; ██████╔╝ ╚████╔╝     ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║    ███████║██║        ██║   ██║   ██║██████╔╝    ███████║██╔██╗ ██║██║  ██║       ██║   ███████║██████╔╝██║  ███╗█████╗     ██║   
+; ██╔══██╗  ╚██╔╝      ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║    ██╔══██║██║        ██║   ██║   ██║██╔══██╗    ██╔══██║██║╚██╗██║██║  ██║       ██║   ██╔══██║██╔══██╗██║   ██║██╔══╝     ██║   
+; ██████╔╝   ██║       ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║    ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║    ██║  ██║██║ ╚████║██████╔╝       ██║   ██║  ██║██║  ██║╚██████╔╝███████╗   ██║   
+; ╚═════╝    ╚═╝       ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝    ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝        ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
+
+;/* GetRandomSceneWithActionForActorAndTarget
+* * returns a random scene applicable for the actors with an action of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Type, the action type
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomSceneWithActionForActorAndTarget(Actor[] Actors, int ActorPosition, int TargetPosition, string Type) Global Native
+
+;/* GetRandomSceneWithAnyActionForActorAndTarget
+* * returns a random scene applicable for the actors with any of a list of actions of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, an array of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomSceneWithAnyActionForActorAndTarget(Actor[] Actors, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* GetRandomSceneWithAnyActionForActorAndTargetCSV
+* * same as GetRandomSceneWithAnyActionForActorAndTarget, except types are passed as csv-string
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomSceneWithAnyActionForActorAndTargetCSV(Actor[] Actors, int ActorPosition, int TargetPosition, string Types) Global Native
+
+;/* GetRandomSceneWithAllActionsForActorAndTarget
+* * returns a random scene applicable for the actors with all of a list of actions of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, an array of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomSceneWithAllActionsForActorAndTarget(Actor[] Actors, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* GetRandomSceneWithAllActionsForActorAndTargetCSV
+* * same as GetRandomSceneWithAllActionsForActorAndTarget, except types are passed as csv-string
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomSceneWithAllActionsForActorAndTargetCSV(Actor[] Actors, int ActorPosition, int TargetPosition, string Types) Global Native
+
+
+;/* GetRandomFurnitureSceneWithActionForActorAndTarget
+* * returns a random furniture scene applicable for the actors with an action of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: FurnitureType, the type of furniture for the scene
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Type, the action type
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomFurnitureSceneWithActionForActorAndTarget(Actor[] Actors, string FurnitureType, int ActorPosition, int TargetPosition, string Type) Global Native
+
+;/* GetRandomFurnitureSceneWithAnyActionForActorAndTarget
+* * returns a random furniture scene applicable for the actors with any of a list of actions of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: FurnitureType, the type of furniture for the scene
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, an array of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomFurnitureSceneWithAnyActionForActorAndTarget(Actor[] Actors, string FurnitureType, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* GetRandomFurnitureSceneWithAnyActionForActorAndTargetCSV
+* * same as GetRandomFurnitureSceneWithAnyActionForActorAndTarget, except types are passed as csv-string
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: FurnitureType, the type of furniture for the scene
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomFurnitureSceneWithAnyActionForActorAndTargetCSV(Actor[] Actors, string FurnitureType, int ActorPosition, int TargetPosition, string Types) Global Native
+
+;/* GetRandomFurnitureSceneWithAllActionsForActorAndTarget
+* * returns a random furniture scene applicable for the actors with all of a list of actions of an actor and a target
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: FurnitureType, the type of furniture for the scene
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, an array of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomFurnitureSceneWithAllActionsForActorAndTarget(Actor[] Actors, string FurnitureType, int ActorPosition, int TargetPosition, string[] Types) Global Native
+
+;/* GetRandomFurnitureSceneWithAllActionsForActorAndTargetCSV
+* * same as GetRandomFurnitureSceneWithAllActionsForActorAndTarget, except types are passed as csv-string
+* *
+* * @param: Actors, the actors the check scene conditions against
+* * @param: FurnitureType, the type of furniture for the scene
+* * @param: ActorPosition, the index of the action actor in the scene
+* * @param: TargetPosition, the index of the action target in the scene
+* * @param: Types, a csv-string of action types
+* *
+* * @return: the id of a matching random scene, "" if no scene was found
+*/;
+string Function GetRandomFurnitureSceneWithAllActionsForActorAndTargetCSV(Actor[] Actors, string FurnitureType, int ActorPosition, int TargetPosition, string Types) Global Native
 
 
 ; ██████╗ ██╗   ██╗    ███████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 
