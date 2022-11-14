@@ -1,8 +1,8 @@
 {
 	"actor":{
-		"stimulation":0.8,
+		"stimulation":0.0,
 		"requirements":[
-			"penis"
+			"mouth"
 		],
 		"strippingSlots":[
 			32,
@@ -12,7 +12,7 @@
 		]
 	},
 	"target":{
-		"stimulation":1.0,
+		"stimulation":2.0,
 		"requirements":[
 			"vagina"
 		],
