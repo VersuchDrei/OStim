@@ -1,6 +1,6 @@
 {
 	"actor":{
-		"stimulation":1.0,
+		"stimulation":0.0,
 		"requirements":[
 			"foot"
 		],
@@ -12,7 +12,7 @@
 		]
 	},
 	"target":{
-		"stimulation":1.0,
+		"stimulation":0.7,
 		"requirements":[
 			"penis"
 		],
