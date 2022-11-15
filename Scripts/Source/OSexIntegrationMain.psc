@@ -337,30 +337,6 @@ String ClassBoobjob
 String ClassBreastFeeding
 String ClassFootjob
 
-;Body parts
-Int Penis
-Int Vagina
-Int Mouth
-Int Hand
-Int Clit
-;extra parts
-Int Anus
-Int Feet
-Int Breasts
-Int Prostate
-
-Float[] PenisStimValues
-Float[] VaginaStimValues
-Float[] MouthStimValues
-Float[] HandStimValues
-Float[] ClitStimValues
-
-Float[] AnusStimValues
-Float[] FeetStimValues
-Float[] BreastsStimValues
-Float[] ProstateStimValues
-
-
 bool ReallignedDuringThisAnim
 
 String o
@@ -794,25 +770,25 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 
 		;Profile()
-		If !DisableStimulationCalculation
-			DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
-			If SubActor
-				SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
-				SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement as int)
-			EndIf
-			If ThirdActor
-				ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
-				ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
-			EndIf
-		EndIf
+		;If !DisableStimulationCalculation
+		;	DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
+		;	If SubActor
+		;		SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
+		;		SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement) as int)
+		;	EndIf
+		;	If ThirdActor
+		;		ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
+		;		ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
+		;	EndIf
+		;EndIf
 		;Profile("Stim calculation")
 
-		If (SubExcitement >= 100.0)
+		If (GetActorExcitement(SubActor) >= 100.0)
 			MostRecentOrgasmedActor = SubActor
 			SubTimesOrgasm += 1
 			Orgasm(SubActor)
 			If (GetCurrentAnimationClass() == ClassSex)
-				DomExcitement += 5
+				SetActorExcitement(DomActor, GetActorExcitement(DomActor) + 5)
 			EndIf
 			If (EndOnSubOrgasm)
 				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
@@ -825,15 +801,15 @@ Event OnUpdate() ;OStim main logic loop
 			EndIf
 		EndIf
 				
-		DomActor.SetFactionRank(OStimExcitementFaction, DomExcitement as int)
+		DomActor.SetFactionRank(OStimExcitementFaction, GetActorExcitement(DomActor) as int)
 
-		If (ThirdExcitement >= 100.0)
+		If (GetActorExcitement(ThirdActor) >= 100.0)
 			MostRecentOrgasmedActor = ThirdActor
 			ThirdTimesOrgasm += 1
 			Orgasm(ThirdActor)
 		EndIf
 
-		If (DomExcitement >= 100.0)
+		If (GetActorExcitement(DomActor) >= 100.0)
 			MostRecentOrgasmedActor = DomActor
 			DomTimesOrgasm += 1
 			Orgasm(DomActor)
@@ -1447,10 +1423,10 @@ float function GetEstimatedTimeUntilEnd()
 	float sub = 99999.0
 
 	if EndOnDomOrgasm
-		dom = total * (1 - (DomExcitement/100.0))
+		dom = total * (1 - (GetActorExcitement( DomActor)/100.0))
 	endif 
 	if EndOnSubOrgasm
-		sub = total * (1 - (SubExcitement/100.0))
+		sub = total * (1 - (GetActorExcitement( SubActor)/100.0))
 	endif 
 
 	if sub < dom
@@ -1922,6 +1898,7 @@ EndEvent
 
 bool ranOnce ; quick hack to get this to not run on scene start, better solution?
 Event SyncActors(string eventName, string strArg, float numArg, Form sender)
+	;TODO: Actor Switching
 	if !ranOnce
 		ranOnce = true 
 		Console("Skipping first actra sync event")
@@ -2005,8 +1982,10 @@ Function OnAnimationChange()
 	If (Split.Length > 2)
 		String SpeedString = Split[2]
 		CurrentSpeed = SpeedStringToInt(SpeedString)
+		OSANative.UpdateSpeed(Password, CurrentSpeed)
 	Else
 		CurrentSpeed = 0
+		OSANative.UpdateSpeed(Password, 0)
 	EndIf
 
 	String CClass = PapyrusUtil.StringSplit(Split[1], "-")[0]
@@ -2110,10 +2089,10 @@ Function OnSpank()
 	Console("Spank event recieved")
 
 	If (AllowUnlimitedSpanking)
-		SubExcitement += 5
+		SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)		
 	Else
 		If (SpankCount < SpankMax)
-			SubExcitement += 5
+			SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)
 		Else
 
 			SubActor.DamageActorValue("health", 5.0)
@@ -2162,255 +2141,22 @@ EndFunction
 
 
 Float Function GetCurrentStimulation(Actor Act) ; how much an Actor is being stimulated in the current animation
-	Float Ret = 0.0
-	String CClass = GetCurrentAnimationClass()
-	;Bool Aggressive = GetCurrentAnimIsAggressive()
-	Bool Sub = Act == SubActor || (!SubActor && IsFemale(Act))
-	If ThirdActor == Act
-		sub = AppearsFemale(ThirdActor)
-	EndIf
-	Float Excitement = GetActorExcitement(Act)
-
-	If (CClass == ClassSex)
-		If (Sub)
-			Ret = GetInteractionStim(Penis, Vagina)
-			If (Excitement > 75.0) ; extra lubrication increases enjoyment
-				Ret += 0.2
-			Elseif (Excitement < 25.0)
-				Ret -= 0.2
-			EndIf
-		Else
-			Ret = GetInteractionStim(Vagina, Penis)
-		EndIf
-	ElseIf ((CClass == ClassHolding) || (CClass == ClassApartUndressing) || (CClass == ClassRoughHolding)) ; Lightly exciting
-		If (Excitement > 50.0)
-			Ret = -1.0
-		EndIf
-	ElseIf (CClass == ClassEmbracing) ; more lightly exciting
-		If (Excitement > 75.0)
-			Ret = -1.0
-		EndIf
-	ElseIf (CClass == ClassApart)
-		If (Excitement > 25.0)
-			Ret = -1.0
-		EndIf
-	ElseIf ((CClass == ClassMasturbate) || (CClass == ClassHeadHeldMasturbate))
-		If (Sub)
-			Ret = 0.0
-		Else
-			Ret = GetInteractionStim(Hand, Penis)
-		EndIf
-	ElseIf (CClass == ClassCunn)
-		If (Sub)
-			If (ChanceRoll(50))
-				Ret = GetInteractionStim(Mouth, Clit)
-			Else
-				Ret = GetInteractionStim(Mouth, Vagina)
-			EndIf
-		Else
-			Ret = 0.0
-		EndIf
-	ElseIf ((CClass == ClassPenisjob) || (CClass == ClassHeadHeldPenisjob))
-		If (Sub)
-			Ret = 0.0
-		Else
-			If (ChanceRoll(10))
-				Ret = GetInteractionStim(Hand, Penis) + (GetInteractionStim(Mouth, Penis) - 1.0)
-			Else
-				Ret = GetInteractionStim(Mouth, Penis)
-			EndIf
-		EndIf
-	ElseIf (CClass == ClassHandjob) || (CClass == ClassApartHandjob) || (CClass == ClassDualHandjob)
-		If (Sub)
-			Ret = 0.0
-		Else
-			Ret = GetInteractionStim(Hand, Penis)
-		EndIf
-	ElseIf (CClass == ClassBlowjob) || (CClass == ClassHeadHeldBlowjob)
-		If (Sub)
-			Ret = 0.0
-		Else
-			Ret = GetInteractionStim(Mouth, Penis)
-		EndIf
-	ElseIf (CClass == Class69Handjob)
-		If (Sub)
-			If GetCurrentAnimationSpeed() == 1
-				If chanceRoll(30)
-					Ret = GetInteractionStim(Mouth, Clit)
-				Else
-					Ret = GetInteractionStim(Mouth, Vagina)
-				EndIf
-			Else
-				Ret = 0.0 ;this animation is broken
-			EndIf
-		Else
-			Ret = GetInteractionStim(Hand, Penis)
-		EndIf
-	ElseIf (CClass == Class69Blowjob)
-		If (Sub)
-			If (GetCurrentAnimationSpeed() == 1)
-				If (ChanceRoll(30))
-					Ret = GetInteractionStim(Mouth, Clit)
-				Else
-					Ret = GetInteractionStim(Mouth, Vagina)
-				EndIf
-			Else
-				Ret = 0.0 ;this animation is broken
-			EndIf
-		Else
-			Ret = GetInteractionStim(Mouth, Penis)
-		EndIf
-	ElseIf (CClass == ClassClitRub)
-		If (Sub)
-			Ret = GetInteractionStim(Hand, Clit)
-		Else
-			Ret = 0.0
-		EndIf
-	ElseIf (CClass == ClassOneFingerPen)
-		If (Sub)
-			Ret = GetInteractionStim(Hand, Vagina)
-		Else
-			Ret = 0.0
-		EndIf
-	ElseIf (CClass == ClassTwoFingerPen)
-		If (Sub)
-			Ret = GetInteractionStim(Hand, Vagina) * 1.5
-		Else
-			Ret = 0.0
-		EndIf
-	ElseIf (CClass == ClassSelfSuck)
-		If (Sub)
-			Ret = 0.0
-		Else
-			Ret = GetInteractionStim(Mouth, Penis)
-		EndIf
-	ElseIf (CClass == ClassAnal)
-		If (Sub)
-			If (IsFemale(GetSubActor()))
-				Ret = (GetInteractionStim(Penis, Anus))
-			Else
-				Ret = (GetInteractionStim(Penis, Prostate)) + (GetInteractionStim(Penis, Anus))
-			EndIf
-		Else
-			Ret = GetInteractionStim(Anus, Penis)
-		EndIf
-	ElseIf (CClass == ClassFootjob)
-		If (Sub)
-			Ret = GetInteractionStim(Penis, Feet)
-		Else
-			Ret = GetInteractionStim(Feet, Penis)
-		EndIf
-	ElseIf (CClass == ClassBoobjob)
-		If (Sub)
-			Ret = GetInteractionStim(Penis, Breasts)
-		Else
-			Ret = GetInteractionStim(Breasts, Penis)
-		EndIf
-	ElseIf (CClass == ClassBreastFeeding)
-		If (Sub)
-			Ret = GetInteractionStim(Mouth, Breasts)
-		Else
-			Ret = GetInteractionStim(Breasts, Mouth)
-		EndIf
-	Else
-		If (GetCurrentAnimation() == "undefined") ;osex broke!
-			Console("Osex state broken. Returning to default animation")
-			WarpToAnimation("0MF|Cy6!DOy6|Ho|DoggyLi")
-		Else
-			Console("Unknown animation class: " + CClass + ". Please report this to the dev!")
-		EndIf
-	EndIf
-
-	If (Ret > 0.0)
-		Int Speed = GetCurrentAnimationSpeed()
-		Int NumSpeeds = GetCurrentAnimationMaxSpeed()
-
-		If (!CurrAnimHasIdleSpeed)
-			NumSpeeds += 1
-		EndIf
-
-		If (SubActor && !IsNaked(GetSexPartner(Act)))
-			Ret -= 0.1
-		EndIf
-
-
-		Int HalfwaySpeed = Math.Ceiling((NumSpeeds as Float) / 2.0) ; 5 -> 3 | 3 -> 2 etc
-		If (Speed == (HalfwaySpeed - 2))
-			Ret -= 0.4
-		ElseIf (Speed == (HalfwaySpeed - 1))
-			Ret -= 0.2
-		ElseIf (Speed == (HalfwaySpeed))
-			;do nothing
-		ElseIf (Speed == (HalfwaySpeed + 1))
-			Ret += 0.2
-		ElseIf (Speed == (HalfwaySpeed + 2))
-			Ret += 0.4
-		EndIf
-
-		If ((Speed == 0) && CurrAnimHasIdleSpeed)
-			Ret = 0.0
-		EndIf
-	EndIf
-
-	If (Ret > 0.0)
-		Ret *= SexExcitementMult
-	EndIf
-
-	Return Ret
-EndFunction
-
-Float Function GetInteractionStim(Int Stimulator, Int Stimulated) ; holds interaction between body parts
-	Float[] StimulatorValues
-
-	If (Stimulator == Penis)
-		StimulatorValues = PenisStimValues
-	ElseIf (Stimulator == Vagina)
-		StimulatorValues = VaginaStimValues
-	ElseIf (Stimulator == Mouth)
-		StimulatorValues = MouthStimValues
-	ElseIf (Stimulator == Hand)
-		StimulatorValues = HandStimValues
-	ElseIf (Stimulator == Clit)
-		StimulatorValues = ClitStimValues
-	ElseIf (Stimulator == Anus)
-		StimulatorValues = AnusStimValues
-	ElseIf (Stimulator == Feet)
-		StimulatorValues = FeetStimValues
-	ElseIf (Stimulator == Breasts)
-		StimulatorValues = BreastsStimValues
-	ElseIf (Stimulator == Prostate)
-		StimulatorValues = ProstateStimValues
-	Else
-		Console("Unknown Stimulator")
-	EndIf
-
-	Return StimulatorValues[Stimulated]
+	;TODO: Return this from c++?
+	return 0
 EndFunction
 
 Float Function GetActorExcitement(Actor Act) ; at 100, Actor orgasms
-	If (Act == DomActor)
-		Return DomExcitement
-	ElseIf (Act == SubActor)
-		Return SubExcitement
-	ElseIf (Act == ThirdActor)
-		return ThirdExcitement
-	Else
-		Debug.Notification("Unknown Actor")
-	EndIf
+	if(Act)
+		return OSANative.GetActorExcitement(Password, Act)
+	endif
+	return 0
 EndFunction
 
 Function SetActorExcitement(Actor Act, Float Value)
-	If (Act == DomActor)
-		DomExcitement = Value
-	ElseIf Act == SubActor
-		SubExcitement = Value
-	ElseIf (Act == ThirdActor)
-		ThirdExcitement = Value
-	Else
-		Console("Unknown Actor")
-	EndIf
-
-	Act.SetFactionRank(OStimExcitementFaction, Value as int)
+	if(Act)
+		OSANative.SetActorExcitement(Password, Act, Value)
+		Act.SetFactionRank(OStimExcitementFaction, Value as int)
+	endIf
 EndFunction
 
 Function Orgasm(Actor Act)
@@ -2913,118 +2659,6 @@ Function SetSystemVars()
 	ClassBoobjob = "BoJ"
 	ClassBreastFeeding = "BoF"
 	ClassFootjob = "FJ"
-
-	Penis = 0
-	Vagina = 1
-	Mouth = 2
-	Hand = 3
-	Clit = 4
-	;extra
-	Anus = 5
-	Feet = 6
-	Breasts = 7
-	Prostate = 8
-
-	PenisStimValues = new Float[9]
-	VaginaStimValues = new Float[9]
-	MouthStimValues = new Float[9]
-	HandStimValues = new Float[9]
-	ClitStimValues = new Float[9]
-
-	AnusStimValues = new Float[9]
-	FeetStimValues = new Float[9]
-	BreastsStimValues = new Float[9]
-	ProstateStimValues = new Float[9]
-
-	PenisStimValues[Penis] = 0.4
-	PenisStimValues[Vagina] = 0.8
-	PenisStimValues[Mouth] = 0.0
-	PenisStimValues[Hand] = 0.0
-	PenisStimValues[Clit] = 0.85
-	PenisStimValues[Anus] = 0.2
-	PenisStimValues[Feet] = 0.0
-	PenisStimValues[Breasts] = 0
-	PenisStimValues[Prostate] = 0.6
-
-	VaginaStimValues[Penis] = 1.0
-	VaginaStimValues[Vagina] = 0.6
-	VaginaStimValues[Mouth] = 0.0
-	VaginaStimValues[Hand] = 0.0
-	VaginaStimValues[Clit] = 1.0
-	VaginaStimValues[Anus] = 0.0
-	VaginaStimValues[Feet] = 0.0
-	VaginaStimValues[Breasts] = 0.0
-	VaginaStimValues[Prostate] = 0.0
-
-	MouthStimValues[Penis] = 1.4
-	MouthStimValues[Vagina] = 1.0
-	MouthStimValues[Mouth] = 0.1
-	MouthStimValues[Hand] = 0.0
-	MouthStimValues[Clit] = 2.0
-	MouthStimValues[Anus] = 0.1
-	MouthStimValues[Feet] = 0.0
-	MouthStimValues[Breasts] = 0.1
-	MouthStimValues[Prostate] = 0.0
-
-	HandStimValues[Penis] = 0.9
-	HandStimValues[Vagina] = 0.6
-	HandStimValues[Mouth] = 0.0
-	HandStimValues[Hand] = 0.0
-	HandStimValues[Clit] = 1.3
-	HandStimValues[Anus] = 0.1
-	HandStimValues[Feet] = 0.0
-	HandStimValues[Breasts] = 0.0
-	HandStimValues[Prostate] = 0.5
-
-	ClitStimValues[Penis] = 0.2
-	ClitStimValues[Vagina] = 0.1
-	ClitStimValues[Mouth] = 0.0
-	ClitStimValues[Hand] = 0.0
-	ClitStimValues[Clit] = 1.1
-	ClitStimValues[Anus] = 0.0
-	ClitStimValues[Feet] = 0.0
-	ClitStimValues[Breasts] = 0.0
-	ClitStimValues[Prostate] = 0.0
-
-	AnusStimValues[Penis] = 1.2
-	AnusStimValues[Vagina] = 0.2
-	AnusStimValues[Mouth] = 0.0
-	AnusStimValues[Hand] = 0.0
-	AnusStimValues[Clit] = 0.5
-	AnusStimValues[Anus] = 0.0
-	AnusStimValues[Feet] = 0.0
-	AnusStimValues[Breasts] = 0.0
-	AnusStimValues[Prostate] = 0.0
-
-	FeetStimValues[Penis] = 0.7
-	FeetStimValues[Vagina] = 0.6
-	FeetStimValues[Mouth] = 0.0
-	FeetStimValues[Hand] = 0.0
-	FeetStimValues[Clit] = 0.8
-	FeetStimValues[Anus] = 0.1
-	FeetStimValues[Feet] = 0.0
-	FeetStimValues[Breasts] = 0.0
-	FeetStimValues[Prostate] = 0.3
-
-	BreastsStimValues[Penis] = 0.8
-	BreastsStimValues[Vagina] = 0.3
-	BreastsStimValues[Mouth] = 0.0
-	BreastsStimValues[Hand] = 0.0
-	BreastsStimValues[Clit] = 1.0
-	BreastsStimValues[Anus] = 0.0
-	BreastsStimValues[Feet] = 0.0
-	BreastsStimValues[Breasts] = 0.1
-	BreastsStimValues[Prostate] = 0.0
-
-	ProstateStimValues[Penis] = 1.2
-	ProstateStimValues[Vagina] = 0.2
-	ProstateStimValues[Mouth] = 0.0
-	ProstateStimValues[Hand] = 0.0
-	ProstateStimValues[Clit] = 0.5
-	ProstateStimValues[Anus] = 0.0
-	ProstateStimValues[Feet] = 0.0
-	ProstateStimValues[Breasts] = 0.0
-	ProstateStimValues[Prostate] = 0.0
 EndFunction
 
 Function SetDefaultSettings()
