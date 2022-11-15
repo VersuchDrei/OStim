@@ -525,7 +525,7 @@ string Function GetRandomSceneWithAllSceneTagsAndAnyMultiActorTagForAllCSV(Actor
 */;
 string Function GetRandomSceneWithAnySceneTagAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
 
-;/* GetRandomSceneWithAllSceneTagAndAllMultiActorTagsForAnyCSV
+;/* GetRandomSceneWithAllSceneTagsAndAllMultiActorTagsForAnyCSV
 * * returns a random scene applicable for the actors with all of a list of scene tags and at least one actor having all of the respective actor tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -534,7 +534,7 @@ string Function GetRandomSceneWithAnySceneTagAndAllMultiActorTagsForAnyCSV(Actor
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAllSceneTagAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
+string Function GetRandomSceneWithAllSceneTagsAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
 
 ;/* GetRandomSceneWithAnySceneTagAndAllMultiActorTagsForAllCSV
 * * returns a random scene applicable for the actors with any of a list of scene tags and all actors having all of the respective actor tags
@@ -547,7 +547,7 @@ string Function GetRandomSceneWithAllSceneTagAndAllMultiActorTagsForAnyCSV(Actor
 */;
 string Function GetRandomSceneWithAnySceneTagAndAllMultiActorTagsForAllCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
 
-;/* GetRandomSceneWithAllSceneTagAndAllMultiActorTagsForAllCSV
+;/* GetRandomSceneWithAllSceneTagsAndAllMultiActorTagsForAllCSV
 * * returns a random scene applicable for the actors with all of a list of scene tags and all actors having all of the respective actor tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -556,7 +556,7 @@ string Function GetRandomSceneWithAnySceneTagAndAllMultiActorTagsForAllCSV(Actor
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAllSceneTagAndAllMultiActorTagsForAllCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
+string Function GetRandomSceneWithAllSceneTagsAndAllMultiActorTagsForAllCSV(Actor[] Actors, string SceneTags, string ActorTags) Global Native
 
 
 ;/* GetRandomFurnitureSceneWithAnySceneTagAndAnyMultiActorTagForAnyCSV
@@ -619,7 +619,7 @@ string Function GetRandomFurnitureSceneWithAllSceneTagsAndAnyMultiActorTagForAll
 */;
 string Function GetRandomFurnitureSceneWithAnySceneTagAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
 
-;/* GetRandomFurnitureSceneWithAllSceneTagAndAllMultiActorTagsForAnyCSV
+;/* GetRandomFurnitureSceneWithAllSceneTagsAndAllMultiActorTagsForAnyCSV
 * * returns a random furniture scene applicable for the actors with all of a list of scene tags and at least one actor having all of the respective actor tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -629,7 +629,7 @@ string Function GetRandomFurnitureSceneWithAnySceneTagAndAllMultiActorTagsForAny
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAllSceneTagAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
+string Function GetRandomFurnitureSceneWithAllSceneTagsAndAllMultiActorTagsForAnyCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
 
 ;/* GetRandomFurnitureSceneWithAnySceneTagAndAllMultiActorTagsForAllCSV
 * * returns a random furniture scene applicable for the actors with any of a list of scene tags and all actors having all of the respective actor tags
@@ -643,7 +643,7 @@ string Function GetRandomFurnitureSceneWithAllSceneTagAndAllMultiActorTagsForAny
 */;
 string Function GetRandomFurnitureSceneWithAnySceneTagAndAllMultiActorTagsForAllCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
 
-;/* GetRandomFurnitureSceneWithAllSceneTagAndAllMultiActorTagsForAllCSV
+;/* GetRandomFurnitureSceneWithAllSceneTagsAndAllMultiActorTagsForAllCSV
 * * returns a random furniture scene applicable for the actors with all of a list of scene tags and all actors having all of the respective actor tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -653,7 +653,7 @@ string Function GetRandomFurnitureSceneWithAnySceneTagAndAllMultiActorTagsForAll
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAllSceneTagAndAllMultiActorTagsForAllCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
+string Function GetRandomFurnitureSceneWithAllSceneTagsAndAllMultiActorTagsForAllCSV(Actor[] Actors, string FurnitureType, string SceneTags, string ActorTags) Global Native
 
 
 ; ██████╗ ██╗   ██╗     █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗
@@ -1162,15 +1162,24 @@ string Function GetRandomFurnitureSceneWithAllActionsForActorAndTargetCSV(Actor[
 ;/* GetRandomSceneSuperloadCSV
 * * returns a random scene matching the given conditions
 * * parameters given as "" will be ignored for condition checks
+* * 
+* * I don't expect a lot of people to fully understand this just from the documentation, it is way too big and complex for that
+* * so don't hesitate to join the OStim NG Discord (discord.gg/ostim) and ask for help in the ostim-dev channel
 * *
 * * @param: Actors, an array of actors to check scene conditions on
 * * @param: FurnitureType, the furniture type of the scene, "" means it's a no-furniture-scene
 * * @param: AnySceneTag, a csv-string of tags, the scene needs to have at least one of these
 * * @param: AllSceneTags, a csv-string of tags, the scene needs to have all of these
+* * @param: SceneTagWhitelist, a csv-string of tags, the scene needs to have only these
+* * @param: SceneTagBlacklist, a csv-string of tags, the scene needs to have none of these
 * * @param: AnyActorTagForAny, a csv-string of lists of tags, at least one actor needs to have at least one tag of their respective list
 * * @param: AnyActorTagForAll, a csv-string of lists of tags, all actors need to have at least one tag of their respective list
 * * @param: AllActorTagsForAny, a csv-string of lists of tags, at least one actor needs to have all tags of their respective list
 * * @param: AllActorTagsForAll, a csv-string of lists of tags, all actors need to have all tags of their respective list
+* * @param: ActorTagWhitelistForAny, a csv-string of lists of tags, at least one actor needs to have only tags of their respective list
+* * @param: ActorTagWhitelistForAll, a csv-string of lists of tags, all actors need to have only tags of their respective list
+* * @param: ActorTagBlacklistForAny, a csv-string of lists of tags, at least one actor needs to have no tag of their respective list
+* * @param: ActorTagBlacklistForAll, a csv-string of lists of tags, all actors need to have no tag of their respective list
 * * @param: AnyActionType, a csv-string of action types, the scene needs to have at least one of these
 * * @param: AnyActionActor, a csv-string of lists of indices, the actor of AnyActionType needs to be in their respective list
 * * @param: AnyActionTarget, a csv-string of lists of indices, the target of AnyActionType needs to be in their respective list
@@ -1187,7 +1196,23 @@ string Function GetRandomFurnitureSceneWithAllActionsForActorAndTargetCSV(Actor[
 * * @param: AllActionMatesAll, a csv-string of lists of indices, AllActionTypes need to have all mates in all of the respective lists
 * * @param: AllActionParticipantsAny, a csv-string of lists of indices, AllActionTypes need to have at least one participant in all of the respective lists
 * * @param: AllActionParticipantsAll, a csv-string of lists of indices, AllActionTypes need to have all mates in all of the respective lists
+* * @param: ActionWhitelistTypes, a csv-string of action types, the scene needs to have only these
+* * @param: ActionWhitelistActors, a csv-string of lists of indices, the actors of ActionWhitelistTypes need to be in their respective list
+* * @param: ActionWhitelistTargets, a csv-string of lists of indices, the targets of ActionWhitelistTypes need to be in their respective list
+* * @param: ActionWhitelistPerformers, a csv-string of lists of indices, the performers of ActionWhitelistTypes need to be in their respective list
+* * @param: ActionWhitelistMatesAny, a csv-string of lists of indices, ActionWhitelistTypes need to have at least one mate in their respective list
+* * @param: ActionWhitelistMatesAll, a csv-string of lists of indices, ActionWhitelistTypes need to have all mates in their respective list
+* * @param: ActionWhitelistParticipantsAny, a csv-string of lists of indices, ActionWhitelistTypes need to have at least one participant in their respective list
+* * @param: ActionWhitelistParticipantsAll, a csv-string of lists of indices, ActionWhitelistTypes need to have all participants in their respective list
+* * @param: ActionBlacklistTypes, a csv-string of action types, the scene needs to have none of these
+* * @param: ActionBlacklistActors, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with actors in the respective list
+* * @param: ActionBlacklistTargets, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with targets in the respective list
+* * @param: ActionBlacklistPerformers, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with performers in the respective list
+* * @param: ActionBlacklistMatesAny, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with at least one mate in the respective list
+* * @param: ActionBlacklistMatesAll, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with all mates in the respective list
+* * @param: ActionBlacklistParticipantsAny, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with at least one performer in the respective list
+* * @param: ActionBlacklistParticipantsAll, a csv-string of lists of indices, ActionBlacklistTypes are limited to actions with all performers in the respective list
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneSuperloadCSV(Actor[] Actors, string FurnitureType = "", string AnySceneTag = "", string AllSceneTags = "", string AnyActorTagForAny = "", string AnyActorTagForAll = "", string AllActorTagsForAny = "", string AllActorTagsForAll = "", string AnyActionType = "", string AnyActionActor = "", string AnyActionTarget = "", string AnyActionPerformer = "", string AnyActionMatesAny = "", string AnyActionMatesAll = "", string AnyActionParticipantAny = "", string AnyActionParticipantAll = "", string AllActionTypes = "", string AllActionActors = "", string AllActionTargets = "", string AllActionPerformers = "", string AllActionMatesAny = "", string AllActionMatesAll = "", string AllActionParticipantsAny = "", string AllActionParticipantsAll = "") Global Native
+string Function GetRandomSceneSuperloadCSV(Actor[] Actors, string FurnitureType = "", string AnySceneTag = "", string AllSceneTags = "", string SceneTagWhitelist = "", string SceneTagBlacklist = "", string AnyActorTagForAny = "", string AnyActorTagForAll = "", string AllActorTagsForAny = "", string AllActorTagsForAll = "", string ActorTagWhitelistForAny = "", string ActorTagWhitelistForAll = "", string ActorTagBlacklistForAny = "", string ActorTagBlacklistForAll = "", string AnyActionType = "", string AnyActionActor = "", string AnyActionTarget = "", string AnyActionPerformer = "", string AnyActionMatesAny = "", string AnyActionMatesAll = "", string AnyActionParticipantAny = "", string AnyActionParticipantAll = "", string AllActionTypes = "", string AllActionActors = "", string AllActionTargets = "", string AllActionPerformers = "", string AllActionMatesAny = "", string AllActionMatesAll = "", string AllActionParticipantsAny = "", string AllActionParticipantsAll = "", string ActionWhitelistTypes = "", string ActionWhitelistActors = "", string ActionWhitelistTargets = "", string ActionWhitelistPerformers = "", string ActionWhitelistMatesAny = "", string ActionWhitelistMatesAll = "", string ActionWhitelistParticipantsAny = "", string ActionWhitelistParticipantsAll = "", string ActionBlacklistTypes = "", string ActionBlacklistActors = "", string ActionBlacklistTargets = "", string ActionBlacklistPerformers = "", string ActionBlacklistMatesAny = "", string ActionBlacklistMatesAll= "", string ActionBlacklistParticipantsAny = "", string ActionBlacklistParticipantsAll = "") Global Native
