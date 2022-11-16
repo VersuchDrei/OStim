@@ -1,0 +1,30 @@
+{
+	"actor":{
+		"stimulation":0.2,
+		"requirements":[
+			"penis"
+		],
+		"strippingSlots":[
+			32,
+			49,
+			52,
+			53
+		]
+	},
+	"target":{
+		"stimulation":0.0,
+		"requirements":[
+		],
+		"strippingSlots":[
+			32,
+			49,
+			52,
+			53
+		]
+	},
+	"performer":{
+		"floats":{
+			"stamina":2.0
+		}
+	}
+}
