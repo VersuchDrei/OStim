@@ -8,9 +8,9 @@ To send events through animation graphs with precise timestamps, use [hkanno64](
 
 Annotation = Graph Event, but annotation is used to refer to events that are embedded inside animation files specifically.
 ### Graph Triggers
-`OST_EnterSceneReady` - Go into scene ready state; locks all movement except motion inside the anim itself, disables stagger and headtracking. 
+`OST_EnterSceneReady` - Go into scene ready state; blocks transitions, disables stagger and headtracking. 
 
-`OST_ExitSceneReady` - Exit scene ready state.
+`OST_ExitSceneReady` - Exit scene ready state. Must be called on exiting scene.
 
 `OST_DisableFootIK` - Disable FootIK (correction of character lower body to account for slopes/slants). Experimental.
 
@@ -39,20 +39,24 @@ Dummy events do nothing on the graph end, they are intended to be used as a pigg
 
 
 ## Graph Variables
-Use [SetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=SetAnimationVariableInt_-_ObjectReference) to set variables, and [GetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=GetAnimationVariableInt_-_ObjectReference) to get them. The first five variables need to be binded to the anim clips they want to control via behaviour, this can be done with the Nemesis Transition Tool.
+Use [SetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=SetAnimationVariableInt_-_ObjectReference) to set variables, and [GetAnimationVariable<Type>](https://www.creationkit.com/index.php?title=GetAnimationVariableInt_-_ObjectReference) to get them. The first five variables need to be binded to the anim clips they want to control via behaviour, this can be done with the Animlist Transition Tool.
   
 All variables are actor specific, persistent and only reset alongside the graph reset(usually race/sex change). 
   
-`OST_AnimationSpeed`
+'OST_Installed' (bool) returns true if behaviour patch installed, else none. 
   
-`OST_CropAnimStart` 
+`OST_InScene` (bool) don't change this manually unless you want to block transitions only, usually you want OST_EnterSceneReady.
   
-`OST_CropAnimEnd`
+`<modprefix>_AnimationSpeed` (float)
   
-`OST_AnimStartTime`
+`<modprefix>_CropAnimStart` (float)
   
-`OST_TransitionDuration`
+`<modprefix>_CropAnimEnd` (float)
   
-`OST_UndressTargetSlot`
+`<modprefix>_AnimStartTime` (float)
+  
+`<modprefix>_TransitionDuration` (float)
+  
+`<modprefix>_UndressTargetSlot` (float)
   
 
