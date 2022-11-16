@@ -1231,6 +1231,7 @@
 				<hkcstring>OST_UndressActor</hkcstring>
 				<hkcstring>OST_StartAnimatedCamera</hkcstring>
 				<hkcstring>OST_EndAnimatedCamera</hkcstring>
+				<hkcstring>OST_ExitEvent</hkcstring>
 <!-- CLOSE -->
 			</hkparam>
 			<hkparam name="attributeNames" numelements="0"></hkparam>
@@ -1466,13 +1467,8 @@
 				<hkcstring>AimGainOnDragonMount</hkcstring>
 				<hkcstring>iWantMountedWeaponAnims</hkcstring>
 <!-- MOD_CODE ~ostmng~ OPEN -->
-				<hkcstring>OST_AnimationSpeed</hkcstring>
-				<hkcstring>OST_CropAnimStart</hkcstring>
-				<hkcstring>OST_CropAnimEnd</hkcstring>
-				<hkcstring>OST_AnimStartTime</hkcstring>
-				<hkcstring>OST_TransitionDuration</hkcstring>
-				<hkcstring>OST_AllowTransition</hkcstring>
-				<hkcstring>OST_UndressTargetSlot</hkcstring>
+				<hkcstring>OST_Installed</hkcstring>
+				<hkcstring>OST_InScene</hkcstring>
 <!-- CLOSE -->
 			</hkparam>
 			<hkparam name="characterPropertyNames" numelements="15">
