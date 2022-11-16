@@ -20,13 +20,8 @@ Annotation = Graph Event, but annotation is used to refer to events that are emb
 
 `OST_EndAnimatedCamera` - Ends animated camera.
 
-
-### Annotation Intended
-`OST_FullAnimSpeed` - changes speed variable to x2 speed (2.0). 
-
-`OST_DoubleAnimSpeed` - changes speed variable to half speed.
-
-`OST_ResetAnimSpeed` - changes speed variable to x1 speed.
+### Transition Blocking
+The `SceneReady` events block certain input transitions like drawing/sheathing weapons until after they exit scene ready.
 
 ### Dummy Events
 Dummy events do nothing on the graph end, they are intended to be used as a piggyback for animations to communicate via annos with listening code, which can then carry out the appropriate actions
