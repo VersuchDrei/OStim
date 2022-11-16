@@ -11,7 +11,7 @@
 				#2512
 				#2510
 <!-- MOD_CODE ~ostmng~ OPEN -->
-				#ostmng$30
+				#ostmng$33
 <!-- CLOSE -->
 			</hkparam>
 		</hkobject>
