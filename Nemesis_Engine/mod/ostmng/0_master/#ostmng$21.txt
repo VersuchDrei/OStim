@@ -1,0 +1,10 @@
+		<hkobject name="#ostmng$21" class="hkbEventDrivenModifier" signature="0x7ed3f44e">
+			<hkparam name="variableBindingSet">null</hkparam>
+			<hkparam name="userData">1</hkparam>
+			<hkparam name="name">OST_EnableFootIKEDM</hkparam>
+			<hkparam name="enable">true</hkparam>
+			<hkparam name="modifier">#ostmng$20</hkparam>
+			<hkparam name="activateEventId">$eventID[OST_EnableFootIK]$</hkparam>
+			<hkparam name="deactivateEventId">$eventID[OST_DisableFootIK]$</hkparam>
+			<hkparam name="activeByDefault">false</hkparam>
+		</hkobject>

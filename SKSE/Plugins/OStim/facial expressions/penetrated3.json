@@ -8,8 +8,8 @@
 	"female": {
 		"expression": {
 			"type": 3,
-			"baseValue": 50,
-			"excitementMultiplier": 0.5
+			"baseValue": 40,
+			"excitementMultiplier": 0.4
 		},
 		"phonemes": [{
 			"type": 7,

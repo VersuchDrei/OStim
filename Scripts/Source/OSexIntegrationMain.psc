@@ -381,6 +381,14 @@ _oUI_Lockwidget LockWidget
 
 
 ; -------------------------------------------------------------------------------------------------
+; BBLS/Migal mods stuff so we don't apply FaceLight over his actors who already have it -----------
+
+Faction BBLS_FaceLightFaction
+ActorBase Vayne
+; add Coralyn here when she is released
+
+
+; -------------------------------------------------------------------------------------------------
 ; -------------------------------------------------------------------------------------------------
 
 
@@ -1109,6 +1117,21 @@ string function GetCurrentAnimationSceneID()
 	return currentsceneid
 endfunction
 
+Bool Function ActorHasFacelight(Actor Act)
+	{Checks if Actor already has FaceLight. Currently we only check BBLS NPCs and Vayne}
+	If (BBLS_FaceLightFaction && Act.GetFactionRank(BBLS_FaceLightFaction) >= 0)
+		return true
+	EndIf
+
+	If (Vayne && Act.GetActorBase() == Vayne)
+		; Vayne's facelight can be turned on or off in her MCM menu
+		; The below GlobalVariable tells us if Vayne's facelight is currently on or off
+		return (Game.GetFormFromFile(0x0004B26B, "CS_Vayne.esp") as GlobalVariable).GetValueInt() == 1
+	EndIf
+
+	return false
+EndFunction
+
 Function LightActor(Actor Act, Int Pos, Int Brightness) ; pos 1 - ass, pos 2 - face | brightness - 0 = dim
 	If (Pos == 0)
 		Return
@@ -1122,10 +1145,15 @@ Function LightActor(Actor Act, Int Pos, Int Brightness) ; pos 1 - ass, pos 2 - f
 			Which = "AssBright"
 		EndIf
 	ElseIf (Pos == 2) ;face
-		If (Brightness == 0)
-			Which = "FaceDim"
+		If (!ActorHasFacelight(Act))
+			If (Brightness == 0)
+				Which = "FaceDim"
+			Else
+				Which = "FaceBright"
+			EndIf
 		Else
-			Which = "FaceBright"
+			Console(Act.GetActorBase().GetName() + " already has facelight, not applying it")
+			return
 		EndIf
 	EndIf
 
@@ -3673,6 +3701,9 @@ Function OnLoadGame()
 		SendLoadGameEvent()
 
 	EndIf
+
+	BBLS_FaceLightFaction = Game.GetFormFromFile(0x00755331, "BBLS_SKSE64_Patch.esp") as Faction
+	Vayne = Game.GetFormFromFile(0x0000083D, "CS_Vayne.esp") as ActorBase
 
 	;may annoy ihud users?
 	UI.SetBool("HUD Menu", "_root.HUDMovieBaseInstance._visible", true)
