@@ -1,0 +1,16 @@
+		<hkobject name="#ostmng$30" class="BSIsActiveModifier" signature="0xb0fde45a">
+			<hkparam name="variableBindingSet">#ostmng$29</hkparam>
+			<hkparam name="userData">2</hkparam>
+			<hkparam name="name">OST_EnterSceneActiveModifier</hkparam>
+			<hkparam name="enable">true</hkparam>
+			<hkparam name="bIsActive0">false</hkparam>
+			<hkparam name="bInvertActive0">false</hkparam>
+			<hkparam name="bIsActive1">false</hkparam>
+			<hkparam name="bInvertActive1">false</hkparam>
+			<hkparam name="bIsActive2">false</hkparam>
+			<hkparam name="bInvertActive2">true</hkparam>
+			<hkparam name="bIsActive3">false</hkparam>
+			<hkparam name="bInvertActive3">true</hkparam>
+			<hkparam name="bIsActive4">false</hkparam>
+			<hkparam name="bInvertActive4">false</hkparam>
+		</hkobject>
