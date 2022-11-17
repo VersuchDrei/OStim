@@ -649,7 +649,21 @@ Event OnUpdate() ;OStim main logic loop
 	If (FurnitureType != FURNITURE_TYPE_NONE)
 		AlignActorsWithCurrentFurniture()
 		If (StartingAnimation == "")
-			StartingAnimation = "0MF|KNy6!KNy6|Ho|KnLap"
+			If FurnitureType == FURNITURE_TYPE_BED
+				StartingAnimation = "0MF|KNy6!KNy6|Ho|KnLap"
+			ElseIf FurnitureType == FURNITURE_TYPE_BENCH
+				StartingAnimation = "OpS_furniture|Ben!Ch|Ap|BenchIdle"
+			ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
+				StartingAnimation = ""
+			ElseIf FurnitureType == FURNITURE_TYPE_TABLE
+				StartingAnimation = "OpS_furniture|Cra!Tab|Ap|CraftingTableIdle"
+			ElseIf FurnitureType == FURNITURE_TYPE_SHELF
+				StartingAnimation = "OpS_furniture|She!Lf|Ap|ShelfIdle"
+			ElseIf FurnitureType == FURNITURE_TYPE_WALL
+				StartingAnimation = ""
+			ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
+				StartingAnimation = "OpS_furniture|Coo!Pot|Ap|CookingPotIdle"
+			EndIf
 		EndIf
 	Else
 		If (SubActor && SubActor != PlayerRef)
