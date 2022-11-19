@@ -655,6 +655,7 @@ Event OnUpdate() ;OStim main logic loop
 	endif 
 
 	If (FurnitureType != FURNITURE_TYPE_NONE)
+		CurrentFurniture.BlockActivation(true)
 		AlignActorsWithCurrentFurniture()
 		If (StartingAnimation == "")
 			If FurnitureType == FURNITURE_TYPE_BED
@@ -908,8 +909,10 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	If ResetPosAfterSceneEnd && !ForceCloseOStimThread
+		DomActor.StopTranslation()
 		DomActor.SetPosition(domcoords[0], domcoords[1], domcoords[2])
 		If SubActor
+			SubActor.StopTranslation()
 			SubActor.SetPosition(subcoords[0], subcoords[1], subcoords[2]) ;return
 		EndIf
 		If (UseFades && EndedProper && IsPlayerInvolved())
@@ -961,6 +964,10 @@ Event OnUpdate() ;OStim main logic loop
 	SceneRunning = False
 	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
+
+	If (FurnitureType != FURNITURE_TYPE_NONE)
+		CurrentFurniture.BlockActivation(false)
+	EndIf
 
 EndEvent
 
@@ -1392,6 +1399,10 @@ Bool Function UsingBed()
 	Return FurnitureType == FURNITURE_TYPE_BED
 EndFunction
 
+Bool Function UsingFurniture()
+	Return FurnitureType != FURNITURE_TYPE_NONE
+EndFunction
+
 ObjectReference Function GetBed()
 	Return CurrentFurniture
 EndFunction
@@ -1703,7 +1714,7 @@ Function SelectFurniture()
 		While i < Furnitures.Length
 			If Furnitures[i]
 				CurrentFurniture = Furnitures[i]
-				FurnitureType = i
+				FurnitureType = i + 1
 				Return
 			EndIf
 			i += 1
@@ -1967,7 +1978,6 @@ Event OnAnimate(String EventName, String zAnimation, Float NumArg, Form Sender)
 		OnAnimationChange()
 
 		SendModEvent("ostim_animationchanged")
-
 	EndIf
 EndEvent
 

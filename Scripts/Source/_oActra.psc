@@ -214,8 +214,12 @@ Event OnAlignStage()
 	;The postObj.getAngleZ() only seems to rotate NPCs however If this could somehow effect the player it would
 	;make this whole thing much bette / smoother
 
-	Actra.TranslateTo(PosObj.x, PosObj.y, PosObj.z, 0, 0, PosObj.getAngleZ(), 150.0, 0)
+	;Actra.TranslateTo(PosObj.x, PosObj.y, PosObj.z, 0, 0, PosObj.getAngleZ(), 150.0, 0)
+	Actra.MoveTo(PosObj)
 	Actra.SetVehicle(PosObj)
+	; NPCs will try to clip out of furniture after ~2 seconds, the only way to prevent that is to have them still translating during that time
+	; so we just rotate them very slowly for a tiny amount over the first 10 seconds
+	Actra.TranslateTo(PosObj.GetPositionX(), PosObj.GetPositionY(), PosObj.GetPositionZ(), PosObj.GetAngleX(), PosObj.GetAngleY(), PosObj.GetAngleZ() + 0.001, 500, 0.0001)
 	SendModEvent("ostim_setvehicle")
 	Aligned = True
 EndEvent
