@@ -51,7 +51,7 @@ string Function GetRandomFurnitureScene(Actor[] Actors, string FurnitureType) Gl
 ; ██████╔╝   ██║       ███████║╚██████╗███████╗██║ ╚████║███████╗       ██║   ██║  ██║╚██████╔╝
 ; ╚═════╝    ╚═╝       ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝       ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
 
-;/* GetRandomSceneWithTag
+;/* GetRandomSceneWithSceneTag
 * * returns a random scene applicable for the actors with a scene tag
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -59,9 +59,9 @@ string Function GetRandomFurnitureScene(Actor[] Actors, string FurnitureType) Gl
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithTag(Actor[] Actors, string Tag) Global Native
+string Function GetRandomSceneWithSceneTag(Actor[] Actors, string Tag) Global Native
 
-;/* GetRandomSceneWithAnyTag
+;/* GetRandomSceneWithAnySceneTag
 * * returns a random scene applicable for the actors with any of a list of scene tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -69,9 +69,9 @@ string Function GetRandomSceneWithTag(Actor[] Actors, string Tag) Global Native
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAnyTag(Actor[] Actors, string[] Tags) Global Native
+string Function GetRandomSceneWithAnySceneTag(Actor[] Actors, string[] Tags) Global Native
 
-;/* GetRandomSceneWithAnyTagCSV
+;/* GetRandomSceneWithAnySceneTagCSV
 * * same as GetRandomSceneWithAnyTag, except tags are given in a csv-string
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -79,9 +79,9 @@ string Function GetRandomSceneWithAnyTag(Actor[] Actors, string[] Tags) Global N
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAnyTagCSV(Actor[] Actors, string Tags) Global Native
+string Function GetRandomSceneWithAnySceneTagCSV(Actor[] Actors, string Tags) Global Native
 
-;/* GetRandomSceneWithAllTags
+;/* GetRandomSceneWithAllSceneTags
 * * returns a random scene applicable for the actors with all of a list of scene tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -89,9 +89,9 @@ string Function GetRandomSceneWithAnyTagCSV(Actor[] Actors, string Tags) Global 
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAllTags(Actor[] Actors, string[] Tags) Global Native
+string Function GetRandomSceneWithAllSceneTags(Actor[] Actors, string[] Tags) Global Native
 
-;/* GetRandomSceneWithAllTagsCSV
+;/* GetRandomSceneWithAllSceneTagsCSV
 * * same as GetRandomSceneWithAllTags, except tags are given in a csv-string
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -99,10 +99,10 @@ string Function GetRandomSceneWithAllTags(Actor[] Actors, string[] Tags) Global 
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomSceneWithAllTagsCSV(Actor[] Actors, string Tags) Global Native
+string Function GetRandomSceneWithAllSceneTagsCSV(Actor[] Actors, string Tags) Global Native
 
 
-;/* GetRandomFurnitureSceneWithTag
+;/* GetRandomFurnitureSceneWithSceneTag
 * * returns a random furniture scene applicable for the actors with a scene tag
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -111,9 +111,9 @@ string Function GetRandomSceneWithAllTagsCSV(Actor[] Actors, string Tags) Global
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithTag(Actor[] Actors, string FurnitureType, string Tag) Global Native
+string Function GetRandomFurnitureSceneWithSceneTag(Actor[] Actors, string FurnitureType, string Tag) Global Native
 
-;/* GetRandomFurnitureSceneWithAnyTag
+;/* GetRandomFurnitureSceneWithAnySceneTag
 * * returns a random furniture scene applicable for the actors with any of a list of scene tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -122,9 +122,9 @@ string Function GetRandomFurnitureSceneWithTag(Actor[] Actors, string FurnitureT
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAnyTag(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
+string Function GetRandomFurnitureSceneWithAnySceneTag(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
 
-;/* GetRandomFurnitureSceneWithAnyTagCSV
+;/* GetRandomFurnitureSceneWithAnySceneTagCSV
 * * same as GetRandomFurnitureSceneWithAnyTag, except tags are given in a csv-string
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -133,9 +133,9 @@ string Function GetRandomFurnitureSceneWithAnyTag(Actor[] Actors, string Furnitu
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAnyTagCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
+string Function GetRandomFurnitureSceneWithAnySceneTagCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
 
-;/* GetRandomFurnitureSceneWithAllTags
+;/* GetRandomFurnitureSceneWithAllSceneTags
 * * returns a random furniture scene applicable for the actors with all of a list of scene tags
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -144,9 +144,9 @@ string Function GetRandomFurnitureSceneWithAnyTagCSV(Actor[] Actors, string Furn
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAllTags(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
+string Function GetRandomFurnitureSceneWithAllSceneTags(Actor[] Actors, string FurnitureType, string[] Tags) Global Native
 
-;/* GetRandomFurnitureSceneWithAllTagsCSV
+;/* GetRandomFurnitureSceneWithAllSceneTagsCSV
 * * same as GetRandomFurnitureSceneWithAllTags, except tags are given in a csv-string
 * *
 * * @param: Actors, the actors the check scene conditions against
@@ -155,7 +155,7 @@ string Function GetRandomFurnitureSceneWithAllTags(Actor[] Actors, string Furnit
 * *
 * * @return: the id of a matching random scene, "" if no scene was found
 */;
-string Function GetRandomFurnitureSceneWithAllTagsCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
+string Function GetRandomFurnitureSceneWithAllSceneTagsCSV(Actor[] Actors, string FurnitureType, string Tags) Global Native
 
 
 ; ██████╗ ██╗   ██╗    ███████╗██╗███╗   ██╗ ██████╗ ██╗     ███████╗     █████╗  ██████╗████████╗ ██████╗ ██████╗     ████████╗ █████╗  ██████╗ 

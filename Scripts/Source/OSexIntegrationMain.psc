@@ -661,17 +661,17 @@ Event OnUpdate() ;OStim main logic loop
 			If FurnitureType == FURNITURE_TYPE_BED
 				StartingAnimation = "0MF|KNy6!KNy6|Ho|KnLap"
 			ElseIf FurnitureType == FURNITURE_TYPE_BENCH
-				StartingAnimation = "OpS_furniture|Ben!Ch|Ap|BenchIdle"
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", "idle")
 			ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
-				StartingAnimation = ""
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", "idle")
 			ElseIf FurnitureType == FURNITURE_TYPE_TABLE
-				StartingAnimation = "OpS_furniture|Cra!Tab|Ap|CraftingTableIdle"
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", "idle")
 			ElseIf FurnitureType == FURNITURE_TYPE_SHELF
-				StartingAnimation = "OpS_furniture|She!Lf|Ap|ShelfIdle"
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", "idle")
 			ElseIf FurnitureType == FURNITURE_TYPE_WALL
-				StartingAnimation = ""
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", "idle")
 			ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
-				StartingAnimation = "OpS_furniture|Coo!Pot|Ap|CookingPotIdle"
+				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", "idle")
 			EndIf
 		EndIf
 	Else
