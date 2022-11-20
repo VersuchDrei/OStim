@@ -219,7 +219,7 @@ bool Property UseIntroScenes
 		If Value
 			OStimUseIntroScenes.value = 1
 		Else
-			OStimUseIntroScenes.value = 10
+			OStimUseIntroScenes.value = 0
 		EndIf
 	EndFunction
 EndProperty
@@ -2622,7 +2622,9 @@ Bool Function ChanceRoll(Int Chance) ; input 60: 60% of returning true ;DEPRECIA
 EndFunction
 
 Int Function SpeedStringToInt(String In) ; casting does not work so...
-
+	If StringUtil.GetLength(In) != 2
+		Return 0
+	EndIf
 	return (StringUtil.AsOrd(StringUtil.GetNthChar(In, 1)) - 48)
 
 EndFunction

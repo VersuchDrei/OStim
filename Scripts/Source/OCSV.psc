@@ -29,6 +29,8 @@ string Function CreateCSVList(int Size, string Filler) Global
 		Ret += "," + Filler
 		i += 1
 	EndWhile
+
+	Return Ret
 EndFunction
 
 
@@ -58,4 +60,6 @@ string Function CreateCSVMatrix(int Size, string Filler) Global
 		Ret += ";" + Filler
 		i += 1
 	EndWhile
+
+	Return Ret
 EndFunction
