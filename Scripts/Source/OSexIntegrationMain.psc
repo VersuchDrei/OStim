@@ -800,20 +800,6 @@ Event OnUpdate() ;OStim main logic loop
 			AutoIncreaseSpeed()
 		EndIf
 
-		;Profile()
-		;If !DisableStimulationCalculation
-		;	DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
-		;	If SubActor
-		;		SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
-		;		SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement) as int)
-		;	EndIf
-		;	If ThirdActor
-		;		ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
-		;		ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
-		;	EndIf
-		;EndIf
-		;Profile("Stim calculation")
-
 		If (GetActorExcitement(SubActor) >= 100.0)
 			MostRecentOrgasmedActor = SubActor
 			SubTimesOrgasm += 1
