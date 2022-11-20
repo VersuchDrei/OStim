@@ -2,7 +2,8 @@ ScriptName OsexIntegrationMCM Extends SKI_ConfigBase
 
 ; sex settings
 Int SetActorSpeedControl
-Int SetsexExcitementMult
+Int SetMaleSexExcitementMult
+Int SetFemaleSexExcitementMult
 Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
@@ -275,7 +276,8 @@ Event OnPageReset(String Page)
 		;=============================================================================================
 		AddColoredHeader("$ostim_header_sex_scenes")
 		SetActorSpeedControl = AddToggleOption("$ostim_speed_control", Main.EnableActorSpeedControl)
-		SetsexExcitementMult = AddSliderOption("$ostim_excitement_mult", Main.SexExcitementMult, "{2} x")
+		SetMaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_male", Main.MaleSexExcitementMult, "{2} x")
+		SetFemaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_female", Main.FemaleSexExcitementMult, "{2} x")
 		SetClipinglessFirstPerson = AddToggleOption("$ostim_clippingless", Main.EnableImprovedCamSupport)
 		SetCustomTimescale = AddSliderOption("$ostim_timescale", Main.CustomTimescale, "{0}")
 		SetUseFades = AddToggleOption("$ostim_use_fades", Main.UseFades)
@@ -877,8 +879,10 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_control_toggle_key")
 	ElseIf (Option == SetOnlyLightInDark)
 		SetInfoText("$ostim_tooltip_dark_light")
-	ElseIf (Option == SetsexExcitementMult)
-		SetInfoText("$ostim_tooltip_excitement_mult")
+	ElseIf (Option == SetMaleSexExcitementMult)
+		SetInfoText("$ostim_tooltip_excitement_mult_male")
+	ElseIf (Option == SetFemaleSexExcitementMult)
+		SetInfoText("$ostim_tooltip_excitement_mult_female")
 	ElseIf (Option == SetKeymap)
 		SetInfoText("$ostim_tooltip_main_key")
 	ElseIf (Option == SetKeyUp)
@@ -962,8 +966,13 @@ EndEvent
 
 Event OnOptionSliderOpen(Int Option)
 	Main.PlayTickBig()
-	If (Option == SetSexExcitementMult)
-		SetSliderDialogStartValue(Main.SexExcitementMult)
+	If (Option == SetMaleSexExcitementMult)
+		SetSliderDialogStartValue(Main.MaleSexExcitementMult)
+		SetSliderDialogDefaultValue(1.0)
+		SetSliderDialogRange(0.1, 3.0)
+		SetSliderDialogInterval(0.1)
+	ElseIf (Option == SetFemaleSexExcitementMult)
+		SetSliderDialogStartValue(Main.FemaleSexExcitementMult)
 		SetSliderDialogDefaultValue(1.0)
 		SetSliderDialogRange(0.1, 3.0)
 		SetSliderDialogInterval(0.1)
@@ -1027,9 +1036,12 @@ EndEvent
 
 Event OnOptionSliderAccept(Int Option, Float Value)
 	Main.PlayTickBig()
-	If (Option == SetSexExcitementMult)
-		Main.SexExcitementMult = Value
-		SetSliderOptionValue(SetsexExcitementMult, Value, "{2} x")
+	If (Option == SetMaleSexExcitementMult)
+		Main.MaleSexExcitementMult = Value
+		SetSliderOptionValue(SetMaleSexExcitementMult, Value, "{2} x")
+	ElseIf (Option == SetFemaleSexExcitementMult)
+		Main.FemaleSexExcitementMult = Value
+		SetSliderOptionValue(SetFemaleSexExcitementMult, Value, "{2} x")
 	Elseif (option == SetORDifficulty)
 		SetExternalInt(oromance, GVORDifficulty, value as int)
 		SetSliderOptionValue(SetORDifficulty, Value as int, "{0}")
@@ -1242,7 +1254,8 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetEndOnBothOrgasm", Main.RequireBothOrgasmsToFinish as Int)
 	JMap.SetInt(OstimSettingsFile, "SetActorSpeedControl", Main.EnableActorSpeedControl as Int)
 	JMap.SetInt(OstimSettingsFile, "SetResetPosition", Main.ResetPosAfterSceneEnd as Int)
-	JMap.SetFlt(OstimSettingsFile, "SetsexExcitementMult", Main.SexExcitementMult as Float)
+	JMap.SetFlt(OstimSettingsFile, "SetsexExcitementMult", Main.MaleSexExcitementMult as Float)
+	JMap.SetFlt(OstimSettingsFile, "SetFemaleSexExcitementMult", Main.FemaleSexExcitementMult as Float)
 	JMap.SetInt(OstimSettingsFile, "SetClipinglessFirstPerson", Main.EnableImprovedCamSupport as Int)
 	JMap.SetInt(OstimSettingsFile, "SetEndAfterActorHit", Main.EndAfterActorHit as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseRumble", Main.UseRumble as Int)
@@ -1442,7 +1455,8 @@ Function ImportSettings(bool default = false)
 	Main.RequireBothOrgasmsToFinish = JMap.GetInt(OstimSettingsFile, "SetEndOnBothOrgasm")
 	Main.EnableActorSpeedControl = JMap.GetInt(OstimSettingsFile, "SetActorSpeedControl")
 	Main.ResetPosAfterSceneEnd = JMap.GetInt(OstimSettingsFile, "SetResetPosition")
-	Main.SexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetsexExcitementMult")
+	Main.MaleSexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetsexExcitementMult")
+	Main.FemaleSexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetFemaleSexExcitementMult")
 	Main.EnableImprovedCamSupport = JMap.GetInt(OstimSettingsFile, "SetClipinglessFirstPerson")
 	Main.EndAfterActorHit = JMap.GetInt(OstimSettingsFile, "SetEndAfterActorHit")
 	Main.UseRumble = JMap.GetInt(OstimSettingsFile, "SetUseRumble")
