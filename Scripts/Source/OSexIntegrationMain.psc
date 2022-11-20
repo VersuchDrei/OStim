@@ -28,6 +28,16 @@ ScriptName OSexIntegrationMain Extends Quest
 ;			╚██████╔╝███████║   ██║   ██║██║ ╚═╝ ██║
 ;			 ╚═════╝ ╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝
 
+; -------------------------------------------------------------------------------------------------
+; CONSTANTS  --------------------------------------------------------------------------------------
+int Property FURNITURE_TYPE_NONE = 0 AutoReadOnly
+int Property FURNITURE_TYPE_BED = 1 AutoReadOnly
+int Property FURNITURE_TYPE_BENCH = 2 AutoReadOnly
+int Property FURNITURE_TYPE_CHAIR = 3 AutoReadOnly
+int Property FURNITURE_TYPE_TABLE = 4 AutoReadOnly
+int Property FURNITURE_TYPE_SHELF = 5 AutoReadOnly
+int Property FURNITURE_TYPE_WALL = 6 AutoReadOnly
+int Property FURNITURE_TYPE_COOKING_POT = 7 AutoReadOnly
 
 ; -------------------------------------------------------------------------------------------------
 ; PROPERTIES  -------------------------------------------------------------------------------------
@@ -64,7 +74,7 @@ Bool Property ResetPosAfterSceneEnd Auto
 Bool Property AllowUnlimitedSpanking Auto
 
 Bool Property AutoUndressIfNeeded Auto
-Int Property BedSearchDistance Auto
+Int Property FurnitureSearchDistance Auto
 
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
@@ -113,9 +123,11 @@ Int Property SpeedDownKey Auto
 Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
 
-Bool Property UseBed Auto
-Bool Property ConfirmBed Auto
+Bool Property UseFurniture Auto
+Bool Property SelectFurniture Auto
 Message Property OStimBedConfirmationMessage Auto
+Message Property OStimFurnitureSelectionMessage Auto
+GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
@@ -151,7 +163,7 @@ Int Property FreecamFOV Auto
 Int Property DefaultFOV Auto
 Int Property FreecamSpeed Auto
 
-Int Property BedReallignment Auto
+Int Property BedRealignment Auto
 
 Bool Property ForceFirstPersonAfter Auto
 
@@ -194,6 +206,20 @@ bool Property DisableSchlongBending
 			OStimDisableSchlongBending.value = 1
 		Else
 			OStimDisableSchlongBending.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUseIntroScenes Auto
+bool Property UseIntroScenes
+	bool Function Get()
+		Return OStimUseIntroScenes.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUseIntroScenes.value = 1
+		Else
+			OStimUseIntroScenes.value = 0
 		EndIf
 	EndFunction
 EndProperty
@@ -251,8 +277,8 @@ Int ThirdTimesOrgasm
 
 Actor MostRecentOrgasmedActor
 
-Bool UsingBed
-ObjectReference CurrentBed
+int FurnitureType
+ObjectReference CurrentFurniture
 
 Bool property EndedProper auto
 
@@ -337,8 +363,6 @@ String ClassBoobjob
 String ClassBreastFeeding
 String ClassFootjob
 
-bool ReallignedDuringThisAnim
-
 String o
 Int Password
 
@@ -376,7 +400,7 @@ EndEvent
 * * @param: zAnimateUndress, no longer in use
 * * @param: zStartingAnimation, the animation to start with
 * * @param: zThirdActor, the third actor, index 2
-* * @param: Bed, the bed to start the animation on, can be None
+* * @param: Bed, the furniture to start the animation on, can be None
 * * @param: Aggressive, if the scene is aggressive
 * * @param: AggressingActor, the aggressor in an aggressive scene
 */;
@@ -507,10 +531,10 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	EndIf
 
 	If (Bed)
-		UsingBed = True
-		Currentbed = Bed
+		FurnitureType = OFurniture.GetFurnitureType(Bed)
+		CurrentFurniture = Bed
 	Else
-		UsingBed = False
+		FurnitureType = 0
 	EndIf
 
 	ForceCloseOStimThread = false
@@ -588,13 +612,15 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	If (!UsingBed && UseBed)
-		Currentbed = FindBed(Actors[0])
-		If (CurrentBed)
-			If !ConfirmBed || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
-				UsingBed = True
+	If FurnitureType == FURNITURE_TYPE_NONE && UseFurniture
+		If StartingAnimation == ""
+			SelectFurniture()
+		Else
+			CurrentFurniture = FindBed(Actors[0])
+			If !SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
+				FurnitureType == FURNITURE_TYPE_BED
 			Else
-				CurrentBed = None
+				CurrentFurniture = None
 			EndIf
 		EndIf
 	EndIf
@@ -610,27 +636,40 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
+	string SceneTag = "idle"
+	If UseIntroScenes
+		SceneTag = "intro"
+	EndIf
 
-	If ThirdActor && (StartingAnimation == "")
-		If UsingBed
-			startinganimation = "OpS|LyB!Kne!Kne|Ho|3PLyingIdle"
-		Else
-			startinganimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
-		EndIf
-	endif 
-
-	If (UsingBed)
-		AllignActorsWithCurrentBed()
-		If (StartingAnimation == "")
-			StartingAnimation = "0MF|KNy6!KNy6|Ho|KnLap"
-		EndIf
-	Else
+	If FurnitureType == FURNITURE_TYPE_NONE
 		If (SubActor && SubActor != PlayerRef)
 			SubActor.MoveTo(DomActor)
 		ElseIf (SubActor == PlayerRef)
 			DomActor.MoveTo(SubActor)
 		EndIf
-			
+	Else
+		CurrentFurniture.BlockActivation(true)
+		AlignActorsWithCurrentFurniture()
+	EndIf
+
+	If (StartingAnimation == "")
+		If FurnitureType == FURNITURE_TYPE_NONE
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BED
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "kneeling,lyingback,lyingside,sitting"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BENCH
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_TABLE
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_SHELF
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_WALL
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", SceneTag)
+		EndIf
 	EndIf
 
 	If (StartingAnimation == "")
@@ -659,13 +698,7 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	if !ThirdActor
-		CurrentAnimation = "0MF|Sy6!Sy9|Ho|St9Adore"
-	elseIf SubActor
-		CurrentAnimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
-	Else
-		CurrentAnimation = startingAnimation
-	endif 
+	CurrentAnimation = startingAnimation
 	LastHubOID = -1
 	;OnAnimationChange()
 
@@ -702,8 +735,6 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	StartTime = Utility.GetCurrentRealTime()
-
-	ReallignedDuringThisAnim = false
 
 	ToggleActorAI(True)
 
@@ -768,20 +799,6 @@ Event OnUpdate() ;OStim main logic loop
 		If (EnableActorSpeedControl && !AnimationIsAtMaxSpeed())
 			AutoIncreaseSpeed()
 		EndIf
-
-		;Profile()
-		;If !DisableStimulationCalculation
-		;	DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
-		;	If SubActor
-		;		SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
-		;		SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement) as int)
-		;	EndIf
-		;	If ThirdActor
-		;		ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
-		;		ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
-		;	EndIf
-		;EndIf
-		;Profile("Stim calculation")
 
 		If (GetActorExcitement(SubActor) >= 100.0)
 			MostRecentOrgasmedActor = SubActor
@@ -861,8 +878,10 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	If ResetPosAfterSceneEnd && !ForceCloseOStimThread
+		DomActor.StopTranslation()
 		DomActor.SetPosition(domcoords[0], domcoords[1], domcoords[2])
 		If SubActor
+			SubActor.StopTranslation()
 			SubActor.SetPosition(subcoords[0], subcoords[1], subcoords[2]) ;return
 		EndIf
 		If (UseFades && EndedProper && IsPlayerInvolved())
@@ -914,6 +933,10 @@ Event OnUpdate() ;OStim main logic loop
 	SceneRunning = False
 	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
+
+	If (FurnitureType != FURNITURE_TYPE_NONE)
+		CurrentFurniture.BlockActivation(false)
+	EndIf
 
 EndEvent
 
@@ -1342,11 +1365,15 @@ Float Function GetTimeSinceLastPlayerInteraction()
 EndFunction
 
 Bool Function UsingBed()
-	Return Usingbed
+	Return FurnitureType == FURNITURE_TYPE_BED
+EndFunction
+
+Bool Function UsingFurniture()
+	Return FurnitureType != FURNITURE_TYPE_NONE
 EndFunction
 
 ObjectReference Function GetBed()
-	Return Currentbed
+	Return CurrentFurniture
 EndFunction
 
 Bool Function IsFemale(Actor Act)
@@ -1649,12 +1676,42 @@ EndFunction
 ;
 ;				Code related to beds
 
+Function SelectFurniture()
+	ObjectReference[] Furnitures = OFurniture.FindFurniture(Actors.Length, Actors[0], (FurnitureSearchDistance + 1) * 100.0, 96)
+	If !SelectFurniture || !IsPlayerInvolved()
+		int i = 0
+		While i < Furnitures.Length
+			If Furnitures[i]
+				CurrentFurniture = Furnitures[i]
+				FurnitureType = i + 1
+				Return
+			EndIf
+			i += 1
+		EndWhile
+	Else
+		int i = 0
+		While i < Furnitures.Length
+			If Furnitures[i]
+				OStimFurnitureSelectionButtons[i].Value = 1
+			Else
+				OStimFurnitureSelectionButtons[i].Value = 0
+			EndIf
+			i += 1
+		EndWhile
+		FurnitureType = OStimFurnitureSelectionMessage.Show()
+		If FurnitureType == 0
+			CurrentFurniture = None
+		Else
+			CurrentFurniture = Furnitures[FurnitureType - 1]
+		EndIf
+	EndIf
+EndFunction
 
 ObjectReference Function FindBed(ObjectReference CenterRef, Float Radius = 0.0)
 	If !(Radius > 0.0)
 		; we are searching from the center of the bed
 		; center to edge of the bed is about 1 meter / 100 units
-		Radius = (BedSearchDistance + 1) * 100.0
+		Radius = (FurnitureSearchDistance + 1) * 100.0
 	EndIf
 
 	ObjectReference[] Beds = OSANative.FindBed(CenterRef, Radius, 96.0)
@@ -1703,49 +1760,48 @@ Bool Function IsBedRoll(objectReference Bed)
 	Return (Bed.Haskeyword(Keyword.GetKeyword("FurnitureBedRoll")))
 EndFunction
 
-Function AllignActorsWithCurrentBed()
+Function AlignActorsWithCurrentFurniture()
 	int i = Actors.Length
 	While i
 		i -= 1
 		Actors[i].SetDontMove(True)
 	EndWhile
 
-	Bool BedRoll = IsBedRoll(Currentbed)
-	Bool Flip = !BedRoll
+	bool Bed = FurnitureType == FURNITURE_TYPE_BED && !IsBedRoll(CurrentFurniture)
 
 	Float FlipFloat = 0
-	If (Flip)
+	If (Bed)
 		FlipFloat = 180
 	EndIf
 
-	Float DomSpeed = CurrentBed.GetDistance(Actors[0]) * 100
+	Float DomSpeed = CurrentFurniture.GetDistance(Actors[0]) * 100
 	Float BedOffsetX = 0
 	Float BedOffsetY = 0
 	Float BedOffsetZ = 0
 
-	If (!BedRoll)
+	If (Bed)
 		Console("Current bed is not a bedroll. Moving actors backwards a bit")
 
-		Int Offset = 31 + BedReallignment
+		Int Offset = 31 + BedRealignment
 		If (SubActor == PlayerRef)
 			Console("Player is SubActor. Adding some extra bed offset")
 			Offset += 36
 		EndIf
 
-		BedOffsetX = Math.Cos(OUtils.TrigAngleZ(CurrentBed.GetAngleZ())) * Offset
-		BedOffsetY = Math.Sin(OUtils.TrigAngleZ(CurrentBed.GetAngleZ())) * Offset
+		BedOffsetX = Math.Cos(OUtils.TrigAngleZ(CurrentFurniture.GetAngleZ())) * Offset
+		BedOffsetY = Math.Sin(OUtils.TrigAngleZ(CurrentFurniture.GetAngleZ())) * Offset
 		BedOffsetZ = 45
 	Else
 		Console("Bedroll. Not realigning")
 	EndIf
 
-	float[] bedCoords = OSANative.GetCoords(CurrentBed)
+	float[] bedCoords = OSANative.GetCoords(CurrentFurniture)
 	bedCoords[0] = bedCoords[0] + BedOffsetX
 	bedCoords[1] = bedCoords[1] + BedOffsetY
 	bedCoords[2] = bedCoords[2] + BedOffsetZ
-	Float BedAngleX = Currentbed.GetAngleX()
-	Float BedAngleY = Currentbed.GetAngleY()
-	Float BedAngleZ = Currentbed.GetAngleZ()
+	Float BedAngleX = CurrentFurniture.GetAngleX()
+	Float BedAngleY = CurrentFurniture.GetAngleY()
+	Float BedAngleZ = CurrentFurniture.GetAngleZ()
 
 	Actors[0].TranslateTo(bedCoords[0], bedCoords[1], bedCoords[2], BedAngleX, BedAngleY, BedAngleZ, DomSpeed, afMaxRotationSpeed = 100)
 	Actors[0].SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
@@ -1779,7 +1835,7 @@ Function AllignActorsWithCurrentBed()
 	EndWhile
 EndFunction
 
-ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are alligned on
+ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are aligned on
 	Int StageID = Actors[0].GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
 	Return Stage
@@ -1891,7 +1947,6 @@ Event OnAnimate(String EventName, String zAnimation, Float NumArg, Form Sender)
 		OnAnimationChange()
 
 		SendModEvent("ostim_animationchanged")
-
 	EndIf
 EndEvent
 
@@ -1994,8 +2049,6 @@ Function OnAnimationChange()
 	EndIf
 
 	CurrAnimClass = CClass
-
-	ReallignedDuringThisAnim = False 
 
 	Int CorrectActorCount = ODatabase.GetNumActors(CurrentOID)
 
@@ -2569,7 +2622,9 @@ Bool Function ChanceRoll(Int Chance) ; input 60: 60% of returning true ;DEPRECIA
 EndFunction
 
 Int Function SpeedStringToInt(String In) ; casting does not work so...
-
+	If StringUtil.GetLength(In) != 2
+		Return 0
+	EndIf
 	return (StringUtil.AsOrd(StringUtil.GetNthChar(In, 1)) - 48)
 
 EndFunction
@@ -2707,8 +2762,8 @@ UseFreeCam
 	SpeedUpNonSexAnimation = False ;game pauses if anim finished early
 	SpeedUpSpeed = 1.5
 
-	Usebed = True
-	BedSearchDistance = 15
+	UseFurniture = True
+	FurnitureSearchDistance = 15
 
 	DisableStimulationCalculation = false
 
@@ -2739,7 +2794,7 @@ UseFreeCam
 
 	Forcefirstpersonafter = !UseFreeCam
 
-	BedReallignment = 0
+	BedRealignment = 0
 
 	UseRumble = Game.UsingGamepad()
 	UseScreenShake = False

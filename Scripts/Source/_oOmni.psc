@@ -261,7 +261,14 @@ Function PrepActra(String[] sceneSuite, Actor[] Actra)
         GlobalPosition[StageID].Delete()
     EndIf
 
-    GlobalPosition[StageID] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
+    OsexIntegrationMain OStim = OUtils.GetOStim()
+    If OStim.UsingFurniture() && OStim.IsActorInvolved(Actra[0])
+        GlobalPosition[StageID] = OStim.GetBed().PlaceAtMe(OBlankStatic) As ObjectReference
+        GlobalPosition[StageID].MoveTo(OStim.GetBed())
+    Else
+        GlobalPosition[StageID] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
+    EndIf
+    
 
     Int i = 0
     Int L = Actra.Length
@@ -387,7 +394,13 @@ Function ActraReadyByKey(Actor[] Actra, String StageID, Int Index, Bool Solo = F
         GlobalPosition[StageIDInt].Delete()
     EndIf
 
-    GlobalPosition[StageIDint] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
+    OsexIntegrationMain OStim = OUtils.GetOStim()
+    If OStim.UsingFurniture() && OStim.IsActorInvolved(Actra[0])
+        GlobalPosition[StageIDint] = OStim.GetBed().PlaceAtMe(OBlankStatic) As ObjectReference
+        GlobalPosition[StageIDint].MoveTo(OStim.GetBed())
+    Else
+        GlobalPosition[StageIDint] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
+    EndIf
     OSpell[1].Cast(Actra[0], Actra[0])
 
     i = 0

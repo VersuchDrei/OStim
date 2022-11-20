@@ -9,6 +9,7 @@ Int SetUseRumble
 Int SetUseScreenShake
 Int SetScaling
 Int SetSchlongBending
+int SetUseIntroScenes
 int SetResetPosition
 int SetOnlyGayAnimsInGayScenes
 
@@ -65,10 +66,10 @@ String[] SubLightBrightList
 String[] DomLightBrightList
 
 ; bed settings
-Int SetEnableBeds
-Int SetConfirmBed
-Int SetBedSearchDistance
-Int SetBedReallignment
+Int SetEnableFurniture
+Int SetSelectFurniture
+Int SetFurnitureSearchDistance
+Int SetBedRealignment
 
 ; ai control settings
 Int SetAIControl
@@ -284,6 +285,7 @@ Event OnPageReset(String Page)
 		SetForceFirstPerson = AddToggleOption("$ostim_force_first", Main.ForceFirstPersonAfter)
 		SetScaling = AddToggleOption("$ostim_scaling", Main.DisableScaling)
 		SetSchlongBending = AddToggleOption("$ostim_schlong_bending", Main.DisableSchlongBending)
+		SetUseIntroScenes = AddToggleOption("$ostim_use_intro_scenes", Main.UseIntroScenes)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
 		AddEmptyOption()
 
@@ -303,11 +305,11 @@ Event OnPageReset(String Page)
 		SetOrgasmBoostsRel = AddToggleOption("$ostim_orgasm_boost_rel", Main.OrgasmIncreasesRelationship)
 		AddEmptyOption()
 
-		AddColoredHeader("$ostim_header_beds")
-		SetEnableBeds = AddToggleOption("$ostim_use_beds", Main.UseBed)
-		SetConfirmBed = AddToggleOption("$ostim_confirm_bed", Main.ConfirmBed)
-		SetBedSearchDistance = AddSliderOption("$ostim_bed_search_rad", Main.BedSearchDistance, "{0} meters")
-		SetBedReallignment = AddSliderOption("$ostim_bed_reallignment", Main.BedReallignment, "{0} units")
+		AddColoredHeader("$ostim_header_furniture")
+		SetEnableFurniture = AddToggleOption("$ostim_use_furniture", Main.UseFurniture)
+		SetSelectFurniture = AddToggleOption("$ostim_select_furniture", Main.SelectFurniture)
+		SetFurnitureSearchDistance = AddSliderOption("$ostim_furniture_search_rad", Main.FurnitureSearchDistance, "{0} meters")
+		SetBedRealignment = AddSliderOption("$ostim_bed_realignment", Main.BedRealignment, "{0} units")
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_excitement_bars")
@@ -582,12 +584,12 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetResetPosition)
 		Main.ResetPosAfterSceneEnd = !Main.ResetPosAfterSceneEnd
 		SetToggleOptionValue(Option, Main.ResetPosAfterSceneEnd)
-	ElseIf (Option == SetEnableBeds)
-		Main.UseBed = !Main.UseBed
-		SetToggleOptionValue(Option, Main.UseBed)
-	ElseIf (Option == SetConfirmBed)
-		Main.ConfirmBed = !Main.ConfirmBed
-		SetToggleOptionValue(Option, Main.ConfirmBed)
+	ElseIf (Option == SetEnableFurniture)
+		Main.UseFurniture = !Main.UseFurniture
+		SetToggleOptionValue(Option, Main.UseFurniture)
+	ElseIf (Option == SetSelectFurniture)
+		Main.SelectFurniture = !Main.SelectFurniture
+		SetToggleOptionValue(Option, Main.SelectFurniture)
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
@@ -597,6 +599,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSchlongBending)
 		Main.DisableSchlongBending = !Main.DisableSchlongBending
 		SetToggleOptionValue(Option, Main.DisableSchlongBending)
+	ElseIf (Option == SetUseIntroScenes)
+		Main.UseIntroScenes = !Main.UseIntroScenes
+		SetToggleOptionValue(Option, Main.UseIntroScenes)
 	ElseIf (Option == SetUseRumble)
 		Main.UseRumble = !Main.UseRumble
 		SetToggleOptionValue(Option, Main.UseRumble)
@@ -788,6 +793,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_scaling")
 	ElseIf (Option == SetSchlongBending)
 		SetInfoText("$ostim_tooltip_schlong_bending")
+	ElseIf (Option == SetUseIntroScenes)
+		SetInfoText("$ostim_tooltip_use_intro_scenes")
 	ElseIf (Option == SetUseCosaveWorkaround)
 		SetInfoText("$ostim_tooltip_cosave")
 	ElseIf (Option == SetFreeCamFOV)
@@ -816,8 +823,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_reset_position")
 	ElseIf (Option == SetUndressIfNeed)
 		SetInfoText("$ostim_tooltip_undress_if_need")
-	ElseIf (Option == SetBedSearchDistance)
-		SetInfoText("$ostim_tooltip_bed_search_dist")
+	ElseIf (Option == SetFurnitureSearchDistance)
+		SetInfoText("$ostim_tooltip_furniture_search_dist")
 	ElseIf (Option == SetUseAutoFades)
 		SetInfoText("$ostim_tooltip_auto_fades")
 	ElseIf (Option == SetAIChangeChance)
@@ -832,10 +839,10 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_third_bar")
 	ElseIf (Option == SetSubBar)
 		SetInfoText("$ostim_tooltip_sub_bar")
-	ElseIf (Option == SetEnableBeds)
-		SetInfoText("$ostim_tooltip_enable_beds")
-	ElseIf (Option == SetConfirmBed)
-		SetInfoText("$ostim_tooltip_confirm_bed")
+	ElseIf (Option == SetEnableFurniture)
+		SetInfoText("$ostim_tooltip_enable_furniture")
+	ElseIf (Option == SetSelectFurniture)
+		SetInfoText("$ostim_tooltip_select_furniture")
 	ElseIf (Option == SetTutorialMessages)
 		SetInfoText("$ostim_tooltip_enable_tutorial")
 	ElseIf (Option == setupdate)
@@ -880,8 +887,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_speed_down_key")
 	ElseIf (Option == SetUseScreenShake)
 		SetInfoText("$ostim_tooltip_screen_shake")
-	ElseIf (Option == SetBedReallignment)
-		SetInfoText("$ostim_tooltip_bed_reallignment")
+	ElseIf (Option == SetBedRealignment)
+		SetInfoText("$ostim_tooltip_bed_realignment")
 	ElseIf (Option == SetPullOut)
 		SetInfoText("$ostim_tooltip_pullout_key")
 	ElseIf (Option == SetThanks)
@@ -960,8 +967,8 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(1.0)
 		SetSliderDialogRange(0.1, 3.0)
 		SetSliderDialogInterval(0.1)
-	ElseIf (Option == SetBedSearchDistance)
-		SetSliderDialogStartValue(Main.BedSearchDistance)
+	ElseIf (Option == SetFurnitureSearchDistance)
+		SetSliderDialogStartValue(Main.FurnitureSearchDistance)
 		SetSliderDialogDefaultValue(15.0)
 		SetSliderDialogRange(1, 30)
 		SetSliderDialogInterval(1)
@@ -985,8 +992,8 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(3.0)
 		SetSliderDialogRange(1, 20)
 		SetSliderDialogInterval(1)
-	ElseIf (Option == SetBedReallignment)
-		SetSliderDialogStartValue(Main.BedReallignment)
+	ElseIf (Option == SetBedRealignment)
+		SetSliderDialogStartValue(Main.BedRealignment)
 		SetSliderDialogDefaultValue(0.0)
 		SetSliderDialogRange(-250, 250)
 		SetSliderDialogInterval(1)
@@ -1035,8 +1042,8 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 	Elseif (option == SetOPFreq)
 		StorageUtil.SetIntValue(none, SUOPFreq, value as int)
 		SetSliderOptionValue(SetOPFreq, Value, "{0}")
-	ElseIf (Option == SetBedSearchDistance)
-		Main.BedSearchDistance = (Value as Int)
+	ElseIf (Option == SetFurnitureSearchDistance)
+		Main.FurnitureSearchDistance = (Value as Int)
 		SetSliderOptionValue(Option, Value, "{0} Meters")
 	ElseIf (Option == SetCustomTimescale)
 		Main.CustomTimescale = (Value as Int)
@@ -1050,8 +1057,8 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 	ElseIf (Option == SetCameraSpeed)
 		Main.FreecamSpeed = (Value as Int)
 		SetSliderOptionValue(Option, Value, "{0}")
-	ElseIf (Option == SetBedReallignment)
-		Main.BedReallignment = (Value as Int)
+	ElseIf (Option == SetBedRealignment)
+		Main.BedRealignment = (Value as Int)
 		SetSliderOptionValue(Option, Value, "{0} Units")
 	ElseIf (Option == SetAIChangeChance)
 		Main.AiSwitchChance = (Value as Int)
@@ -1242,6 +1249,7 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetUseScreenShake", Main.UseScreenShake as Int)
 	JMap.SetInt(OstimSettingsFile, "SetScaling", Main.DisableScaling as Int)
 	JMap.SetInt(OstimSettingsFile, "SetSchlongBending", Main.DisableSchlongBending As Int)
+	JMap.SetInt(OStimSettingsFile, "SetUseIntroScenes", Main.UseIntroScenes As Int)
 	JMap.SetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes", Main.OnlyGayAnimsInGayScenes as Int)
 
 	; Player roles settings.
@@ -1285,10 +1293,10 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetFreecamToggleKey", Main.FreecamKey as Int)
 
 	; Bed settings export.
-	JMap.SetInt(OstimSettingsFile, "SetEnableBeds", Main.UseBed as Int)
-	JMap.SetInt(OstimSettingsFile, "SetConfirmBed", Main.ConfirmBed as Int)
-	JMap.SetInt(OstimSettingsFile, "SetBedSearchDistance", Main.BedSearchDistance as Int)
-	JMap.SetInt(OstimSettingsFile, "SetBedReallignment", Main.BedReallignment as Int)
+	JMap.SetInt(OstimSettingsFile, "SetEnableFurniture", Main.UseFurniture as Int)
+	JMap.SetInt(OstimSettingsFile, "SetSelectFurniture", Main.SelectFurniture as Int)
+	JMap.SetInt(OstimSettingsFile, "SetFurnitureSearchDistance", Main.FurnitureSearchDistance as Int)
+	JMap.SetInt(OstimSettingsFile, "SetBedRealignment", Main.BedRealignment as Int)
 
 	; Ai/Control settings export.
 	JMap.SetInt(OstimSettingsFile, "SetAIControl", Main.UseAIControl as Int)
@@ -1441,6 +1449,7 @@ Function ImportSettings(bool default = false)
 	Main.UseScreenShake = JMap.GetInt(OstimSettingsFile, "SetUseScreenShake")
 	Main.DisableScaling = JMap.GetInt(OstimSettingsFile, "SetScaling")
 	Main.DisableSchlongBending = JMap.GetInt(OstimSettingsFile, "SetSchlongBending")
+	Main.UseIntroScenes = JMap.GetInt(OstimSettingsFile, "SetUseIntroScenes", 1)
 	Main.OnlyGayAnimsInGayScenes = JMap.GetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes")
 
 	;Player Roles settings
@@ -1486,20 +1495,20 @@ Function ImportSettings(bool default = false)
 	Main.RemapFreecamKey(main.FreecamKey)
 
 	; OSA keys settings import.
-	OSAControl.osaMainMenuKey =  JMap.GetInt(OstimSettingsFile, "SetOsaMainMenuKey")
-	OSAControl.osaUpKey = JMap.GetInt(OstimSettingsFile, "SetOsaUpKey")
-	OSAControl.osaDownKey = JMap.GetInt(OstimSettingsFile, "SetOsaDownKey")
-	OSAControl.osaLeftKey = JMap.GetInt(OstimSettingsFile, "SetOsaLeftKey")
-	OSAControl.osaRightKey = JMap.GetInt(OstimSettingsFile, "SetOsaRightKey")
-	OSAControl.osaTogKey = JMap.GetInt(OstimSettingsFile, "SetOsaTogKey")
-	OSAControl.osaYesKey = JMap.GetInt(OstimSettingsFile, "SetOsaYesKey")
-	OSAControl.osaEndKey = JMap.GetInt(OstimSettingsFile, "SetOsaEndKey")
+	OSAControl.osaMainMenuKey =  JMap.GetInt(OstimSettingsFile, "SetOsaMainMenuKey", 156)
+	OSAControl.osaUpKey = JMap.GetInt(OstimSettingsFile, "SetOsaUpKey", 72)
+	OSAControl.osaDownKey = JMap.GetInt(OstimSettingsFile, "SetOsaDownKey", 76)
+	OSAControl.osaLeftKey = JMap.GetInt(OstimSettingsFile, "SetOsaLeftKey", 75)
+	OSAControl.osaRightKey = JMap.GetInt(OstimSettingsFile, "SetOsaRightKey", 77)
+	OSAControl.osaTogKey = JMap.GetInt(OstimSettingsFile, "SetOsaTogKey", 73)
+	OSAControl.osaYesKey = JMap.GetInt(OstimSettingsFile, "SetOsaYesKey", 71)
+	OSAControl.osaEndKey = JMap.GetInt(OstimSettingsFile, "SetOsaEndKey", 83)
 
-	; Bed settings export.
-	Main.UseBed = JMap.GetInt(OstimSettingsFile, "SetEnableBeds")
-	Main.ConfirmBed = JMap.GetInt(OstimSettingsFile, "SetConfirmBed")
-	Main.BedSearchDistance = JMap.GetInt(OstimSettingsFile, "SetBedSearchDistance")
-	Main.BedReallignment = JMap.GetInt(OstimSettingsFile, "SetBedReallignment")
+	; Furniture settings export.
+	Main.UseFurniture = JMap.GetInt(OstimSettingsFile, "SetEnableFurniture",1)
+	Main.SelectFurniture = JMap.GetInt(OstimSettingsFile, "SetSelectFurniture")
+	Main.FurnitureSearchDistance = JMap.GetInt(OstimSettingsFile, "SetFurnitureSearchDistance", 15)
+	Main.BedRealignment = JMap.GetInt(OstimSettingsFile, "SetBedRealignment")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
 	
 	;Orgasm settings

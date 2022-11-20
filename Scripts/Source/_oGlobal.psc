@@ -74,6 +74,7 @@ Function ActorLock(Actor Actra, Actor Player) Global
         Actra.SetRestrained(True)
         Actra.SetDontMove(True)
     EndIf
+    Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", True)
 EndFunction
 
 ; Disables all locking stuff used in OSA,
