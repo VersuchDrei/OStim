@@ -210,6 +210,20 @@ bool Property DisableSchlongBending
 	EndFunction
 EndProperty
 
+GlobalVariable Property OStimUseIntroScenes Auto
+bool Property UseIntroScenes
+	bool Function Get()
+		Return OStimUseIntroScenes.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUseIntroScenes.value = 1
+		Else
+			OStimUseIntroScenes.value = 10
+		EndIf
+	EndFunction
+EndProperty
+
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
@@ -409,7 +423,7 @@ EndEvent
 * * @param: zAnimateUndress, no longer in use
 * * @param: zStartingAnimation, the animation to start with
 * * @param: zThirdActor, the third actor, index 2
-* * @param: Bed, the bed to start the animation on, can be None
+* * @param: Bed, the furniture to start the animation on, can be None
 * * @param: Aggressive, if the scene is aggressive
 * * @param: AggressingActor, the aggressor in an aggressive scene
 */;
@@ -645,42 +659,40 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
+	string SceneTag = "idle"
+	If UseIntroScenes
+		SceneTag = "intro"
+	EndIf
 
-	If ThirdActor && (StartingAnimation == "")
-		If FurnitureType == FURNITURE_TYPE_BED
-			startinganimation = "OpS|LyB!Kne!Kne|Ho|3PLyingIdle"
-		Else
-			startinganimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
-		EndIf
-	endif 
-
-	If (FurnitureType != FURNITURE_TYPE_NONE)
-		CurrentFurniture.BlockActivation(true)
-		AlignActorsWithCurrentFurniture()
-		If (StartingAnimation == "")
-			If FurnitureType == FURNITURE_TYPE_BED
-				StartingAnimation = "0MF|KNy6!KNy6|Ho|KnLap"
-			ElseIf FurnitureType == FURNITURE_TYPE_BENCH
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", "idle")
-			ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", "idle")
-			ElseIf FurnitureType == FURNITURE_TYPE_TABLE
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", "idle")
-			ElseIf FurnitureType == FURNITURE_TYPE_SHELF
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", "idle")
-			ElseIf FurnitureType == FURNITURE_TYPE_WALL
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", "idle")
-			ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
-				StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", "idle")
-			EndIf
-		EndIf
-	Else
+	If FurnitureType == FURNITURE_TYPE_NONE
 		If (SubActor && SubActor != PlayerRef)
 			SubActor.MoveTo(DomActor)
 		ElseIf (SubActor == PlayerRef)
 			DomActor.MoveTo(SubActor)
 		EndIf
-			
+	Else
+		CurrentFurniture.BlockActivation(true)
+		AlignActorsWithCurrentFurniture()
+	EndIf
+
+	If (StartingAnimation == "")
+		If FurnitureType == FURNITURE_TYPE_NONE
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BED
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "kneeling,lyingback,lyingside,sitting"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BENCH
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_TABLE
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_SHELF
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_WALL
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", SceneTag)
+		ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", SceneTag)
+		EndIf
 	EndIf
 
 	If (StartingAnimation == "")
@@ -709,13 +721,7 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	if !ThirdActor
-		CurrentAnimation = "0MF|Sy6!Sy9|Ho|St9Adore"
-	elseIf SubActor
-		CurrentAnimation = "OpS|Sta!Sta!Sta|Ho|Ace3PStanding"
-	Else
-		CurrentAnimation = startingAnimation
-	endif 
+	CurrentAnimation = startingAnimation
 	LastHubOID = -1
 	;OnAnimationChange()
 
