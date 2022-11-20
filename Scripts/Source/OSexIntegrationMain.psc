@@ -109,8 +109,28 @@ Int Property CustomTimescale Auto
 
 Bool Property OrgasmIncreasesRelationship Auto
 
-Float Property SexExcitementMult Auto
+;Deprecated, kept for potential integrations
+float Property SexExcitementMult Auto
 
+GlobalVariable Property OStimMaleSexExcitementMult Auto
+float Property MaleSexExcitementMult
+	float Function Get()
+		Return OStimMaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimMaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFemaleSexExcitementMult Auto
+float Property FemaleSexExcitementMult
+	float Function Get()
+		Return OStimFemaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimFemaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
 Int Property KeyMap Auto
 
 int property FreecamKey auto 
@@ -1442,9 +1462,11 @@ Function AllowVehicleReset()
 	EndWhile
 EndFunction
 
+
+;Is this even used or necessary?
 float function GetEstimatedTimeUntilEnd()
 	float total = 120
-	total /= SexExcitementMult
+	total /= MaleSexExcitementMult ; This will no longer work
 
 	float dom = 99999.0
 	float sub = 99999.0
@@ -2752,7 +2774,8 @@ Function SetDefaultSettings()
 
 	LowLightLevelLightsOnly = False
 
-	SexExcitementMult = 1.0
+	MaleSexExcitementMult = 1.0
+	FemaleSexExcitementMult = 1.0
 
 	SoundFormNumberWhitelist = new int[1]
 	SoundFormNumberWhitelist[0] = 9999 ;initializing to avoid array-related bugs
