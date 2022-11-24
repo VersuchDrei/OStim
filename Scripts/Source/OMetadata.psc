@@ -1298,7 +1298,7 @@ int[] Function FindAllActionsForParticipantsAny(string Id, int[] Positions, stri
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForsParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
 
 ;/* FindActionForParticipantsAll
 * * returns the first occurance of an action with all participants in a given list
@@ -1386,7 +1386,7 @@ int[] Function FindAllActionsForParticipantsAll(string Id, int[] Positions, stri
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForsParticipantsAllCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForParticipantsAllCSV(string Id, string Positions, string Types) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗    ███████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 

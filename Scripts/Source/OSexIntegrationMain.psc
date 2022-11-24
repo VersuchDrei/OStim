@@ -109,9 +109,6 @@ Int Property CustomTimescale Auto
 
 Bool Property OrgasmIncreasesRelationship Auto
 
-;Deprecated, kept for potential integrations
-float Property SexExcitementMult Auto
-
 GlobalVariable Property OStimMaleSexExcitementMult Auto
 float Property MaleSexExcitementMult
 	float Function Get()
@@ -554,7 +551,8 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		FurnitureType = OFurniture.GetFurnitureType(Bed)
 		CurrentFurniture = Bed
 	Else
-		FurnitureType = 0
+		FurnitureType = FURNITURE_TYPE_NONE
+		CurrentFurniture = None
 	EndIf
 
 	ForceCloseOStimThread = false
@@ -718,7 +716,8 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	CurrentAnimation = startingAnimation
+	CurrentAnimation = ""
+	CurrentSceneID = StartingAnimation
 	LastHubOID = -1
 	;OnAnimationChange()
 
@@ -746,12 +745,14 @@ Event OnUpdate() ;OStim main logic loop
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
 
+	;/
 	int AEvent = ModEvent.Create(EventName)
 	Modevent.PushString(AEvent, EventName)
 	ModEvent.PushString(AEvent, CurrentAnimation)
 	ModEvent.PushFloat(AEvent, 0.0)
 	ModEvent.PushForm(AEvent, self)
 	ModEvent.Send(AEvent)
+	/;
 
 
 	StartTime = Utility.GetCurrentRealTime()
@@ -806,6 +807,8 @@ Event OnUpdate() ;OStim main logic loop
 	If (UseFades && IsPlayerInvolved())
 		FadeFromBlack()
 	EndIf
+
+	Rescale()
 
 	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
 		If (LoopTimeTotal > 1)
@@ -1282,21 +1285,6 @@ Actor Function GetActor(int Index)
 	Return None
 EndFunction
 
-; deprecated, use GetActor(0) instead
-Actor Function GetDomActor()
-	Return GetActor(0)
-EndFunction
-
-; deprecated, use GetActor(1) instead
-Actor Function GetSubActor()
-	Return GetActor(1)
-EndFunction
-
-; deprecated, use GetActor(2) instead
-Actor Function GetThirdActor()
-	Return GetActor(2)
-EndFunction
-
 ; do not modify this array or OStim will break!
 Actor[] Function GetActors()
 	Return Actors
@@ -1392,7 +1380,7 @@ Bool Function UsingFurniture()
 	Return FurnitureType != FURNITURE_TYPE_NONE
 EndFunction
 
-ObjectReference Function GetBed()
+ObjectReference Function GetFurniture()
 	Return CurrentFurniture
 EndFunction
 
@@ -1783,6 +1771,8 @@ Bool Function IsBedRoll(objectReference Bed)
 EndFunction
 
 Function AlignActorsWithCurrentFurniture()
+	OFurniture.GetOffset(CurrentFurniture)
+
 	int i = Actors.Length
 	While i
 		i -= 1
@@ -2946,7 +2936,9 @@ EndFunction
 
 Function RemapStartKey(Int zKey)
 	UnregisterForKey(KeyMap)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	KeyMap = zKey
 EndFunction
 
@@ -2958,28 +2950,36 @@ EndFunction
 
 Function RemapControlToggleKey(Int zKey)
 	UnregisterForKey(ControlToggleKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	ControlToggleKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapSpeedUpKey(Int zKey)
 	UnregisterForKey(SpeedUpKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	speedUpKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapSpeedDownKey(Int zKey)
 	UnregisterForKey(SpeedDownKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	speedDownKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapPullOutKey(Int zKey)
 	UnregisterForKey(PullOutKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	PullOutKey = zKey
 	LoadOSexControlKeys()
 EndFunction
@@ -3349,11 +3349,21 @@ Function OnLoadGame()
 
 		RegisterForModEvent("ostim_actorhit", "OnActorHit")
 		LoadOSexControlKeys()
-		RegisterForKey(SpeedUpKey)
-		RegisterForKey(SpeedDownKey)
-		RegisterForKey(PullOutKey)
-		RegisterForKey(ControlToggleKey)
-		RegisterForKey(KeyMap)
+		If SpeedUpKey != 1
+			RegisterForKey(SpeedUpKey)
+		EndIf
+		If SpeedDownKey != 1
+			RegisterForKey(SpeedDownKey)
+		EndIf
+		If PullOutKey != 1
+			RegisterForKey(PullOutKey)
+		EndIf
+		If ControlToggleKey != 1
+			RegisterForKey(ControlToggleKey)
+		EndIf
+		If KeyMap != 1
+			RegisterForKey(KeyMap)
+		EndIf
 
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
@@ -3382,4 +3392,41 @@ EndFunction
 
 Function UnsetOffset(int Index)
 	Offsets[Index] = 0
+EndFunction
+
+
+; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
+; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
+; ██║  ██║█████╗  ██████╔╝██████╔╝█████╗  ██║     ███████║   ██║   █████╗  ██║  ██║
+; ██║  ██║██╔══╝  ██╔═══╝ ██╔══██╗██╔══╝  ██║     ██╔══██║   ██║   ██╔══╝  ██║  ██║
+; ██████╔╝███████╗██║     ██║  ██║███████╗╚██████╗██║  ██║   ██║   ███████╗██████╔╝
+; ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝ 
+
+; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
+
+float Property SexExcitementMult Auto
+
+bool Property UseBed
+	bool Function Get()
+		Return UseFurniture
+	EndFunction
+	Function Set(bool Value)
+		UseFurniture = Value
+	EndFunction
+EndProperty
+
+Actor Function GetDomActor()
+	Return GetActor(0)
+EndFunction
+
+Actor Function GetSubActor()
+	Return GetActor(1)
+EndFunction
+
+Actor Function GetThirdActor()
+	Return GetActor(2)
+EndFunction
+
+ObjectReference Function GetBed()
+	Return GetFurniture()
 EndFunction

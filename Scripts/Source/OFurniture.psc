@@ -10,3 +10,5 @@ int Function GetFurnitureType(ObjectReference FurnitureRef) Global Native
 int Function ToFurnitureTypeInt(string FurnitureType) Global Native
 
 ObjectReference[] Function FindFurniture(int ActorCount, ObjectReference CenterRef, float Radius, float SameFloor = 0.0) Global Native
+
+float[] Function GetOffset(ObjectReference FurnitureRef) Global Native
