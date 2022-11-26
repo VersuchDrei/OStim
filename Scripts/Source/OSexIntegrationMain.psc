@@ -667,7 +667,7 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	Else
 		CurrentFurniture.BlockActivation(true)
-		AlignActorsWithCurrentFurniture()
+		;AlignActorsWithCurrentFurniture()
 	EndIf
 
 	If (StartingAnimation == "")
@@ -809,6 +809,9 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Rescale()
+	If CurrentFurniture
+		OFurniture.ResetClutter(Actors[0], 500)
+	EndIf
 
 	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
 		If (LoopTimeTotal > 1)
@@ -910,6 +913,10 @@ Event OnUpdate() ;OStim main logic loop
 		If (UseFades && EndedProper && IsPlayerInvolved())
 			Game.FadeOutGame(False, True, 25.0, 25.0) ; keep the screen black
 		EndIf
+	EndIf
+
+	If CurrentFurniture
+		OFurniture.ResetClutter(Actors[0], 500)
 	EndIf
 
 	If (ForceFirstPersonAfter && IsPlayerInvolved())
