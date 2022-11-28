@@ -70,6 +70,8 @@ String[] DomLightBrightList
 Int SetEnableFurniture
 Int SetSelectFurniture
 Int SetFurnitureSearchDistance
+int SetResetClutter
+int SetResetClutterRadius
 Int SetBedRealignment
 
 ; ai control settings
@@ -311,6 +313,8 @@ Event OnPageReset(String Page)
 		SetEnableFurniture = AddToggleOption("$ostim_use_furniture", Main.UseFurniture)
 		SetSelectFurniture = AddToggleOption("$ostim_select_furniture", Main.SelectFurniture)
 		SetFurnitureSearchDistance = AddSliderOption("$ostim_furniture_search_rad", Main.FurnitureSearchDistance, "{0} meters")
+		SetResetClutter = AddToggleOption("$ostim_reset_clutter", Main.ResetClutter)
+		SetResetClutterRadius = AddSliderOption("$ostim_reset_clutter_radius", Main.ResetClutterRadius, "{0} meters")
 		SetBedRealignment = AddSliderOption("$ostim_bed_realignment", Main.BedRealignment, "{0} units")
 		AddEmptyOption()
 
@@ -592,6 +596,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSelectFurniture)
 		Main.SelectFurniture = !Main.SelectFurniture
 		SetToggleOptionValue(Option, Main.SelectFurniture)
+	ElseIf Option == SetResetClutter
+		Main.ResetClutter = !Main.ResetClutter
+		SetToggleOptionValue(Option, Main.ResetClutter)	
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
@@ -825,8 +832,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_reset_position")
 	ElseIf (Option == SetUndressIfNeed)
 		SetInfoText("$ostim_tooltip_undress_if_need")
-	ElseIf (Option == SetFurnitureSearchDistance)
-		SetInfoText("$ostim_tooltip_furniture_search_dist")
 	ElseIf (Option == SetUseAutoFades)
 		SetInfoText("$ostim_tooltip_auto_fades")
 	ElseIf (Option == SetAIChangeChance)
@@ -845,6 +850,12 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_enable_furniture")
 	ElseIf (Option == SetSelectFurniture)
 		SetInfoText("$ostim_tooltip_select_furniture")
+	ElseIf (Option == SetFurnitureSearchDistance)
+		SetInfoText("$ostim_tooltip_furniture_search_dist")
+	ElseIf Option == SetResetClutter
+		SetInfoText("$ostim_tooltip_reset_clutter")
+	Elseif Option == SetResetClutterRadius
+		SetInfoText("$ostim_tooltip_reset_clutter_radius")
 	ElseIf (Option == SetTutorialMessages)
 		SetInfoText("$ostim_tooltip_enable_tutorial")
 	ElseIf (Option == setupdate)
@@ -979,6 +990,11 @@ Event OnOptionSliderOpen(Int Option)
 	ElseIf (Option == SetFurnitureSearchDistance)
 		SetSliderDialogStartValue(Main.FurnitureSearchDistance)
 		SetSliderDialogDefaultValue(15.0)
+		SetSliderDialogRange(1, 30)
+		SetSliderDialogInterval(1)
+	ElseIf Option == SetResetClutterRadius
+		SetSliderDialogStartValue(Main.ResetClutterRadius)
+		SetSliderDialogDefaultValue(5.0)
 		SetSliderDialogRange(1, 30)
 		SetSliderDialogInterval(1)
 	ElseIf (Option == SetCustomTimescale)
@@ -1309,6 +1325,8 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetEnableFurniture", Main.UseFurniture as Int)
 	JMap.SetInt(OstimSettingsFile, "SetSelectFurniture", Main.SelectFurniture as Int)
 	JMap.SetInt(OstimSettingsFile, "SetFurnitureSearchDistance", Main.FurnitureSearchDistance as Int)
+	JMap.SetInt(OstimSettingsFile, "SetResetClutter", Main.ResetClutter as Int)
+	JMap.SetInt(OstimSettingsFile, "SetResetClutterRadius", Main.ResetClutterRadius)
 	JMap.SetInt(OstimSettingsFile, "SetBedRealignment", Main.BedRealignment as Int)
 
 	; Ai/Control settings export.
@@ -1522,6 +1540,8 @@ Function ImportSettings(bool default = false)
 	Main.UseFurniture = JMap.GetInt(OstimSettingsFile, "SetEnableFurniture",1)
 	Main.SelectFurniture = JMap.GetInt(OstimSettingsFile, "SetSelectFurniture")
 	Main.FurnitureSearchDistance = JMap.GetInt(OstimSettingsFile, "SetFurnitureSearchDistance", 15)
+	Main.ResetClutter = JMap.GetInt(OstimSettingsFile, "SetResetClutter", 1)
+	Main.ResetClutterRadius = JMap.GetInt(OstimSettingsFile, "SetResetClutterRadius", 5)
 	Main.BedRealignment = JMap.GetInt(OstimSettingsFile, "SetBedRealignment")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
 	

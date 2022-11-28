@@ -74,7 +74,6 @@ Bool Property ResetPosAfterSceneEnd Auto
 Bool Property AllowUnlimitedSpanking Auto
 
 Bool Property AutoUndressIfNeeded Auto
-Int Property FurnitureSearchDistance Auto
 
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
@@ -140,12 +139,6 @@ Int Property SpeedDownKey Auto
 Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
 
-Bool Property UseFurniture Auto
-Bool Property SelectFurniture Auto
-Message Property OStimBedConfirmationMessage Auto
-Message Property OStimFurnitureSelectionMessage Auto
-GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
-
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
 Bool Property PauseAI Auto
@@ -199,6 +192,13 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
+int Property InstalledVersion Auto
+
+bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; ALIGNMENT SETTINGS  -----------------------------------------------------------------------------
+
 GlobalVariable Property OStimDisableScaling Auto
 bool Property DisableScaling
 	bool Function Get()
@@ -241,9 +241,74 @@ bool Property UseIntroScenes
 	EndFunction
 EndProperty
 
-int Property InstalledVersion Auto
+; -------------------------------------------------------------------------------------------------
+; FURNITURE SETTINGS  -----------------------------------------------------------------------------
 
-bool property ShowTutorials auto
+GlobalVariable Property OStimUseFurniture Auto
+bool Property UseFurniture
+	bool Function Get()
+		Return OStimUseFurniture.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUseFurniture.value = 1
+		Else
+			OStimUseFurniture.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimSelectFurniture Auto
+bool Property SelectFurniture
+	bool Function Get()
+		Return OStimSelectFurniture.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimSelectFurniture.value = 1
+		Else
+			OStimSelectFurniture.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFurnitureSearchDistance Auto
+int Property FurnitureSearchDistance
+	int Function Get()
+		Return OStimFurnitureSearchDistance.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimFurnitureSearchDistance.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimResetClutter Auto
+bool Property ResetClutter
+	bool Function Get()
+		Return OStimResetClutter.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimResetClutter.value = 1
+		Else
+			OStimResetClutter.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimResetClutterRadius Auto
+int Property ResetClutterRadius
+	int Function Get()
+		Return OStimResetClutterRadius.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimResetClutterRadius.value = Value
+	EndFunction
+EndProperty
+
+Message Property OStimBedConfirmationMessage Auto
+Message Property OStimFurnitureSelectionMessage Auto
+GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 ; -------------------------------------------------------------------------------------------------
 ; SCRIPTWIDE VARIABLES ----------------------------------------------------------------------------
@@ -255,6 +320,7 @@ Actor ThirdActor
 
 Actor[] Actors
 float[] Offsets
+float[] RMHeights
 
 String diasa
 
@@ -501,17 +567,20 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Actors[2] = ThirdActor
 
 		Offsets = new float[3]
+		RMHeights = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 
 		Offsets = new float[2]
+		RMHeights = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
 
 		Offsets = new float[1]
+		RMHeights = new float[1]
 	EndIf
 
 	int i = Actors.Length
@@ -520,10 +589,18 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 		TogglePrecisionForActor(Actors[i], false)
 
-		If nioverride.HasNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")
-			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")[2]
+		bool isFemale = IsFemale(Actors[i])
+
+		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
+			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
 		Else
 			Offsets[i] = 0
+		EndIf
+
+		If nioverride.HasNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
+			RMHeights[i] = nioverride.GetNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
+		Else
+			RMHeights[i] = 1
 		EndIf
 
 		Actors[i].AddToFaction(OStimExcitementFaction)
@@ -674,7 +751,7 @@ Event OnUpdate() ;OStim main logic loop
 		If FurnitureType == FURNITURE_TYPE_NONE
 			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
 		ElseIf FurnitureType == FURNITURE_TYPE_BED
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "kneeling,lyingback,lyingside,sitting"))
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
 		ElseIf FurnitureType == FURNITURE_TYPE_BENCH
 			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", SceneTag)
 		ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
@@ -809,8 +886,8 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Rescale()
-	If CurrentFurniture
-		OFurniture.ResetClutter(Actors[0], 500)
+	If CurrentFurniture && ResetClutter
+		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
 
 	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
@@ -915,8 +992,8 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	If CurrentFurniture
-		OFurniture.ResetClutter(Actors[0], 500)
+	If CurrentFurniture && ResetClutter
+		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
 
 	If (ForceFirstPersonAfter && IsPlayerInvolved())
@@ -1707,14 +1784,21 @@ Function SelectFurniture()
 		EndWhile
 	Else
 		int i = 0
+		bool hasValid = False
 		While i < Furnitures.Length
 			If Furnitures[i]
 				OStimFurnitureSelectionButtons[i].Value = 1
+				hasValid = True
 			Else
 				OStimFurnitureSelectionButtons[i].Value = 0
 			EndIf
 			i += 1
 		EndWhile
+
+		If !hasValid
+			Return
+		EndIf
+
 		FurnitureType = OStimFurnitureSelectionMessage.Show()
 		If FurnitureType == 0
 			CurrentFurniture = None
@@ -2100,9 +2184,15 @@ Function OnAnimationChange()
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 
 			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
+			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
 			bool isFemale = IsFemale(Actors[2])
+			
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
+			EndIf
+
+			If nioverride.HasNodeTransformScale(Actors[2], False, isFemale, "NPC", "RSMPlugin")
+				RMHeights[2] = nioverride.GetNodeTransformScale(Actors[2], false, isFemale, "NPC", "RSMPlugin")
 			EndIf
 
 			ThirdActor.AddToFaction(OStimExcitementFaction)
@@ -2126,6 +2216,7 @@ Function OnAnimationChange()
 		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
 
 		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
+		RMHeights = PapyrusUtil.ResizeFloatArray(RMHeights, 2)
 
 		If !DisableScaling
 			ThirdActor.SetScale(1.0)
@@ -2198,7 +2289,7 @@ Function RestoreScales()
 EndFunction
 
 Function Rescale()
-	OSANative.UpdateForScene(CurrentSceneID, Actors, Offsets)
+	OSANative.UpdateForScene(CurrentSceneID, Actors, RMHeights, Offsets)
 EndFunction
 
 ;
@@ -2783,7 +2874,10 @@ UseFreeCam
 	SpeedUpSpeed = 1.5
 
 	UseFurniture = True
+	SelectFurniture = False
 	FurnitureSearchDistance = 15
+	ResetClutter = True
+	ResetClutterRadius = 5
 
 	DisableStimulationCalculation = false
 
