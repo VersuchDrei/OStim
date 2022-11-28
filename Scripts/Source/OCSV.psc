@@ -33,6 +33,29 @@ string Function CreateCSVList(int Size, string Filler) Global
 	Return Ret
 EndFunction
 
+string Function CreateSingleCSVListEntry(int Index, string Entry) Global
+	string Ret = ""
+
+	While Index
+		Index -= 1
+		Ret += ","
+	EndWhile
+
+	Ret += Entry
+
+	Return Ret
+EndFunction
+
+string Function ConcatCSVLists(string ListA, string ListB) Global
+	If ListA == ""
+		Return ListB
+	ElseIf ListB == ""
+		Return ListA
+	Else
+		Return ListA + "," + ListB
+	EndIf
+EndFunction
+
 
 ; ███╗   ███╗ █████╗ ████████╗██████╗ ██╗ ██████╗███████╗███████╗
 ; ████╗ ████║██╔══██╗╚══██╔══╝██╔══██╗██║██╔════╝██╔════╝██╔════╝
@@ -62,4 +85,27 @@ string Function CreateCSVMatrix(int Size, string Filler) Global
 	EndWhile
 
 	Return Ret
+EndFunction
+
+string Function CreateSingleCSVMatrixEntry(int Index, string Entry) Global
+	string Ret = ""
+
+	While Index
+		Index -= 1
+		Ret += ";"
+	EndWhile
+	
+	Ret += Entry
+
+	Return Ret
+EndFunction
+
+string Function ConcatCSVMatrices(string MatrixA, string MatrixB) Global
+	If MatrixA == ""
+		Return MatrixB
+	ElseIf MatrixB == ""
+		Return MatrixA
+	Else
+		Return MatrixA + ";" + MatrixB
+	EndIf
 EndFunction

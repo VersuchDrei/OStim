@@ -91,8 +91,6 @@ int SetTutorialMessages
 Int SetUseFades
 Int SetUseAutoFades
 
-Int SetMute
-
 ; camera settings
 Int SetUseFreeCam
 Int SetFreeCamFOV
@@ -330,7 +328,6 @@ Event OnPageReset(String Page)
 		AddColoredHeader("$ostim_header_system")
 		SetResetState = AddTextOption("$ostim_reset_state", "")
 		SetUpdate = AddTextOption("$ostim_update", "")
-		SetMute = AddToggleOption("$ostim_mute_osa", Main.MuteOSA)
 		SetTutorialMessages = AddToggleOption("$ostim_tutorial", Main.ShowTutorials)
 		;SetUseCosaveWorkaround = AddToggleOption("$ostim_cosave", Main.useBrokenCosaveWorkaround)
 		AddEmptyOption()
@@ -644,9 +641,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetHideNPCOnNPCBars)
 		Main.HideBarsInNPCScenes = !Main.HideBarsInNPCScenes
 		SetToggleOptionValue(Option, Main.HideBarsInNPCScenes)
-	ElseIf (Option == SetMute)
-		Main.MuteOSA = !Main.MuteOSA
-		SetToggleOptionValue(Option, Main.MuteOSA)
 	ElseIf (Option == SetEndAfterActorHit)
 		Main.EndAfterActorHit = !Main.EndAfterActorHit
 		SetToggleOptionValue(Option, Main.EndAfterActorHit)
@@ -870,8 +864,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_orgasm_boosts_rel")
 	ElseIf (Option == SetDomLightMode)
 		SetInfoText("$ostim_tooltip_dom_light")
-	ElseIf (Option == SetMute)
-		SetInfoText("$ostim_tooltip_mute_osa")
 	ElseIf (Option == SetSubLightMode)
 		SetInfoText("$ostim_tooltip_sub_light")
 	ElseIf (Option == SetCameraSpeed)
@@ -1361,7 +1353,6 @@ Function ExportSettings()
 
 	JMap.SetInt(OstimSettingsFile, "SetUseFades", Main.UseFades as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseAutoFades", Main.UseAutoFades as Int)
-	JMap.SetInt(OstimSettingsFile, "SetMute", Main.MuteOSA as Int)
 
 	int clothes = JArray.objectWithInts(main.StrippingSlots)
 	JMap.setObj(OstimSettingsFile,"Slots", clothes)
@@ -1568,8 +1559,6 @@ Function ImportSettings(bool default = false)
 	
 	Main.UseFades = JMap.GetInt(OstimSettingsFile, "SetUseFades")
 	Main.UseAutoFades = JMap.GetInt(OstimSettingsFile, "SetUseAutoFades")
-	
-	Main.MuteOSA = JMap.GetInt(OstimSettingsFile, "SetMute")
 
 	Main.ShowTutorials = JMap.GetInt(OstimSettingsFile, "SetTutorialMessages")
 	

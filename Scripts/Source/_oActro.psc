@@ -74,7 +74,7 @@ int style = alignStyle as int
     		float Cos = Math.Cos(Angle)
     		float[] offset = OFurniture.GetOffset(FurnitureRef)
 
-    		posObj.SetPosition(X + Cos * offset[0] + Sin * offset[1], Y + Sin * offset[0] + Cos * offset[1], Z + offset[2])
+    		posObj.SetPosition(X + Cos * offset[0] + Sin * offset[1], Y - Sin * offset[0] + Cos * offset[1], Z + offset[2])
     		posObj.SetAngle(0, 0, Angle + Math.RadiansToDegrees(offset[3]))
     	Else
         	posObj.moveTo(actra[actorLocHub as int])

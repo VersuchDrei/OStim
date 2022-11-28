@@ -39,6 +39,10 @@ int Property FURNITURE_TYPE_SHELF = 5 AutoReadOnly
 int Property FURNITURE_TYPE_WALL = 6 AutoReadOnly
 int Property FURNITURE_TYPE_COOKING_POT = 7 AutoReadOnly
 
+string[] Property FURNITURE_TYPE_STRINGS Auto
+
+string[] Property POSITION_TAGS Auto
+
 ; -------------------------------------------------------------------------------------------------
 ; PROPERTIES  -------------------------------------------------------------------------------------
 
@@ -1464,6 +1468,10 @@ Bool Function UsingFurniture()
 	Return FurnitureType != FURNITURE_TYPE_NONE
 EndFunction
 
+string Function GetFurnitureType()
+	Return FURNITURE_TYPE_STRINGS[FurnitureType]
+EndFunction
+
 ObjectReference Function GetFurniture()
 	Return CurrentFurniture
 EndFunction
@@ -2306,6 +2314,21 @@ EndFunction
 Float Function GetCurrentStimulation(Actor Act) ; how much an Actor is being stimulated in the current animation
 	;TODO: Return this from c++?
 	return 0
+EndFunction
+
+float Function GetHighestExcitement()
+	float Highest = 0
+
+	int i = Actors.Length
+	While i
+		i -= 1
+		float Excitement = GetActorExcitement(Actors[i])
+		If Excitement > Highest
+			Highest = Excitement
+		EndIf
+	EndWhile
+
+	return Highest
 EndFunction
 
 Float Function GetActorExcitement(Actor Act) ; at 100, Actor orgasms
@@ -3477,6 +3500,34 @@ Function OnLoadGame()
 
 	BBLS_FaceLightFaction = Game.GetFormFromFile(0x00755331, "BBLS_SKSE64_Patch.esp") as Faction
 	Vayne = Game.GetFormFromFile(0x0000083D, "CS_Vayne.esp") as ActorBase
+
+	FURNITURE_TYPE_STRINGS = new string[8]
+	FURNITURE_TYPE_STRINGS[0] = ""
+	FURNITURE_TYPE_STRINGS[1] = "bed"
+	FURNITURE_TYPE_STRINGS[2] = "bench"
+	FURNITURE_TYPE_STRINGS[3] = "chair"
+	FURNITURE_TYPE_STRINGS[4] = "table"
+	FURNITURE_TYPE_STRINGS[5] = "shelf"
+	FURNITURE_TYPE_STRINGS[6] = "wall"
+	FURNITURE_TYPE_STRINGS[7] = "cookingpot"
+
+	POSITION_TAGS = new string[16]
+	POSITION_TAGS[0]  = "allfours"
+	POSITION_TAGS[1]  = "bendover"
+	POSITION_TAGS[2]  = "facingaway"
+	POSITION_TAGS[3]  = "handstanding"
+	POSITION_TAGS[4]  = "kneeling"
+	POSITION_TAGS[5]  = "lyingback"
+	POSITION_TAGS[6]  = "facingaway"
+	POSITION_TAGS[7]  = "lyingfront"
+	POSITION_TAGS[8]  = "lyingside"
+	POSITION_TAGS[9]  = "onbottom"
+	POSITION_TAGS[10] = "ontop"
+	POSITION_TAGS[11] = "sitting"
+	POSITION_TAGS[12] = "spreadlegs"
+	POSITION_TAGS[13] = "squatting"
+	POSITION_TAGS[14] = "standing"
+	POSITION_TAGS[15] = "suspended"
 
 	;may annoy ihud users?
 	UI.SetBool("HUD Menu", "_root.HUDMovieBaseInstance._visible", true)
