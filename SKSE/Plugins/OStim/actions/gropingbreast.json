@@ -1,6 +1,7 @@
 {
 	"actor":{
-		"stimulation":0.0,
+		"stimulation":0.1,
+		"maxStimulation":50,
 		"requirements":[
 			"hand"
 		],
@@ -9,14 +10,15 @@
 		]
 	},
 	"target":{
-		"stimulation":0.0,
+		"stimulation":0.1,
+		"maxStimulation":50,
 		"requirements":[
 			"breast"
 		]
 	},
 	"performer":{
 		"floats":{
-			"stamina":2.0
+			"stamina":0.5
 		}
 	}
 }

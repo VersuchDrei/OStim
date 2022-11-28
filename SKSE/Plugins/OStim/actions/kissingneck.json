@@ -1,6 +1,7 @@
 {
 	"actor":{
-		"stimulation":0.0,
+		"stimulation":0.1,
+		"maxStimulation":50,
 		"requirements":[
 			"mouth"
 		],
@@ -11,14 +12,10 @@
 		]
 	},
 	"target":{
-		"stimulation":0.0,
+		"stimulation":0.1,
+		"maxStimulation":50,
 		"strippingSlots":[
 			45
 		]
-	},
-	"performer":{
-		"floats":{
-			"stamina":2.0
-		}
 	}
 }

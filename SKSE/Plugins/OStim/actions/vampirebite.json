@@ -12,11 +12,7 @@
 		]
 	},
 	"target":{
-		"stimulation":0.0
-	},
-	"performer":{
-		"floats":{
-			"stamina":0.0
-		}
+		"stimulation":0.25,
+		"maxStimulation":50
 	}
 }
