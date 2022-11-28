@@ -12,7 +12,7 @@
 		]
 	},
 	"target":{
-		"stimulation":0.0,
+		"stimulation":0.3,
 		"requirements":[
 			"breast"
 		],
