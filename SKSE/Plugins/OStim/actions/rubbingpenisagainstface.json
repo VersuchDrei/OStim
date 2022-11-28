@@ -13,13 +13,10 @@
 	},
 	"target":{
 		"stimulation":0.0,
-		"requirements":[
-		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			30,
+			44,
+			55
 		]
 	},
 	"performer":{

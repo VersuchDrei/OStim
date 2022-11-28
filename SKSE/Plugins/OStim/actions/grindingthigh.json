@@ -1,25 +1,23 @@
 {
 	"actor":{
-		"stimulation":0.0,
+		"stimulation":0.6,
 		"requirements":[
-			"breasts"
-		],
-		"strippingSlots":[
-			32,
-			46,
-			56
-		]
-	},
-	"target":{
-		"stimulation":0.8,
-		"requirements":[
-			"penis"
+			"vagina"
 		],
 		"strippingSlots":[
 			32,
 			49,
 			52,
 			53
+		]
+	},
+	"target":{
+		"strippingSlots":[
+			32,
+			49,
+			52,
+			53,
+			54
 		]
 	},
 	"performer":{

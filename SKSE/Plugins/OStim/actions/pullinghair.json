@@ -5,10 +5,7 @@
 			"hand"
 		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			33
 		]
 	},
 	"target":{
@@ -16,10 +13,7 @@
 		"requirements":[
 		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			30
 		]
 	},
 	"performer":{

@@ -6,26 +6,17 @@
 			"vampire"
 		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			30,
+			44,
+			55
 		]
 	},
 	"target":{
-		"stimulation":0.0,
-		"requirements":[
-		],
-		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
-		]
+		"stimulation":0.0
 	},
 	"performer":{
 		"floats":{
-			"stamina":2.0
+			"stamina":0.0
 		}
 	}
 }
