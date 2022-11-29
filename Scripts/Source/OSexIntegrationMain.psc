@@ -756,18 +756,8 @@ Event OnUpdate() ;OStim main logic loop
 			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
 		ElseIf FurnitureType == FURNITURE_TYPE_BED
 			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
-		ElseIf FurnitureType == FURNITURE_TYPE_BENCH
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_TABLE
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_SHELF
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_WALL
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", SceneTag)
+		Else
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
 		EndIf
 	EndIf
 
@@ -1053,16 +1043,19 @@ EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
 
-	If SoloAnimsInstalled()
-		If IsFemale(Masturbator)
-			console("actor is female, starting WANK|Sy9|Ap|FemaleStanding")
-			StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = "WANK|Sy9|Ap|FemaleStanding", Bed = MBed)
-		Else
-			console("Actor is male, starting WANK|Sy9|Ap|MaleStanding")
-			StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = "WANK|Sy9|Ap|MaleStanding", Bed = MBed)
-		EndIf
+	string Type = "malemasturbation"
+	If IsFemale(Masturbator)
+		Type = "femalemasturbation"
+	EndIf
+
+	Actor[] Solo = new Actor[1]
+	Solo[0] = Masturbator
+
+	string Id = OLibrary.GetRandomSceneWithAction(Solo, Type)
+	If Id != ""
+		StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = Id, Bed = MBed)
 	Else
-		console("masturbation animations were not found.")
+		console("No masturbation animation was not found.")
 	EndIf
 EndFunction
 
@@ -1144,14 +1137,6 @@ EndFunction
 
 Int Function GetAPIVersion()
 	Return 27
-EndFunction
-
-bool Function SoloAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/WANK/Boy9/Sx/AnubsMagicDildoBentOver.xml")
-EndFunction
-
-bool Function ThreesomeAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
 EndFunction
 
 Function IncreaseAnimationSpeed()
@@ -3529,6 +3514,8 @@ Function OnLoadGame()
 	POSITION_TAGS[14] = "standing"
 	POSITION_TAGS[15] = "suspended"
 
+	MuteOSA = False
+
 	;may annoy ihud users?
 	UI.SetBool("HUD Menu", "_root.HUDMovieBaseInstance._visible", true)
 
@@ -3581,4 +3568,12 @@ EndFunction
 
 ObjectReference Function GetBed()
 	Return GetFurniture()
+EndFunction
+
+bool Function SoloAnimsInstalled()
+	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/WANK/Boy9/Sx/AnubsMagicDildoBentOver.xml")
+EndFunction
+
+bool Function ThreesomeAnimsInstalled()
+	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
 EndFunction
