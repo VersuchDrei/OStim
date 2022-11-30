@@ -1,6 +1,6 @@
 {
 	"actor":{
-		"stimulation":1.2,
+		"stimulation":1.0,
 		"requirements":[
 			"penis"
 		],
@@ -12,7 +12,7 @@
 		]
 	},
 	"target":{
-		"stimulation":0.2,
+		"stimulation":0.3,
 		"requirements":[
 			"anus"
 		],
@@ -25,7 +25,7 @@
 	},
 	"performer":{
 		"floats":{
-			"stamina":2.0
+			"stamina":1.0
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"actor":{
-		"stimulation":0.8,
+		"stimulation":1.0,
 		"requirements":[
 			"penis"
 		],
@@ -25,7 +25,7 @@
 	},
 	"performer":{
 		"floats":{
-			"stamina":2.0
+			"stamina":1.0
 		}
 	}
 }

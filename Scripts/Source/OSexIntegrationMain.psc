@@ -39,6 +39,10 @@ int Property FURNITURE_TYPE_SHELF = 5 AutoReadOnly
 int Property FURNITURE_TYPE_WALL = 6 AutoReadOnly
 int Property FURNITURE_TYPE_COOKING_POT = 7 AutoReadOnly
 
+string[] Property FURNITURE_TYPE_STRINGS Auto
+
+string[] Property POSITION_TAGS Auto
+
 ; -------------------------------------------------------------------------------------------------
 ; PROPERTIES  -------------------------------------------------------------------------------------
 
@@ -74,7 +78,6 @@ Bool Property ResetPosAfterSceneEnd Auto
 Bool Property AllowUnlimitedSpanking Auto
 
 Bool Property AutoUndressIfNeeded Auto
-Int Property FurnitureSearchDistance Auto
 
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
@@ -109,9 +112,6 @@ Int Property CustomTimescale Auto
 
 Bool Property OrgasmIncreasesRelationship Auto
 
-;Deprecated, kept for potential integrations
-float Property SexExcitementMult Auto
-
 GlobalVariable Property OStimMaleSexExcitementMult Auto
 float Property MaleSexExcitementMult
 	float Function Get()
@@ -142,12 +142,6 @@ Int Property SpeedUpKey Auto
 Int Property SpeedDownKey Auto
 Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
-
-Bool Property UseFurniture Auto
-Bool Property SelectFurniture Auto
-Message Property OStimBedConfirmationMessage Auto
-Message Property OStimFurnitureSelectionMessage Auto
-GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
@@ -202,6 +196,13 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
+int Property InstalledVersion Auto
+
+bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; ALIGNMENT SETTINGS  -----------------------------------------------------------------------------
+
 GlobalVariable Property OStimDisableScaling Auto
 bool Property DisableScaling
 	bool Function Get()
@@ -244,9 +245,74 @@ bool Property UseIntroScenes
 	EndFunction
 EndProperty
 
-int Property InstalledVersion Auto
+; -------------------------------------------------------------------------------------------------
+; FURNITURE SETTINGS  -----------------------------------------------------------------------------
 
-bool property ShowTutorials auto
+GlobalVariable Property OStimUseFurniture Auto
+bool Property UseFurniture
+	bool Function Get()
+		Return OStimUseFurniture.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUseFurniture.value = 1
+		Else
+			OStimUseFurniture.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimSelectFurniture Auto
+bool Property SelectFurniture
+	bool Function Get()
+		Return OStimSelectFurniture.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimSelectFurniture.value = 1
+		Else
+			OStimSelectFurniture.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFurnitureSearchDistance Auto
+int Property FurnitureSearchDistance
+	int Function Get()
+		Return OStimFurnitureSearchDistance.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimFurnitureSearchDistance.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimResetClutter Auto
+bool Property ResetClutter
+	bool Function Get()
+		Return OStimResetClutter.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimResetClutter.value = 1
+		Else
+			OStimResetClutter.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimResetClutterRadius Auto
+int Property ResetClutterRadius
+	int Function Get()
+		Return OStimResetClutterRadius.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimResetClutterRadius.value = Value
+	EndFunction
+EndProperty
+
+Message Property OStimBedConfirmationMessage Auto
+Message Property OStimFurnitureSelectionMessage Auto
+GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 ; -------------------------------------------------------------------------------------------------
 ; SCRIPTWIDE VARIABLES ----------------------------------------------------------------------------
@@ -258,6 +324,7 @@ Actor ThirdActor
 
 Actor[] Actors
 float[] Offsets
+float[] RMHeights
 
 String diasa
 
@@ -504,17 +571,20 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Actors[2] = ThirdActor
 
 		Offsets = new float[3]
+		RMHeights = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 
 		Offsets = new float[2]
+		RMHeights = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
 
 		Offsets = new float[1]
+		RMHeights = new float[1]
 	EndIf
 
 	int i = Actors.Length
@@ -523,10 +593,18 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 		TogglePrecisionForActor(Actors[i], false)
 
-		If nioverride.HasNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")
-			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")[2]
+		bool isFemale = IsFemale(Actors[i])
+
+		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
+			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
 		Else
 			Offsets[i] = 0
+		EndIf
+
+		If nioverride.HasNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
+			RMHeights[i] = nioverride.GetNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
+		Else
+			RMHeights[i] = 1
 		EndIf
 
 		Actors[i].AddToFaction(OStimExcitementFaction)
@@ -554,7 +632,8 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		FurnitureType = OFurniture.GetFurnitureType(Bed)
 		CurrentFurniture = Bed
 	Else
-		FurnitureType = 0
+		FurnitureType = FURNITURE_TYPE_NONE
+		CurrentFurniture = None
 	EndIf
 
 	ForceCloseOStimThread = false
@@ -669,26 +748,16 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	Else
 		CurrentFurniture.BlockActivation(true)
-		AlignActorsWithCurrentFurniture()
+		;AlignActorsWithCurrentFurniture()
 	EndIf
 
 	If (StartingAnimation == "")
 		If FurnitureType == FURNITURE_TYPE_NONE
 			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
 		ElseIf FurnitureType == FURNITURE_TYPE_BED
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "kneeling,lyingback,lyingside,sitting"))
-		ElseIf FurnitureType == FURNITURE_TYPE_BENCH
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "bench", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_CHAIR
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "chair", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_TABLE
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "table", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_SHELF
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "shelf", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_WALL
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "wall", SceneTag)
-		ElseIf FurnitureType == FURNITURE_TYPE_COOKING_POT
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, "cookingpot", SceneTag)
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
+		Else
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
 		EndIf
 	EndIf
 
@@ -718,7 +787,8 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	CurrentAnimation = startingAnimation
+	CurrentAnimation = ""
+	CurrentSceneID = StartingAnimation
 	LastHubOID = -1
 	;OnAnimationChange()
 
@@ -746,12 +816,14 @@ Event OnUpdate() ;OStim main logic loop
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
 
+	;/
 	int AEvent = ModEvent.Create(EventName)
 	Modevent.PushString(AEvent, EventName)
 	ModEvent.PushString(AEvent, CurrentAnimation)
 	ModEvent.PushFloat(AEvent, 0.0)
 	ModEvent.PushForm(AEvent, self)
 	ModEvent.Send(AEvent)
+	/;
 
 
 	StartTime = Utility.GetCurrentRealTime()
@@ -805,6 +877,11 @@ Event OnUpdate() ;OStim main logic loop
 	
 	If (UseFades && IsPlayerInvolved())
 		FadeFromBlack()
+	EndIf
+
+	Rescale()
+	If CurrentFurniture && ResetClutter
+		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
 
 	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
@@ -909,6 +986,10 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
+	If CurrentFurniture && ResetClutter
+		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
+	EndIf
+
 	If (ForceFirstPersonAfter && IsPlayerInvolved())
 
 		While IsInFreeCam()
@@ -962,16 +1043,19 @@ EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
 
-	If SoloAnimsInstalled()
-		If IsFemale(Masturbator)
-			console("actor is female, starting WANK|Sy9|Ap|FemaleStanding")
-			StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = "WANK|Sy9|Ap|FemaleStanding", Bed = MBed)
-		Else
-			console("Actor is male, starting WANK|Sy9|Ap|MaleStanding")
-			StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = "WANK|Sy9|Ap|MaleStanding", Bed = MBed)
-		EndIf
+	string Type = "malemasturbation"
+	If IsFemale(Masturbator)
+		Type = "femalemasturbation"
+	EndIf
+
+	Actor[] Solo = new Actor[1]
+	Solo[0] = Masturbator
+
+	string Id = OLibrary.GetRandomSceneWithAction(Solo, Type)
+	If Id != ""
+		StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = Id, Bed = MBed)
 	Else
-		console("masturbation animations were not found.")
+		console("No masturbation animation was not found.")
 	EndIf
 EndFunction
 
@@ -1053,14 +1137,6 @@ EndFunction
 
 Int Function GetAPIVersion()
 	Return 27
-EndFunction
-
-bool Function SoloAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/WANK/Boy9/Sx/AnubsMagicDildoBentOver.xml")
-EndFunction
-
-bool Function ThreesomeAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
 EndFunction
 
 Function IncreaseAnimationSpeed()
@@ -1282,21 +1358,6 @@ Actor Function GetActor(int Index)
 	Return None
 EndFunction
 
-; deprecated, use GetActor(0) instead
-Actor Function GetDomActor()
-	Return GetActor(0)
-EndFunction
-
-; deprecated, use GetActor(1) instead
-Actor Function GetSubActor()
-	Return GetActor(1)
-EndFunction
-
-; deprecated, use GetActor(2) instead
-Actor Function GetThirdActor()
-	Return GetActor(2)
-EndFunction
-
 ; do not modify this array or OStim will break!
 Actor[] Function GetActors()
 	Return Actors
@@ -1392,7 +1453,11 @@ Bool Function UsingFurniture()
 	Return FurnitureType != FURNITURE_TYPE_NONE
 EndFunction
 
-ObjectReference Function GetBed()
+string Function GetFurnitureType()
+	Return FURNITURE_TYPE_STRINGS[FurnitureType]
+EndFunction
+
+ObjectReference Function GetFurniture()
 	Return CurrentFurniture
 EndFunction
 
@@ -1712,14 +1777,21 @@ Function SelectFurniture()
 		EndWhile
 	Else
 		int i = 0
+		bool hasValid = False
 		While i < Furnitures.Length
 			If Furnitures[i]
 				OStimFurnitureSelectionButtons[i].Value = 1
+				hasValid = True
 			Else
 				OStimFurnitureSelectionButtons[i].Value = 0
 			EndIf
 			i += 1
 		EndWhile
+
+		If !hasValid
+			Return
+		EndIf
+
 		FurnitureType = OStimFurnitureSelectionMessage.Show()
 		If FurnitureType == 0
 			CurrentFurniture = None
@@ -1783,6 +1855,8 @@ Bool Function IsBedRoll(objectReference Bed)
 EndFunction
 
 Function AlignActorsWithCurrentFurniture()
+	OFurniture.GetOffset(CurrentFurniture)
+
 	int i = Actors.Length
 	While i
 		i -= 1
@@ -2103,9 +2177,15 @@ Function OnAnimationChange()
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 
 			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
+			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
 			bool isFemale = IsFemale(Actors[2])
+			
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
+			EndIf
+
+			If nioverride.HasNodeTransformScale(Actors[2], False, isFemale, "NPC", "RSMPlugin")
+				RMHeights[2] = nioverride.GetNodeTransformScale(Actors[2], false, isFemale, "NPC", "RSMPlugin")
 			EndIf
 
 			ThirdActor.AddToFaction(OStimExcitementFaction)
@@ -2129,6 +2209,7 @@ Function OnAnimationChange()
 		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
 
 		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
+		RMHeights = PapyrusUtil.ResizeFloatArray(RMHeights, 2)
 
 		If !DisableScaling
 			ThirdActor.SetScale(1.0)
@@ -2201,7 +2282,7 @@ Function RestoreScales()
 EndFunction
 
 Function Rescale()
-	OSANative.UpdateForScene(CurrentSceneID, Actors, Offsets)
+	OSANative.UpdateForScene(CurrentSceneID, Actors, RMHeights, Offsets)
 EndFunction
 
 ;
@@ -2218,6 +2299,21 @@ EndFunction
 Float Function GetCurrentStimulation(Actor Act) ; how much an Actor is being stimulated in the current animation
 	;TODO: Return this from c++?
 	return 0
+EndFunction
+
+float Function GetHighestExcitement()
+	float Highest = 0
+
+	int i = Actors.Length
+	While i
+		i -= 1
+		float Excitement = GetActorExcitement(Actors[i])
+		If Excitement > Highest
+			Highest = Excitement
+		EndIf
+	EndWhile
+
+	return Highest
 EndFunction
 
 Float Function GetActorExcitement(Actor Act) ; at 100, Actor orgasms
@@ -2786,7 +2882,10 @@ UseFreeCam
 	SpeedUpSpeed = 1.5
 
 	UseFurniture = True
+	SelectFurniture = False
 	FurnitureSearchDistance = 15
+	ResetClutter = True
+	ResetClutterRadius = 5
 
 	DisableStimulationCalculation = false
 
@@ -2946,7 +3045,9 @@ EndFunction
 
 Function RemapStartKey(Int zKey)
 	UnregisterForKey(KeyMap)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	KeyMap = zKey
 EndFunction
 
@@ -2958,28 +3059,36 @@ EndFunction
 
 Function RemapControlToggleKey(Int zKey)
 	UnregisterForKey(ControlToggleKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	ControlToggleKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapSpeedUpKey(Int zKey)
 	UnregisterForKey(SpeedUpKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	speedUpKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapSpeedDownKey(Int zKey)
 	UnregisterForKey(SpeedDownKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	speedDownKey = zKey
 	LoadOSexControlKeys()
 EndFunction
 
 Function RemapPullOutKey(Int zKey)
 	UnregisterForKey(PullOutKey)
-	RegisterForKey(zKey)
+	If zKey != 1
+		RegisterForKey(zKey)
+	EndIf
 	PullOutKey = zKey
 	LoadOSexControlKeys()
 EndFunction
@@ -3349,11 +3458,21 @@ Function OnLoadGame()
 
 		RegisterForModEvent("ostim_actorhit", "OnActorHit")
 		LoadOSexControlKeys()
-		RegisterForKey(SpeedUpKey)
-		RegisterForKey(SpeedDownKey)
-		RegisterForKey(PullOutKey)
-		RegisterForKey(ControlToggleKey)
-		RegisterForKey(KeyMap)
+		If SpeedUpKey != 1
+			RegisterForKey(SpeedUpKey)
+		EndIf
+		If SpeedDownKey != 1
+			RegisterForKey(SpeedDownKey)
+		EndIf
+		If PullOutKey != 1
+			RegisterForKey(PullOutKey)
+		EndIf
+		If ControlToggleKey != 1
+			RegisterForKey(ControlToggleKey)
+		EndIf
+		If KeyMap != 1
+			RegisterForKey(KeyMap)
+		EndIf
 
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
@@ -3366,6 +3485,36 @@ Function OnLoadGame()
 
 	BBLS_FaceLightFaction = Game.GetFormFromFile(0x00755331, "BBLS_SKSE64_Patch.esp") as Faction
 	Vayne = Game.GetFormFromFile(0x0000083D, "CS_Vayne.esp") as ActorBase
+
+	FURNITURE_TYPE_STRINGS = new string[8]
+	FURNITURE_TYPE_STRINGS[0] = ""
+	FURNITURE_TYPE_STRINGS[1] = "bed"
+	FURNITURE_TYPE_STRINGS[2] = "bench"
+	FURNITURE_TYPE_STRINGS[3] = "chair"
+	FURNITURE_TYPE_STRINGS[4] = "table"
+	FURNITURE_TYPE_STRINGS[5] = "shelf"
+	FURNITURE_TYPE_STRINGS[6] = "wall"
+	FURNITURE_TYPE_STRINGS[7] = "cookingpot"
+
+	POSITION_TAGS = new string[16]
+	POSITION_TAGS[0]  = "allfours"
+	POSITION_TAGS[1]  = "bendover"
+	POSITION_TAGS[2]  = "facingaway"
+	POSITION_TAGS[3]  = "handstanding"
+	POSITION_TAGS[4]  = "kneeling"
+	POSITION_TAGS[5]  = "lyingback"
+	POSITION_TAGS[6]  = "facingaway"
+	POSITION_TAGS[7]  = "lyingfront"
+	POSITION_TAGS[8]  = "lyingside"
+	POSITION_TAGS[9]  = "onbottom"
+	POSITION_TAGS[10] = "ontop"
+	POSITION_TAGS[11] = "sitting"
+	POSITION_TAGS[12] = "spreadlegs"
+	POSITION_TAGS[13] = "squatting"
+	POSITION_TAGS[14] = "standing"
+	POSITION_TAGS[15] = "suspended"
+
+	MuteOSA = False
 
 	;may annoy ihud users?
 	UI.SetBool("HUD Menu", "_root.HUDMovieBaseInstance._visible", true)
@@ -3382,4 +3531,49 @@ EndFunction
 
 Function UnsetOffset(int Index)
 	Offsets[Index] = 0
+EndFunction
+
+
+; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
+; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
+; ██║  ██║█████╗  ██████╔╝██████╔╝█████╗  ██║     ███████║   ██║   █████╗  ██║  ██║
+; ██║  ██║██╔══╝  ██╔═══╝ ██╔══██╗██╔══╝  ██║     ██╔══██║   ██║   ██╔══╝  ██║  ██║
+; ██████╔╝███████╗██║     ██║  ██║███████╗╚██████╗██║  ██║   ██║   ███████╗██████╔╝
+; ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝ 
+
+; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
+
+float Property SexExcitementMult Auto
+
+bool Property UseBed
+	bool Function Get()
+		Return UseFurniture
+	EndFunction
+	Function Set(bool Value)
+		UseFurniture = Value
+	EndFunction
+EndProperty
+
+Actor Function GetDomActor()
+	Return GetActor(0)
+EndFunction
+
+Actor Function GetSubActor()
+	Return GetActor(1)
+EndFunction
+
+Actor Function GetThirdActor()
+	Return GetActor(2)
+EndFunction
+
+ObjectReference Function GetBed()
+	Return GetFurniture()
+EndFunction
+
+bool Function SoloAnimsInstalled()
+	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/WANK/Boy9/Sx/AnubsMagicDildoBentOver.xml")
+EndFunction
+
+bool Function ThreesomeAnimsInstalled()
+	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
 EndFunction

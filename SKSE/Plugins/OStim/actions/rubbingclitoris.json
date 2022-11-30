@@ -1,18 +1,16 @@
 {
 	"actor":{
-		"stimulation":0.0,
+		"stimulation":0.1,
+		"maxStimulation":50,
 		"requirements":[
 			"hand"
 		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			33
 		]
 	},
 	"target":{
-		"stimulation":1.3,
+		"stimulation":0.9,
 		"requirements":[
 			"vagina"
 		],
@@ -25,7 +23,7 @@
 	},
 	"performer":{
 		"floats":{
-			"stamina":2.0
+			"stamina":0.75
 		}
 	}
 }

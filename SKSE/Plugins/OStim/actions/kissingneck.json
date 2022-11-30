@@ -3,19 +3,19 @@
 		"stimulation":0.1,
 		"maxStimulation":50,
 		"requirements":[
-			"hand"
+			"mouth"
 		],
 		"strippingSlots":[
-			33
+			30,
+			44,
+			55
 		]
 	},
 	"target":{
 		"stimulation":0.1,
-		"maxStimulation":50
-	},
-	"performer":{
-		"floats":{
-			"stamina":0.5
-		}
+		"maxStimulation":50,
+		"strippingSlots":[
+			45
+		]
 	}
 }

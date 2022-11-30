@@ -1,20 +1,2 @@
 {
-	"actor":{
-		"stimulation":0.0,
-		"requirements":[
-		],
-		"strippingSlots":[
-		]
-	},
-	"target":{
-		"stimulation":0.0,
-		"requirements":[
-		],
-		"strippingSlots":[
-		]
-	},
-	"performer":{
-		"floats":{
-		}
-	}
 }

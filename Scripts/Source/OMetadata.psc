@@ -15,16 +15,16 @@ ScriptName OMetadata
 ;    ██║   ██║  ██║╚██████╔╝███████║
 ;    ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
 
-;/* GetTags
+;/* GetSceneTags
 * * returns all tags for a scene
 * *
 * * @param: Id, the id of the scene
 * *
 * * @return: an array containing all the tags of the scene
 */;
-string[] Function GetTags(string Id) Global Native
+string[] Function GetSceneTags(string Id) Global Native
 
-;/* HasTag
+;/* HasSceneTag
 * * checks if a scene has a tag
 * *
 * * @param: Id, the id of the scene
@@ -32,9 +32,9 @@ string[] Function GetTags(string Id) Global Native
 * *
 * * @return: true if the scene has the tag, otherwise false
 */;
-bool Function HasTag(string Id, string Tag) Global Native
+bool Function HasSceneTag(string Id, string Tag) Global Native
 
-;/* HasAnyTag
+;/* HasAnySceneTag
 * * checks if a scene has at least one of a list of tags
 * *
 * * @param: Id, the id of the scene
@@ -42,19 +42,19 @@ bool Function HasTag(string Id, string Tag) Global Native
 * *
 * * @return: true if the scene has at least one of the tags, otherwise false
 */;
-bool Function HasAnyTag(string Id, string[] Tags) Global Native
+bool Function HasAnySceneTag(string Id, string[] Tags) Global Native
 
-;/* HasAnyTagCSV
-* * same as HasAnyTag, except tags are passed as a csv-string
+;/* HasAnySceneTagCSV
+* * same as HasAnySceneTag, except tags are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Tags, a csv-string of tags
 * *
 * * @return: true if the scene has at least one of the tags, otherwise false
 */;
-bool Function HasAnyTagCSV(string Id, string Tags) Global Native
+bool Function HasAnySceneTagCSV(string Id, string Tags) Global Native
 
-;/* HasAllTags
+;/* HasAllSceneTags
 * * checks if a scene has all of a list of tags
 * *
 * * @param: Id, the id of the scene
@@ -62,17 +62,38 @@ bool Function HasAnyTagCSV(string Id, string Tags) Global Native
 * *
 * * @return: true if the scene has all the tags, otherwise false
 */;
-bool Function HasAllTags(string Id, string[] Tags) Global Native
+bool Function HasAllSceneTags(string Id, string[] Tags) Global Native
 
-;/* HasAllTagsCSV
-* * same as HasAllTags, except tags are passed as a csv-string
+;/* HasAllSceneTagsCSV
+* * same as HasAllSceneTags, except tags are passed as a csv-string
 * *
 * * @param: Id, the id of the scene
 * * @param: Tags, a csv-string of tags
 * *
 * * @return: true if the scene has all the tags, otherwise false
 */;
-bool Function HasAllTagsCSV(string Id, string Tags) Global Native
+bool Function HasAllSceneTagsCSV(string Id, string Tags) Global Native
+
+;/* GetSceneTagOverlap
+* * returns all scene tags that overlap with the list
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, an array with all the tags to check for
+* *
+* * @return: an array of tags that appear in the scene tags and the given list
+*/;
+string[] Function GetSceneTagOverlap(string Id, string[] Tags) Global Native
+
+;/* GetSceneTagOverlapCSV
+* * same as GetSceneTagOverlap, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: a csv-string of tags that appear in the scene tags and the given list
+*/;
+string Function GetSceneTagOverlapCSV(string Id, string Tags) Global Native
+
 
 ;/* GetActorTags
 * * returns all tags for an actor in a scene
@@ -138,6 +159,28 @@ bool Function HasAllActorTags(string Id, int Position, string[] Tags) Global Nat
 * * @return: true if the actor in the scene has all the tags, otherwise false
 */;
 bool Function HasAllActorTagsCSV(string Id, int Position, string Tags) Global Native
+
+;/* GetActorTagOverlap
+* * returns all actor tags that overlap with the list
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the actor in the scene
+* * @param: Tags, an array with all the tags to check for
+* *
+* * @return: an array of tags that appear in the actor tags and the given list
+*/;
+string[] Function GetActorTagOverlap(string Id, int Position, string[] Tags) Global Native
+
+;/* GetActorTagOverlapCSV
+* * same as GetActorTagOverlap, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the actor in the scene
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: a csv-string of tags that appear in the actor tags and the given list
+*/;
+string Function GetActorTagOverlapCSV(string Id, int Position, string Tags) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
@@ -1298,7 +1341,7 @@ int[] Function FindAllActionsForParticipantsAny(string Id, int[] Positions, stri
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForsParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForParticipantsAnyCSV(string Id, string Positions, string Types) Global Native
 
 ;/* FindActionForParticipantsAll
 * * returns the first occurance of an action with all participants in a given list
@@ -1386,7 +1429,7 @@ int[] Function FindAllActionsForParticipantsAll(string Id, int[] Positions, stri
 * * 
 * * @return: an array of the indices of all occurances of any of the action types
 */;
-int[] Function FindAllActionsForsParticipantsAllCSV(string Id, string Positions, string Types) Global Native
+int[] Function FindAllActionsForParticipantsAllCSV(string Id, string Positions, string Types) Global Native
 
 
 ;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗    ███████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 
