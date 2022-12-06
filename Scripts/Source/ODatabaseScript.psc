@@ -1,3 +1,15 @@
+; ██╗██╗██╗ ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗  ██╗██╗██╗
+; ██║██║██║ ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗ ██║██║██║
+; ██║██║██║ ██║  ██║█████╗  ██████╔╝██████╔╝█████╗  ██║     ███████║   ██║   █████╗  ██║  ██║ ██║██║██║
+; ╚═╝╚═╝╚═╝ ██║  ██║██╔══╝  ██╔═══╝ ██╔══██╗██╔══╝  ██║     ██╔══██║   ██║   ██╔══╝  ██║  ██║ ╚═╝╚═╝╚═╝
+; ██╗██╗██╗ ██████╔╝███████╗██║     ██║  ██║███████╗╚██████╗██║  ██║   ██║   ███████╗██████╔╝ ██╗██╗██╗
+; ╚═╝╚═╝╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝  ╚═╝╚═╝╚═╝
+
+;/* ODatabaseScript
+* * this entire script is deprecated
+* * we will remove it at some point in the future so don't use it or your mod will get broken
+* * if you don't know how to do whatever it is you want to do without it ask for help in the #ostim-dev channel in the OStim NG Discord (discord.gg/ostim)
+*/;
 ScriptName ODatabaseScript Extends Quest
 
 OsexIntegrationMain OStim

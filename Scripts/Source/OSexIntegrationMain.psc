@@ -110,8 +110,6 @@ Float SpeedUpSpeed
 
 Int Property CustomTimescale Auto
 
-Bool Property OrgasmIncreasesRelationship Auto
-
 GlobalVariable Property OStimMaleSexExcitementMult Auto
 float Property MaleSexExcitementMult
 	float Function Get()
@@ -377,8 +375,7 @@ Int[] OSexControlKeys
 
 ;--Thank you ODatabase
 Int CurrentOID ; the OID is the JMap ID of the current animation. You can feed this in to ODatabase
-Int LastHubOID
-Bool CurrentAnimIsAggressive
+string LastHubSceneID
 ;--
 
 Bool property AIRunning auto
@@ -748,7 +745,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	Else
 		CurrentFurniture.BlockActivation(true)
-		;AlignActorsWithCurrentFurniture()
 	EndIf
 
 	If (StartingAnimation == "")
@@ -789,7 +785,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	CurrentAnimation = ""
 	CurrentSceneID = StartingAnimation
-	LastHubOID = -1
+	LastHubSceneID = ""
 	;OnAnimationChange()
 
 	Int OldTimescale = 0
@@ -901,14 +897,9 @@ Event OnUpdate() ;OStim main logic loop
 			MostRecentOrgasmedActor = SubActor
 			SubTimesOrgasm += 1
 			Orgasm(SubActor)
-			If (GetCurrentAnimationClass() == ClassSex)
-				SetActorExcitement(DomActor, GetActorExcitement(DomActor) + 5)
-			EndIf
 			If (EndOnSubOrgasm)
 				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
-					If ODatabase.HasIdleSpeed(CurrentOID)
-						SetCurrentAnimationSpeed(0)
-					EndIf
+					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
 				EndIf
@@ -929,9 +920,7 @@ Event OnUpdate() ;OStim main logic loop
 			Orgasm(DomActor)
 			If (EndOnDomOrgasm)
 				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
-					If ODatabase.HasIdleSpeed(CurrentOID)
-						SetCurrentAnimationSpeed(0)
-					EndIf
+					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
 				EndIf
@@ -1132,7 +1121,7 @@ Bool Function AnimationIsAtMaxSpeed()
 EndFunction
 
 Int Function GetCurrentAnimationMaxSpeed()
-	Return ODatabase.GetMaxSpeed(CurrentOID)
+	Return OMetadata.GetMaxSpeed(CurrentSceneID)
 EndFunction
 
 Int Function GetAPIVersion()
@@ -1173,15 +1162,6 @@ EndFunction
 String Function GetCurrentAnimation()
 	{Return the animation ID of the current animation}
 	Return CurrentAnimation
-EndFunction
-
-String Function GetCurrentAnimationClass()
-	Return CurrAnimClass
-EndFunction
-
-Int Function GetCurrentAnimationOID()
-	{Return the ODatabase ID of the current scene}
-	Return CurrentOID
 EndFunction
 
 string function GetCurrentAnimationSceneID() 
@@ -1234,31 +1214,26 @@ EndFunction
 
 Function TravelToAnimationIfPossible(String Animation) 
 	{Alternative to TravelToAnimation with some safety checks}
-	Int ID = ODatabase.GetAnimationsWithSceneID(ODatabase.GetDatabaseOArray(), Animation)
-	ID = ODatabase.GetObjectOArray(ID, 0)
-	Bool Transitory = ODatabase.IsTransitoryAnimation(ID)
-	If (Transitory)
+	If OMetadata.IsTransition(Animation)
 		WarpToAnimation(Animation)
 	Else
 		TravelToAnimation(Animation)
-		If (True) ; Catch
-			String Lastanimation
-			String Lastlastanimation
-			String Current = CurrentAnimation
-			While (ODatabase.GetSceneIDByAnimID(CurrentAnimation) != Animation)
-				Utility.Wait(1)
-				If (Current != CurrentAnimation)
-					LastLastAnimation = Lastanimation
-					LastAnimation = Current
-					Current = CurrentAnimation
+		String Lastanimation
+		String Lastlastanimation
+		String Current = CurrentAnimation
+		While OSANative.GetSceneIdFromAnimId(CurrentAnimation) != Animation
+			Utility.Wait(1)
+			If (Current != CurrentAnimation)
+				LastLastAnimation = Lastanimation
+				LastAnimation = Current
+				Current = CurrentAnimation
 
-					If (Current == LastLastAnimation)
-						Console("Infinite loop during travel detected. Warping")
-						WarpToAnimation(Animation)
-					EndIf
+				If (Current == LastLastAnimation)
+					Console("Infinite loop during travel detected. Warping")
+					WarpToAnimation(Animation)
 				EndIf
-			EndWhile
-		EndIf
+			EndIf
+		EndWhile
 	EndIf
 EndFunction
 
@@ -1311,10 +1286,6 @@ Function EndAnimation(Bool SmoothEnding = True)
 		;RunOsexCommand("$endscene")
 	endif 
 	;todo: 0SA_Gameloaded can be used exclusively instead of diasa end command??
-EndFunction
-
-Bool Function GetCurrentAnimIsAggressive() ; if the current animation is tagged aggressive
-	Return CurrentAnimIsAggressive
 EndFunction
 
 Bool Function IsSceneAggressiveThemed() ; if the entire situation should be themed aggressively
@@ -1478,23 +1449,8 @@ Bool Function AppearsFemale(Actor Act)
 	Return OSANative.GetSex(OSANative.GetLeveledActorBase(act)) == 1
 EndFunction
 
-Actor Function GetCurrentLeadingActor()
-	{in a blowjob type animation, it would be the female, while in most sex animations, it will be the male}
-	Int ActorNum = ODatabase.GetMainActor(CurrentOID)
-	Return GetActor(ActorNum)
-EndFunction
-
 Bool Function AnimationRunning()
 	Return SceneRunning
-EndFunction
-
-Bool Function IsVaginal()
-	Return (GetCurrentAnimationClass() == ClassSex) && IsFemale(SubActor)
-EndFunction
-
-Bool Function IsOral()
-	string animType = GetCurrentAnimationClass()
-	return animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ"
 EndFunction
 
 String[] Function GetScene()
@@ -1854,83 +1810,6 @@ Bool Function IsBedRoll(objectReference Bed)
 	Return (Bed.Haskeyword(Keyword.GetKeyword("FurnitureBedRoll")))
 EndFunction
 
-Function AlignActorsWithCurrentFurniture()
-	OFurniture.GetOffset(CurrentFurniture)
-
-	int i = Actors.Length
-	While i
-		i -= 1
-		Actors[i].SetDontMove(True)
-	EndWhile
-
-	bool Bed = FurnitureType == FURNITURE_TYPE_BED && !IsBedRoll(CurrentFurniture)
-
-	Float FlipFloat = 0
-	If (Bed)
-		FlipFloat = 180
-	EndIf
-
-	Float DomSpeed = CurrentFurniture.GetDistance(Actors[0]) * 100
-	Float BedOffsetX = 0
-	Float BedOffsetY = 0
-	Float BedOffsetZ = 0
-
-	If (Bed)
-		Console("Current bed is not a bedroll. Moving actors backwards a bit")
-
-		Int Offset = 31 + BedRealignment
-		If (SubActor == PlayerRef)
-			Console("Player is SubActor. Adding some extra bed offset")
-			Offset += 36
-		EndIf
-
-		BedOffsetX = Math.Cos(OUtils.TrigAngleZ(CurrentFurniture.GetAngleZ())) * Offset
-		BedOffsetY = Math.Sin(OUtils.TrigAngleZ(CurrentFurniture.GetAngleZ())) * Offset
-		BedOffsetZ = 45
-	Else
-		Console("Bedroll. Not realigning")
-	EndIf
-
-	float[] bedCoords = OSANative.GetCoords(CurrentFurniture)
-	bedCoords[0] = bedCoords[0] + BedOffsetX
-	bedCoords[1] = bedCoords[1] + BedOffsetY
-	bedCoords[2] = bedCoords[2] + BedOffsetZ
-	Float BedAngleX = CurrentFurniture.GetAngleX()
-	Float BedAngleY = CurrentFurniture.GetAngleY()
-	Float BedAngleZ = CurrentFurniture.GetAngleZ()
-
-	Actors[0].TranslateTo(bedCoords[0], bedCoords[1], bedCoords[2], BedAngleX, BedAngleY, BedAngleZ, DomSpeed, afMaxRotationSpeed = 100)
-	Actors[0].SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
-	If (UseFades && IsPlayerInvolved())
-		Game.FadeOutGame(False, True, 25.0, 25.0) ; keep the screen black
-	EndIf
-
-
-
-
-	i = 1
-	While i < Actors.Length
-		Utility.Wait(0.05)
-		Float OffsetY = Math.Sin(OUtils.TrigAngleZ(Actors[0].GetAngleZ())) * 30
-		Float OffsetX = Math.Cos(OUtils.TrigAngleZ(Actors[0].GetAngleZ())) * 30
-
-		Actors[i].MoveTo(Actors[0], OffsetX, OffsetY, 0)
-		Actors[i].SetAngle(BedAngleX, BedAngleY, BedAngleZ - FlipFloat)
-
-		i += 1
-	EndWhile
-
-	If UseFades && Actors.Find(PlayerRef) != -1
-		Game.FadeOutGame(False, True, 10.0, 5) ; keep the screen black
-	EndIf
-
-	i = Actors.Length
-	While i
-		i -= 1
-		Actors[i].SetDontMove(False)
-	EndWhile
-EndFunction
-
 ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are aligned on
 	Int StageID = Actors[0].GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
@@ -1957,8 +1836,6 @@ EndFunction
 ;
 ;				Some code related to the speed system
 
-
-Bool CurrAnimHasIdleSpeed
 Function AutoIncreaseSpeed()
 	If (GetTimeSinceLastPlayerInteraction() < 5.0)
 		Return
@@ -1980,9 +1857,7 @@ Function AutoIncreaseSpeed()
 	EndIf
 
 	Int Speed = GetCurrentAnimationSpeed()
-	If (!CurrAnimHasIdleSpeed)
-		NumSpeeds += 1
-	ElseIf (Speed == 0)
+	If (Speed == 0)
 		Return
 	EndIf
 
@@ -2112,7 +1987,7 @@ Function OnAnimationChange()
 	
 	bool sceneChange = false 
 
-	string newScene = ODatabase.GetSceneID( CurrentOID )
+	string newScene = OSANative.GetSceneIdFromAnimId(CurrentAnimation)
 	if newScene != CurrentSceneID
 		sceneChange = true 
 	endif 
@@ -2121,13 +1996,10 @@ Function OnAnimationChange()
 	OSANative.ChangeAnimation(Password, CurrentSceneID)
 	;Profile("DB Lookup")
 
-	If (ODatabase.IsHubAnimation(CurrentOID))
-		LastHubOID = CurrentOID
+	If OMetadata.GetMaxSpeed(CurrentSceneID) == 0 && !OMetadata.IsTransition(CurrentSceneID)
+		LastHubSceneID = CurrentSceneID
 		Console("On new hub animation")
 	EndIf
-
-	CurrentAnimIsAggressive = ODatabase.IsAggressive(CurrentOID)
-	CurrAnimHasIdleSpeed = ODatabase.HasIdleSpeed(CurrentOID)
 
 	String[] Split = PapyrusUtil.StringSplit(CurrentAnimation, "_")
 	If (Split.Length > 2)
@@ -2146,7 +2018,7 @@ Function OnAnimationChange()
 
 	CurrAnimClass = CClass
 
-	Int CorrectActorCount = ODatabase.GetNumActors(CurrentOID)
+	Int CorrectActorCount = OMetadata.GetActorCount(CurrentSceneID)
 
 	If (!ThirdActor && (CorrectActorCount == 3)) ; no third actor, but there should be
 		Console("Third actor has joined scene ")
@@ -2330,6 +2202,10 @@ Function SetActorExcitement(Actor Act, Float Value)
 	endIf
 EndFunction
 
+Function AddActorExcitement(Actor Act, Float Value)
+	SetActorExcitement(Act, GetActorExcitement(Act) + Value)
+EndFunction
+
 Function Orgasm(Actor Act)
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
@@ -2356,14 +2232,14 @@ Function Orgasm(Actor Act)
 		Utility.Wait(0.3)
 	EndWhile
 
-	If (OrgasmIncreasesRelationship)
-		Actor Partner = GetSexPartner(Act)
-		Int Rank = Act.GetRelationshipRank(Partner)
-		If (Rank == 0)
-			Act.SetRelationshipRank(Partner, 1)
+	int actorIndex = Actors.find(Act)
+	If actorIndex != -1
+		int actionIndex = OMetadata.FindActionForTarget(CurrentSceneID, actorIndex, "vaginalsex")
+		If actionIndex != -1
+			Actor partner = GetActor(OMetadata.GetActionActor(CurrentSceneID, actionIndex))
+			AddActorExcitement(partner, 5)
 		EndIf
 	EndIf
-
 
 	Act.DamageActorValue("stamina", 250.0)
 EndFunction
@@ -2888,8 +2764,6 @@ UseFreeCam
 	ResetClutterRadius = 5
 
 	DisableStimulationCalculation = false
-
-	OrgasmIncreasesRelationship = False
 	SlowMoOnOrgasm = True
 
 	UseAIControl = False
@@ -3212,9 +3086,9 @@ Event OnKeyDown(Int KeyPress)
 			DecreaseAnimationSpeed()
 			PlayTickSmall()
 		ElseIf ((KeyPress == PullOutKey) && !AIRunning)
-			If (ODatabase.IsSexAnimation(CurrentOID))
-				If (LastHubOID != -1)
-					TravelToAnimationIfPossible(ODatabase.GetSceneID(LastHubOID))
+			If !OMetadata.IsTransition(CurrentSceneID) && OMetadata.GetMaxSpeed(CurrentSceneID) != 0
+				If (LastHubSceneID != "")
+					TravelToAnimationIfPossible(LastHubSceneID)
 				EndIf
 			EndIf
 		EndIf
@@ -3340,11 +3214,6 @@ Function Startup()
 		Debug.MessageBox("OStim: JContainers is not installed, please exit the game and install it to allow Ostim to function.")
 		Return
 	EndIf
-
-	If (!JContainers.FileExistsAtPath(".\\Data\\Scripts\\OSex.pex"))
-		Debug.MessageBox("OStim: OSex is not installed, please exit the game and install it to allow Ostim to function.")
-		Return
-	endif
 
 	SMPInstalled = (SKSE.GetPluginVersion("hdtSSEPhysics") != -1)
 	Console("SMP installed: " + SMPInstalled)
@@ -3543,7 +3412,22 @@ EndFunction
 
 ; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
 
-float Property SexExcitementMult Auto
+bool Property OrgasmIncreasesRelationship
+	bool Function Get()
+		Return false
+	EndFunction
+	Function Set(float Value)
+	EndFunction
+EndProperty
+
+float Property SexExcitementMult
+	float Function Get()
+		Return MaleSexExcitementMult
+	EndFunction
+	Function Set(float Value)
+		MaleSexExcitementMult = Value
+	EndFunction
+EndProperty
 
 bool Property UseBed
 	bool Function Get()
@@ -3576,4 +3460,41 @@ EndFunction
 
 bool Function ThreesomeAnimsInstalled()
 	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
+EndFunction
+
+Bool Function IsVaginal()
+	Return OMetadata.FindAction(CurrentSceneID, "vaginalsex") != -1
+EndFunction
+
+Bool Function IsOral()
+	Return OMetadata.FindAction(CurrentSceneID, "blowjob") != -1
+EndFunction
+
+Actor Function GetCurrentLeadingActor()
+	int actorIndex = 0
+	If OMetadata.HasActions(CurrentSceneID)
+		actorIndex = OMetadata.GetActionPerformer(CurrentSceneID, 0)
+	EndIf
+	Return GetActor(actorIndex)
+EndFunction
+
+Bool Function GetCurrentAnimIsAggressive()
+	int i = Actors.Length
+	While i
+		i -= 1
+		If OMetadata.HasActorTag(CurrentSceneID, i, "aggressor")
+			Return true
+		EndIf
+	EndWhile
+
+	Return false
+EndFunction
+
+String Function GetCurrentAnimationClass()
+	Return CurrAnimClass
+EndFunction
+
+Int Function GetCurrentAnimationOID()
+	{Return the ODatabase ID of the current scene}
+	Return CurrentOID
 EndFunction

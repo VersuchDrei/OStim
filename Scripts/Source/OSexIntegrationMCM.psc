@@ -37,7 +37,6 @@ int SetHideNPCOnNPCBars
 
 ; orgasm settings
 Int SetSlowMoOrgasms
-Int SetOrgasmBoostsRel
 Int SetEndOnOrgasm
 Int SetEndOnSubOrgasm
 Int SetEndOnBothOrgasm
@@ -304,7 +303,6 @@ Event OnPageReset(String Page)
 		SetEndOnSubOrgasm = AddToggleOption("$ostim_orgasm_end_sub", Main.EndOnSubOrgasm)
 		SetEndOnBothOrgasm = AddToggleOption("$ostim_orgasm_end_both", Main.RequireBothOrgasmsToFinish)
 		SetSlowMoOrgasms = AddToggleOption("$ostim_slowmo_orgasm", Main.SlowMoOnOrgasm)
-		SetOrgasmBoostsRel = AddToggleOption("$ostim_orgasm_boost_rel", Main.OrgasmIncreasesRelationship)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_furniture")
@@ -683,9 +681,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSlowMoOrgasms)
 		Main.SlowMoOnOrgasm = !Main.SlowMoOnOrgasm
 		SetToggleOptionValue(Option, Main.SlowMoOnOrgasm)
-	ElseIf (Option == SetOrgasmBoostsRel)
-		Main.OrgasmIncreasesRelationship = !Main.OrgasmIncreasesRelationship
-		SetToggleOptionValue(Option, Main.OrgasmIncreasesRelationship)
 	ElseIf (Option == SetUseFades)
 		Main.UseFades = !Main.UseFades
 		SetToggleOptionValue(Option, Main.UseFades)
@@ -860,8 +855,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_auto_hide_bar")
 	ElseIf (Option == SetSlowMoOrgasms)
 		SetInfoText("$ostim_tooltip_slowmo_orgasms")
-	ElseIf (Option == SetOrgasmBoostsRel)
-		SetInfoText("$ostim_tooltip_orgasm_boosts_rel")
 	ElseIf (Option == SetDomLightMode)
 		SetInfoText("$ostim_tooltip_dom_light")
 	ElseIf (Option == SetSubLightMode)
@@ -1296,7 +1289,6 @@ Function ExportSettings()
 
 	; Orgasm settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSlowMoOrgasms", Main.SlowMoOnOrgasm as Int)
-	JMap.SetInt(OstimSettingsFile, "SetOrgasmBoostsRel", Main.OrgasmIncreasesRelationship as Int)
 
 	; Light settings export.
 	Jmap.SetInt(OstimSettingsFile, "SetDomLightMode", Main.DomLightPos as Int)
@@ -1465,7 +1457,7 @@ Function ImportSettings(bool default = false)
 	Main.EnableActorSpeedControl = JMap.GetInt(OstimSettingsFile, "SetActorSpeedControl")
 	Main.ResetPosAfterSceneEnd = JMap.GetInt(OstimSettingsFile, "SetResetPosition")
 	Main.MaleSexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetsexExcitementMult")
-	Main.FemaleSexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetFemaleSexExcitementMult")
+	Main.FemaleSexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetFemaleSexExcitementMult", 1.0)
 	Main.EnableImprovedCamSupport = JMap.GetInt(OstimSettingsFile, "SetClipinglessFirstPerson")
 	Main.EndAfterActorHit = JMap.GetInt(OstimSettingsFile, "SetEndAfterActorHit")
 	Main.UseRumble = JMap.GetInt(OstimSettingsFile, "SetUseRumble")
@@ -1538,7 +1530,6 @@ Function ImportSettings(bool default = false)
 	
 	;Orgasm settings
 	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms")
-	Main.OrgasmIncreasesRelationship = JMap.GetInt(OstimSettingsFile, "SetOrgasmBoostsRel")
 	
 	; Ai/Control settings export.
 	Main.UseAIControl = JMap.GetInt(OstimSettingsFile, "SetAIControl")

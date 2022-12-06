@@ -219,7 +219,8 @@ Event OnAlignStage()
 	Actra.SetVehicle(PosObj)
 	; NPCs will try to clip out of furniture after ~2 seconds, the only way to prevent that is to have them still translating during that time
 	; so we just rotate them very slowly for a tiny amount over the first 10 seconds
-	Actra.TranslateTo(PosObj.GetPositionX(), PosObj.GetPositionY(), PosObj.GetPositionZ(), PosObj.GetAngleX(), PosObj.GetAngleY(), PosObj.GetAngleZ() + 0.001, 500, 0.0001)
+	; EDIT: for some users after the end of the ten seconds actors start clipping out of alignment again, so we just rotate them for ~2.7 hours instead
+	Actra.TranslateTo(PosObj.GetPositionX(), PosObj.GetPositionY(), PosObj.GetPositionZ(), PosObj.GetAngleX(), PosObj.GetAngleY(), PosObj.GetAngleZ() + 1, 500, 0.0001)
 	SendModEvent("ostim_setvehicle")
 	Aligned = True
 EndEvent

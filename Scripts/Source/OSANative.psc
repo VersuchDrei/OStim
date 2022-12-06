@@ -241,3 +241,5 @@ Function Unlock(String a_lock) Global Native
 ; Experimental
 String Function Translate(String a_key) Global Native
 Function SetLocale(String a_locale = "") Global Native
+
+Function GetSceneIdFromAnimId(string Id) Global Native
