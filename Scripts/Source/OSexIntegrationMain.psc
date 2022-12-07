@@ -3394,7 +3394,7 @@ bool Property OrgasmIncreasesRelationship
 	bool Function Get()
 		Return false
 	EndFunction
-	Function Set(float Value)
+	Function Set(bool Value)
 	EndFunction
 EndProperty
 
