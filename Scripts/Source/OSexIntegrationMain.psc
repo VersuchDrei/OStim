@@ -1982,7 +1982,6 @@ Function OnAnimationChange()
 	
 	Console("Changing animation...")
 
-	;Profile()
 	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 	
 	bool sceneChange = false 
@@ -1994,29 +1993,16 @@ Function OnAnimationChange()
 	CurrentSceneID = newScene
 		
 	OSANative.ChangeAnimation(Password, CurrentSceneID)
-	;Profile("DB Lookup")
 
 	If OMetadata.GetMaxSpeed(CurrentSceneID) == 0 && !OMetadata.IsTransition(CurrentSceneID)
 		LastHubSceneID = CurrentSceneID
 		Console("On new hub animation")
 	EndIf
 
-	String[] Split = PapyrusUtil.StringSplit(CurrentAnimation, "_")
-	If (Split.Length > 2)
-		String SpeedString = Split[2]
-		CurrentSpeed = SpeedStringToInt(SpeedString)
-		OSANative.UpdateSpeed(Password, CurrentSpeed)
-	Else
-		CurrentSpeed = 0
-		OSANative.UpdateSpeed(Password, 0)
-	EndIf
+	CurrentSpeed = OSANative.GetSpeedFromAnimId(CurrentAnimation)
+	OSANative.UpdateSpeed(Password, CurrentSpeed)
 
-	String CClass = PapyrusUtil.StringSplit(Split[1], "-")[0]
-	If (StringUtil.Find(CClass, "Ag") != -1)
-		CClass = StringUtil.Substring(CClass, 2)
-	EndIf
-
-	CurrAnimClass = CClass
+	CurrAnimClass = OSANative.GetAnimClass(CurrentSceneID)
 
 	Int CorrectActorCount = OMetadata.GetActorCount(CurrentSceneID)
 
@@ -2612,14 +2598,6 @@ Bool Function ChanceRoll(Int Chance) ; input 60: 60% of returning true ;DEPRECIA
 
 
 	return OUtils.ChanceRoll(chance)
-
-EndFunction
-
-Int Function SpeedStringToInt(String In) ; casting does not work so...
-	If StringUtil.GetLength(In) != 2
-		Return 0
-	EndIf
-	return (StringUtil.AsOrd(StringUtil.GetNthChar(In, 1)) - 48)
 
 EndFunction
 
@@ -3455,11 +3433,17 @@ ObjectReference Function GetBed()
 EndFunction
 
 bool Function SoloAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/WANK/Boy9/Sx/AnubsMagicDildoBentOver.xml")
+	Actor[] _Actors = new Actor[1]
+	_Actors[0] = None
+	return OLibrary.GetRandomScene(_Actors) != ""
 EndFunction
 
 bool Function ThreesomeAnimsInstalled()
-	return MiscUtil.FileExists("data/meshes/0SA/mod/0Sex/scene/0M2F/Sy6KNy2Sy9/DHJ/Parlor0BJ2HJ.xml")
+	Actor[] _Actors = new Actor[3]
+	_Actors[0] = None
+	_Actors[1] = None
+	_Actors[2] = None
+	return OLibrary.GetRandomScene(_Actors) != ""
 EndFunction
 
 Bool Function IsVaginal()
@@ -3467,6 +3451,7 @@ Bool Function IsVaginal()
 EndFunction
 
 Bool Function IsOral()
+	; this method did not check for animation class VJ, so to keep it working as it was we don't check for cunnilingus
 	Return OMetadata.FindAction(CurrentSceneID, "blowjob") != -1
 EndFunction
 
