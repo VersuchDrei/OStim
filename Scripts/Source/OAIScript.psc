@@ -212,6 +212,11 @@ String Function GetRandomForeplayAnimation(Actor[] Actors, string FurnitureType,
 	string typesAny = ""
 	string typesBlacklist = "analsex,tribbing,vaginalsex"
 
+	string standingTag = ""
+	If FurnitureType == ""
+		standingTag = OCSV.CreateCSVMatrix(Actors.Length, "standing")
+	EndIf
+
 	string actorTagBlacklist = ""
 	If FurnitureType == "bed"
 		actorTagBlacklist = OCSV.CreateCSVMatrix(Actors.Length, "standing")
@@ -224,9 +229,9 @@ String Function GetRandomForeplayAnimation(Actor[] Actors, string FurnitureType,
 		string aggressorList = OCSV.CreateCSVList(4, Aggressor)
 
 		If OStim.IsFemale(Actors[Aggressor])
-			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "cunnilingus,grindingthigh", AnyActionActor = "," + Aggressor, AnyActionTarget = Aggressor, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
+			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "cunnilingus,grindingthigh", AnyActionActor = "," + Aggressor, AnyActionTarget = Aggressor, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
 		Else
-			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "blowjob,boobjob,buttjob,thighjob", AnyActionTarget = AggressorList, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
+			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "blowjob,boobjob,buttjob,thighjob", AnyActionTarget = AggressorList, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
 		EndIf
 
 		If id != ""
@@ -234,12 +239,17 @@ String Function GetRandomForeplayAnimation(Actor[] Actors, string FurnitureType,
 		EndIf
 	EndIf
 
-	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "analfingering,blowjob,boobjob,buttjob,cunnilingus,footjob,grindingthigh,handjob,lickingnipples,lickingpenis,lickingtesticles,rimjob,rubbingclitoris,rubbingpenisagainstface,suckingnipples,thighjob,vaginalfingering", ActionBlacklistTypes = typesBlacklist)
+	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, AnyActorTagForAny = standingTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "analfingering,blowjob,boobjob,buttjob,cunnilingus,footjob,grindingthigh,handjob,lickingnipples,lickingpenis,lickingtesticles,rimjob,rubbingclitoris,rubbingpenisagainstface,suckingnipples,thighjob,vaginalfingering", ActionBlacklistTypes = typesBlacklist)
 EndFunction
 
 String Function GetRandomSexAnimation(Actor[] Actors, string FurnitureType, int Aggressor = -1)
 	string sceneTags = SceneTags()
 	string typesAny = "analsex,vaginalsex"
+
+	string standingTag = ""
+	If FurnitureType == ""
+		standingTag = OCSV.CreateCSVMatrix(Actors.Length, "standing")
+	EndIf
 
 	string actorTagBlacklist = ""
 	If FurnitureType == "bed"
@@ -255,14 +265,14 @@ String Function GetRandomSexAnimation(Actor[] Actors, string FurnitureType, int 
 		string aggressorTag = OCSV.CreateSingleCSVMatrixEntry(Aggressor, "aggressor")
 		string aggressorList = OCSV.CreateCSVList(3, Aggressor)
 
-		string id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny, AnyActionPerformer = AggressorList)
+		string id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny, AnyActionPerformer = AggressorList)
 
 		If id != ""
 			Return id
 		EndIf
 	EndIf
 
-	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny)
+	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, AnyActorTagForAny = standingTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny)
 EndFunction
 
 Function ChangeToPulledOutVersion(Actor[] Actors, string FurnitureType)

@@ -108,10 +108,10 @@ EndFunction
 
 Function SetBarPercent(OSexBar Bar, Float Percent)
 	Bar.SetPercent(Percent / 100.0)
-	Float zPercent = Percent / 100.0
-	If (zPercent >= 1.0)
-		FlashBar(Bar)
-	EndIf
+EndFunction
+
+Function ForceBarPercent(OSexBar Bar, Float Percent)
+	Bar.ForcePercent(Percent / 100.0)
 EndFunction
 
 float Function GetBarPercent(OSexBar Bar)
@@ -190,7 +190,7 @@ bool orgasming
 
 Event OStimOrgasm(String eventName, String strArg, Float numArg, Form sender)
 	Orgasming = True
-	Actor Act = OStim.GetMostRecentOrgasmedActor()
+	Actor Act = sender As Actor
 
 	If (Act == OStim.GetDomActor())
 		SetBarPercent(DomBar, 100)

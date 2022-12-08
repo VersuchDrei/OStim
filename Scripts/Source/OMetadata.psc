@@ -7,6 +7,40 @@
 */;
 ScriptName OMetadata
 
+;  ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ██╗     
+; ██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗██║     
+; ██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║██║     
+; ██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║██║     
+; ╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║███████╗
+;  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+
+;/* IsTransition
+* * checks if the scene is a transition
+* *
+* * @param: Id, the id of the scene
+* *
+* * @return: true if the scene is a transition, otherwise false
+*/;
+bool Function IsTransition(string Id) Global Native
+
+;/* GetMaxSpeed
+* * returns the index of the fastest speed of the scene
+* *
+* * @param: Id, the id of the scene
+* *
+* * @return: the index of the fastest speed
+*/;
+int Function GetMaxSpeed(string Id) Global Native
+
+;/* GetActorCount
+* * returns the actor count of the scene
+* *
+* * @param: Id, the id of the scene
+* *
+* * @return: the actor count
+*/;
+int Function GetActorCount(string Id) Global Native
+
 
 ; ████████╗ █████╗  ██████╗ ███████╗
 ; ╚══██╔══╝██╔══██╗██╔════╝ ██╔════╝
@@ -190,7 +224,7 @@ string Function GetActorTagOverlapCSV(string Id, int Position, string Tags) Glob
 ; ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
 ; ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
 
-;/* HasAction
+;/* HasActions
 * * checks if the scene has at least one action
 * *
 * * @param: Id, the id of the scene
