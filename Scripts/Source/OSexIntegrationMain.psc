@@ -3476,10 +3476,11 @@ Bool Function GetCurrentAnimIsAggressive()
 EndFunction
 
 String Function GetCurrentAnimationClass()
+	; don't use anim classes, use actions from OMetadata
 	Return CurrAnimClass
 EndFunction
 
 Int Function GetCurrentAnimationOID()
-	{Return the ODatabase ID of the current scene}
+	; don't use ODatabase, use OMetadata
 	Return CurrentOID
 EndFunction
