@@ -40,6 +40,7 @@ Int SetSlowMoOrgasms
 Int SetEndOnOrgasm
 Int SetEndOnSubOrgasm
 Int SetEndOnBothOrgasm
+int SetAutoClimaxAnims
 
 ; light settings
 Int SetDomLightMode
@@ -303,6 +304,7 @@ Event OnPageReset(String Page)
 		SetEndOnSubOrgasm = AddToggleOption("$ostim_orgasm_end_sub", Main.EndOnSubOrgasm)
 		SetEndOnBothOrgasm = AddToggleOption("$ostim_orgasm_end_both", Main.RequireBothOrgasmsToFinish)
 		SetSlowMoOrgasms = AddToggleOption("$ostim_slowmo_orgasm", Main.SlowMoOnOrgasm)
+		SetAutoClimaxAnims = AddToggleOption("$ostim_auto_climax_anims", Main.AutoClimaxAnimations)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_furniture")
@@ -681,6 +683,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSlowMoOrgasms)
 		Main.SlowMoOnOrgasm = !Main.SlowMoOnOrgasm
 		SetToggleOptionValue(Option, Main.SlowMoOnOrgasm)
+	ElseIf (Option == SetAutoClimaxAnims)
+		Main.AutoClimaxAnimations = !Main.AutoClimaxAnimations
+		SetToggleOptionValue(Option, Main.AutoClimaxAnimations)
 	ElseIf (Option == SetUseFades)
 		Main.UseFades = !Main.UseFades
 		SetToggleOptionValue(Option, Main.UseFades)
@@ -855,6 +860,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_auto_hide_bar")
 	ElseIf (Option == SetSlowMoOrgasms)
 		SetInfoText("$ostim_tooltip_slowmo_orgasms")
+	ElseIf (Option == SetAutoClimaxAnims)
+		SetInfoText("$ostim_tooltip_auto_climax_anims")
 	ElseIf (Option == SetDomLightMode)
 		SetInfoText("$ostim_tooltip_dom_light")
 	ElseIf (Option == SetSubLightMode)
@@ -1289,6 +1296,7 @@ Function ExportSettings()
 
 	; Orgasm settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSlowMoOrgasms", Main.SlowMoOnOrgasm as Int)
+	JMap.SetInt(OstimSettingsFile, "SetAutoClimaxAnims", Main.AutoClimaxAnimations as Int)
 
 	; Light settings export.
 	Jmap.SetInt(OstimSettingsFile, "SetDomLightMode", Main.DomLightPos as Int)
@@ -1530,6 +1538,7 @@ Function ImportSettings(bool default = false)
 	
 	;Orgasm settings
 	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms")
+	Main.AutoClimaxAnimations = JMap.GetInt(OstimSettingsFile, "SetAutoClimaxAnims")
 	
 	; Ai/Control settings export.
 	Main.UseAIControl = JMap.GetInt(OstimSettingsFile, "SetAIControl")
