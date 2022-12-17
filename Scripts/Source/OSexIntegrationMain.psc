@@ -729,7 +729,7 @@ Event OnUpdate() ;OStim main logic loop
 			SelectFurniture()
 		Else
 			CurrentFurniture = FindBed(Actors[0])
-			If !SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
+			If CurrentFurniture && (!SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0)
 				FurnitureType == FURNITURE_TYPE_BED
 			Else
 				CurrentFurniture = None
@@ -921,8 +921,6 @@ Event OnUpdate() ;OStim main logic loop
 				EndIf
 			EndIf
 		EndIf
-				
-		DomActor.SetFactionRank(OStimExcitementFaction, GetActorExcitement(DomActor) as int)
 
 		If (GetActorExcitement(ThirdActor) >= 100.0)
 			MostRecentOrgasmedActor = ThirdActor
