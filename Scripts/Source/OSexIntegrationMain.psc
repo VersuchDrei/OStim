@@ -57,11 +57,6 @@ Faction Property NVCustomOrgasmFaction Auto
 ; -------------------------------------------------------------------------------------------------
 ; SETTINGS  ---------------------------------------------------------------------------------------
 
-
-Bool Property EndOnDomOrgasm Auto
-Bool Property EndOnSubOrgasm Auto
-Bool Property RequireBothOrgasmsToFinish Auto
-
 Bool Property EnableDomBar Auto
 Bool Property EnableSubBar Auto
 Bool Property EnableThirdBar Auto
@@ -85,7 +80,6 @@ Int Property SubLightBrightness Auto
 Int Property DomLightBrightness Auto
 
 Bool Property LowLightLevelLightsOnly Auto
-Bool Property SlowMoOnOrgasm Auto
 
 Bool Property AlwaysUndressAtAnimStart Auto
 Bool Property TossClothesOntoGround Auto
@@ -197,6 +191,28 @@ Int[] Property StrippingSlots Auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; ORGASM SETTINGS  --------------------------------------------------------------------------------
+
+Bool Property EndOnDomOrgasm Auto
+Bool Property EndOnSubOrgasm Auto
+Bool Property RequireBothOrgasmsToFinish Auto
+Bool Property SlowMoOnOrgasm Auto
+
+GlobalVariable Property OStimAutoClimaxAnimations Auto
+bool Property AutoClimaxAnimations
+	bool Function Get()
+		Return OStimAutoClimaxAnimations.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAutoClimaxAnimations.value = 1
+		Else
+			OStimAutoClimaxAnimations.value = 0
+		EndIf
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; ALIGNMENT SETTINGS  -----------------------------------------------------------------------------
@@ -898,7 +914,7 @@ Event OnUpdate() ;OStim main logic loop
 			SubTimesOrgasm += 1
 			Orgasm(SubActor)
 			If (EndOnSubOrgasm)
-				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
+				If !RequireBothOrgasmsToFinish || DomTimesOrgasm > 0
 					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
@@ -919,7 +935,7 @@ Event OnUpdate() ;OStim main logic loop
 			DomTimesOrgasm += 1
 			Orgasm(DomActor)
 			If (EndOnDomOrgasm)
-				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
+				If !RequireBothOrgasmsToFinish || SubTimesOrgasm > 0
 					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
@@ -1259,6 +1275,20 @@ Function WarpToAnimation(String Animation)
 
 	UI.InvokeString("HUD Menu", diasa + ".menuSelection", Animation)
 
+EndFunction
+
+bool Function AutoTransitionForPosition(int Position, string Type)
+	string SceneId = OMetadata.GetAutoTransitionForActor(CurrentSceneID, Position, Type)
+	If SceneId == ""
+		Return false
+	EndIf
+
+	WarpToAnimation(SceneId)
+	Return true
+EndFunction
+
+bool Function AutoTransitionForActor(Actor Act, string Type)
+	Return AutoTransitionForPosition(Actors.Find(Act), Type)
 EndFunction
 
 Function ToggleActorAI(bool enable)
@@ -2192,7 +2222,7 @@ Function AddActorExcitement(Actor Act, Float Value)
 	SetActorExcitement(Act, GetActorExcitement(Act) + Value)
 EndFunction
 
-Function Orgasm(Actor Act)
+Function Climax(Actor Act)
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
@@ -2203,7 +2233,7 @@ Function Orgasm(Actor Act)
 			SetGameSpeed("1")
 		EndIf
 
-		If Actors.Find(PlayerRef) != -1
+		If UseScreenShake
 			ShakeCamera(1.00, 2.0)
 		EndIf
 
@@ -2228,6 +2258,14 @@ Function Orgasm(Actor Act)
 	EndIf
 
 	Act.DamageActorValue("stamina", 250.0)
+EndFunction
+
+Function Orgasm(Actor Act)
+	If AutoClimaxAnimations && AutoTransitionForActor(Act, "climax")
+		Utility.Wait(5)
+	Else
+		Climax(Act)
+	EndIf
 EndFunction
 
 Event OstimOrgasm(String EventName, String sceneId, Float index, Form Sender)

@@ -26,6 +26,7 @@ Int Yellow
 Int White
 
 actor PlayerRef
+bool Orgasming
 
 Event OnInit()
 	OStim = (Self as Quest) as OSexIntegrationMain
@@ -186,7 +187,6 @@ Event OstimStart(String eventName, String strArg, Float numArg, Form sender)
 	SetBarVisible(ThirdBar, False)
 	SetBarPercent(ThirdBar, 0.0)
 EndEvent
-bool orgasming
 
 Event OStimOrgasm(String eventName, String strArg, Float numArg, Form sender)
 	Orgasming = True

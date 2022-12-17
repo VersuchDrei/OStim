@@ -41,6 +41,17 @@ int Function GetMaxSpeed(string Id) Global Native
 */;
 int Function GetActorCount(string Id) Global Native
 
+;/* GetAutoTransitionForActor
+* * returns the of the respective type for the actor in the scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the actor in the scene
+* * @param: Type, the type of the transition
+* *
+* * @return: the scene id of the transition destination, or "" if it does not have one
+*/;
+string Function GetAutoTransitionForActor(string Id, int Position, string Type) Global Native
+
 
 ; ████████╗ █████╗  ██████╗ ███████╗
 ; ╚══██╔══╝██╔══██╗██╔════╝ ██╔════╝
