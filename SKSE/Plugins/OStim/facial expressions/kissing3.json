@@ -39,10 +39,10 @@
 			"baseValue": 75
 		}, {
 			"type": 12,
-			"baseValue": 100
+			"baseValue": 90
 		}, {
 			"type": 13,
-			"baseValue": 100
+			"baseValue": 90
 		}],
 		"phonemes": [{
 			"type": 12,
