@@ -56,22 +56,22 @@
 	},
 	"male": {
 		"expression": {
-			"type": 0,
+			"type": 2,
 			"baseValue": 20,
 			"excitementMultiplier": 0.2
 		},
 		"modifiers": [{
-			"type": 12,
-			"baseValue": 10,
+			"type": 6,
+			"baseValue": 30,
 			"excitementMultiplier": 0.3
 		}, {
-			"type": 13,
-			"baseValue": 10,
+			"type": 7,
+			"baseValue": 30,
 			"excitementMultiplier": 0.3
 		}],
 		"phonemes": [{
-			"type": 3,
-			"baseValue": 15
+			"type": 5,
+			"baseValue": 20
 		}]
 	}
 }

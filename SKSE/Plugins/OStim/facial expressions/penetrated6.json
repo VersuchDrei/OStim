@@ -7,9 +7,9 @@
 	],
 	"female": {
 		"expression": {
-			"type": 0,
-			"baseValue": 40,
-			"excitementMultiplier": 0.4
+			"type": 3,
+			"baseValue": 50,
+			"excitementMultiplier": 0.5
 		},
 		"phonemes": [{
 			"type": 4,
@@ -36,25 +36,25 @@
 	"male": {
 		"expression": {
 			"type": 0,
-			"baseValue": 20,
+			"baseValue": 50,
 			"excitementMultiplier": 0.2
 		},
 		"modifiers": [{
-			"type": 12,
-			"baseValue": 80
+			"type": 2,
+			"baseValue": 45
 		}, {
-			"type": 13,
-			"baseValue": 80
+			"type": 3,
+			"baseValue": 45
 		}, {
 			"type": 0,
-			"baseValue": 80
+			"baseValue": 25
 		}, {
 			"type": 1,
-			"baseValue": 80
+			"baseValue": 25
 		}],
 		"phonemes": [{
-			"type": 3,
-			"baseValue": 15
+			"type": 8,
+			"baseValue": 60
 		}]
 	}
 }

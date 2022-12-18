@@ -56,16 +56,16 @@
 		},
 		"modifiers": [{
 			"type": 12,
-			"baseValue": 20,
+			"baseValue": 10,
 			"excitementMultiplier": 0.3
 		}, {
 			"type": 13,
-			"baseValue": 20,
+			"baseValue": 10,
 			"excitementMultiplier": 0.3
 		}],
 		"phonemes": [{
 			"type": 9,
-			"baseValue": 15
+			"baseValue": 30
 		}]
 	}
 }

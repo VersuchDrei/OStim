@@ -33,12 +33,12 @@
 	"male": {
 		"duration": 1,
 		"expression": {
-			"type": 4,
-			"baseValue": 75
+			"type": 2,
+			"baseValue": 80
 		},
 		"phonemes": [{
-			"type": 11,
-			"baseValue": 50,
+			"type": 5,
+			"baseValue": 40,
 			"excitementMultiplier": 0.25
 		}]
 	}

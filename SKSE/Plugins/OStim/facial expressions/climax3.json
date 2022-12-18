@@ -32,22 +32,22 @@
 	"male": {
 		"duration": 2,
 		"expression": {
-			"type": 2,
-			"baseValue": 100
+			"type": 4,
+			"baseValue": 60
 		},
 		"phonemes": [{
 			"type": 1,
-			"baseValue": 10
+			"baseValue": 20
 		}, {
 			"type": 11,
-			"baseValue": 10
+			"baseValue": 20
 		}],
 		"modifiers": [{
-			"type": 0,
-			"baseValue": 40
+			"type": 6,
+			"baseValue": 50
 		}, {
-			"type": 1,
-			"baseValue": 40
+			"type": 7,
+			"baseValue": 50
 		}]
 	}
 }
