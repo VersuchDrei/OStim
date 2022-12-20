@@ -376,8 +376,6 @@ Int DomTimesOrgasm
 Int SubTimesOrgasm
 Int ThirdTimesOrgasm
 
-Actor MostRecentOrgasmedActor
-
 int FurnitureType
 ObjectReference CurrentFurniture
 
@@ -910,7 +908,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 
 		If (GetActorExcitement(SubActor) >= 100.0)
-			MostRecentOrgasmedActor = SubActor
 			SubTimesOrgasm += 1
 			Orgasm(SubActor)
 			If (EndOnSubOrgasm)
@@ -923,13 +920,11 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 
 		If (GetActorExcitement(ThirdActor) >= 100.0)
-			MostRecentOrgasmedActor = ThirdActor
 			ThirdTimesOrgasm += 1
 			Orgasm(ThirdActor)
 		EndIf
 
 		If (GetActorExcitement(DomActor) >= 100.0)
-			MostRecentOrgasmedActor = DomActor
 			DomTimesOrgasm += 1
 			Orgasm(DomActor)
 			If (EndOnDomOrgasm)
@@ -1369,10 +1364,6 @@ Function SwapActorOrder() ; Swaps dom position in animation for sub. Only effect
     endif
 EndFunction
 /;
-
-Actor Function GetMostRecentOrgasmedActor()
-	Return MostRecentOrgasmedActor
-EndFunction
 
 Function AddSceneMetadata(string MetaTag)
 	scenemetadata = PapyrusUtil.PushString(scenemetadata, MetaTag)
@@ -2221,6 +2212,8 @@ Function AddActorExcitement(Actor Act, Float Value)
 EndFunction
 
 Function Climax(Actor Act)
+	MostRecentOrgasmedActor = Act
+
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
@@ -3519,4 +3512,10 @@ EndFunction
 Int Function GetCurrentAnimationOID()
 	; don't use ODatabase, use OMetadata
 	Return CurrentOID
+EndFunction
+
+Actor MostRecentOrgasmedActor
+Actor Function GetMostRecentOrgasmedActor()
+	; use (sender As Actor) in the ostim_orgasm event instead
+	Return MostRecentOrgasmedActor
 EndFunction
