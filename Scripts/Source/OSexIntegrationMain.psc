@@ -884,7 +884,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	SendModEvent("ostim_start")
 
-	
+
 	If (UseFades && IsPlayerInvolved())
 		FadeFromBlack()
 	EndIf
@@ -3035,9 +3035,9 @@ Event OnKeyDown(Int KeyPress)
 			If (Target.IsInDialogueWithPlayer())
 				Return
 			EndIf
-			If (!Target.IsDead())
+			If (!Target.IsDead() && !Target.isChild() && Target.HasKeywordString("ActorTypeNPC"))
 				AddSceneMetadata("ostim_manual_start")
-				StartScene(PlayerRef,  Target)
+				StartScene(PlayerRef, Target)
 				return 
 			EndIf
 		Else
