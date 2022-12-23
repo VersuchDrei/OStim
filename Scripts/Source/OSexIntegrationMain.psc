@@ -474,7 +474,7 @@ _oUI_Lockwidget LockWidget
 
 Faction BBLS_FaceLightFaction
 ActorBase Vayne
-; add Coralyn here when she is released
+ActorBase Coralyn
 
 
 ; -------------------------------------------------------------------------------------------------
@@ -1188,6 +1188,12 @@ Bool Function ActorHasFacelight(Actor Act)
 		; Vayne's facelight can be turned on or off in her MCM menu
 		; The below GlobalVariable tells us if Vayne's facelight is currently on or off
 		return (Game.GetFormFromFile(0x0004B26B, "CS_Vayne.esp") as GlobalVariable).GetValueInt() == 1
+	EndIf
+
+	If (Coralyn && Act.GetActorBase() == Coralyn)
+		; Coralyn's facelight can be turned on or off in her MCM menu
+		; The below GlobalVariable tells us if Coralyn's facelight is currently on or off
+		return (Game.GetFormFromFile(0x0004D91E, "CS_Coralyn.esp") as GlobalVariable).GetValueInt() == 1
 	EndIf
 
 	return false
@@ -3361,6 +3367,7 @@ Function OnLoadGame()
 
 	BBLS_FaceLightFaction = Game.GetFormFromFile(0x00755331, "BBLS_SKSE64_Patch.esp") as Faction
 	Vayne = Game.GetFormFromFile(0x0000083D, "CS_Vayne.esp") as ActorBase
+	Coralyn = Game.GetFormFromFile(0x0000080A, "CS_Coralyn.esp") as ActorBase
 
 	FURNITURE_TYPE_STRINGS = new string[8]
 	FURNITURE_TYPE_STRINGS[0] = ""
