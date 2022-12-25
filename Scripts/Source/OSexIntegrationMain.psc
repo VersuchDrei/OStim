@@ -1086,7 +1086,7 @@ Bool Function IsActorInvolved(actor act)
 		return false 
 	endif
 
-	Return Actors.Find(act) != -1
+	Return Actors.Find(act) >= 0
 EndFunction
 
 Bool Function IsPlayerInvolved()
@@ -1293,7 +1293,7 @@ Function ToggleActorAI(bool enable)
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (AnimationRunning() && UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
+	If (AnimationRunning() && UseFades && SmoothEnding && IsPlayerInvolved())
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
@@ -1377,7 +1377,7 @@ bool Function HasSceneMetadata(string MetaTag)
 		metadata = oldscenemetadata
 	endif 
 
-	return metadata.Find(metatag) != -1
+	return metadata.Find(metatag) >= 0
 EndFunction
 
 string[] Function GetAllSceneMetadata()
@@ -2035,7 +2035,7 @@ Function OnAnimationChange()
 		While (i < max)
 			Actor Act = OControl.ActraInRange[i]
 
-			If (Act) && Actors.Find(Act) == -1 && (IsActorActive(Act))
+			If (Act) && !IsActorInvolved(Act) && (IsActorActive(Act))
 				ThirdActor = Act
 				OSANative.AddThirdActor(Password, ThirdActor)
 				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
@@ -2240,7 +2240,7 @@ Function Climax(Actor Act)
 	EndWhile
 
 	int actorIndex = Actors.find(Act)
-	If actorIndex != -1
+	If actorIndex >= 0
 		int actionIndex = OMetadata.FindActionForTarget(CurrentSceneID, actorIndex, "vaginalsex")
 		If actionIndex != -1
 			Actor partner = GetActor(OMetadata.GetActionActor(CurrentSceneID, actionIndex))
@@ -2322,7 +2322,7 @@ Function UnMuteFaceData(Actor Act)
 	EndIf
 
 	int i = Actors.Find(Act)
-	If i != -1
+	If i >= 0
 		OSANative.UpdateExpression(CurrentSceneID, i, Act)
 	EndIf
 EndFunction
@@ -2529,7 +2529,7 @@ EndFunction
 */;
 Function SendExpressionEvent(Actor Act, string EventName)
 	int Position = Actors.find(Act)
-	If Position == -1
+	If Position < 0
 		Return
 	EndIf
 
