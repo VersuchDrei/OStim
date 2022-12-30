@@ -604,7 +604,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 		TogglePrecisionForActor(Actors[i], false)
 
-		bool isFemale = IsFemale(Actors[i])
+		bool isFemale = AppearsFemale(Actors[i])
 
 		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
 			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
@@ -2059,7 +2059,7 @@ Function OnAnimationChange()
 
 			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
 			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
-			bool isFemale = IsFemale(Actors[2])
+			bool isFemale = AppearsFemale(Actors[2])
 			
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
