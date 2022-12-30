@@ -1037,6 +1037,10 @@ Event OnUpdate() ;OStim main logic loop
 		CurrentFurniture.BlockActivation(false)
 	EndIf
 
+	If IsPlayerInvolved()
+		OSANative.EndPlayerDialogue()
+	EndIf
+
 EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)

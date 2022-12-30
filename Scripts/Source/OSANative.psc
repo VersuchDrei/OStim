@@ -105,6 +105,8 @@ Function SetCameraPos(Float X, Float Y, Float Z) Global Native
                                                                      
 Function Control(Int direction, Int glyph) Global Native
 
+Function EndPlayerDialogue() Global Native
+
 
 ; ███████╗ █████╗  ██████╗███████╗
 ; ██╔════╝██╔══██╗██╔════╝██╔════╝
