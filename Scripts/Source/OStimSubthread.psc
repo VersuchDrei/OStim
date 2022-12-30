@@ -59,7 +59,19 @@ bool Function StartScene(actor dom, actor sub = none, actor third = none, float 
 
 	domactor = dom 
 	subactor = sub 
-	thirdactor = third 
+	thirdactor = third
+
+	If (SubActor && AppearsFemale(Dom) && !AppearsFemale(Sub))
+		DomActor = Sub
+		SubActor = Dom
+	EndIf 
+
+	If third
+		If AppearsFemale(ThirdActor) && !AppearsFemale(SubActor)
+			SubActor = third
+			ThirdActor = sub
+		EndIf
+	EndIf
 
 	actor[] actro = PapyrusUtil.ActorArray(3)
 	actro[0] = dom
