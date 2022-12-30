@@ -602,7 +602,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	While i
 		i -= 1
 
-		bool isFemale = IsFemale(Actors[i])
+		bool isFemale = AppearsFemale(Actors[i])
 
 		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
 			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
@@ -1034,6 +1034,10 @@ Event OnUpdate() ;OStim main logic loop
 		CurrentFurniture.BlockActivation(false)
 	EndIf
 
+	If IsPlayerInvolved()
+		OSANative.EndPlayerDialogue()
+	EndIf
+
 EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
@@ -1083,7 +1087,7 @@ Bool Function IsActorInvolved(actor act)
 		return false 
 	endif
 
-	Return Actors.Find(act) != -1
+	Return Actors.Find(act) >= 0
 EndFunction
 
 Bool Function IsPlayerInvolved()
@@ -1290,7 +1294,7 @@ Function ToggleActorAI(bool enable)
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (AnimationRunning() && UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
+	If (AnimationRunning() && UseFades && SmoothEnding && IsPlayerInvolved())
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
@@ -1374,7 +1378,7 @@ bool Function HasSceneMetadata(string MetaTag)
 		metadata = oldscenemetadata
 	endif 
 
-	return metadata.Find(metatag) != -1
+	return metadata.Find(metatag) >= 0
 EndFunction
 
 string[] Function GetAllSceneMetadata()
@@ -2032,7 +2036,7 @@ Function OnAnimationChange()
 		While (i < max)
 			Actor Act = OControl.ActraInRange[i]
 
-			If (Act) && Actors.Find(Act) == -1 && (IsActorActive(Act))
+			If (Act) && !IsActorInvolved(Act) && (IsActorActive(Act))
 				ThirdActor = Act
 				OSANative.AddThirdActor(Password, ThirdActor)
 				i = max
@@ -2050,7 +2054,7 @@ Function OnAnimationChange()
 
 			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
 			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
-			bool isFemale = IsFemale(Actors[2])
+			bool isFemale = AppearsFemale(Actors[2])
 			
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
@@ -2232,7 +2236,7 @@ Function Climax(Actor Act)
 	EndWhile
 
 	int actorIndex = Actors.find(Act)
-	If actorIndex != -1
+	If actorIndex >= 0
 		int actionIndex = OMetadata.FindActionForTarget(CurrentSceneID, actorIndex, "vaginalsex")
 		If actionIndex != -1
 			Actor partner = GetActor(OMetadata.GetActionActor(CurrentSceneID, actionIndex))
@@ -2314,7 +2318,7 @@ Function UnMuteFaceData(Actor Act)
 	EndIf
 
 	int i = Actors.Find(Act)
-	If i != -1
+	If i >= 0
 		OSANative.UpdateExpression(CurrentSceneID, i, Act)
 	EndIf
 EndFunction
@@ -2521,7 +2525,7 @@ EndFunction
 */;
 Function SendExpressionEvent(Actor Act, string EventName)
 	int Position = Actors.find(Act)
-	If Position == -1
+	If Position < 0
 		Return
 	EndIf
 

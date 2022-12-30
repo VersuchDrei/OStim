@@ -1529,7 +1529,7 @@ Function ImportSettings(bool default = false)
 
 	; Furniture settings export.
 	Main.UseFurniture = JMap.GetInt(OstimSettingsFile, "SetEnableFurniture",1)
-	Main.SelectFurniture = JMap.GetInt(OstimSettingsFile, "SetSelectFurniture")
+	Main.SelectFurniture = JMap.GetInt(OstimSettingsFile, "SetSelectFurniture", 1)
 	Main.FurnitureSearchDistance = JMap.GetInt(OstimSettingsFile, "SetFurnitureSearchDistance", 15)
 	Main.ResetClutter = JMap.GetInt(OstimSettingsFile, "SetResetClutter", 1)
 	Main.ResetClutterRadius = JMap.GetInt(OstimSettingsFile, "SetResetClutterRadius", 5)
