@@ -807,7 +807,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Password = DomActor.GetFactionRank(OsaFactionStage)
-	OSANative.StartScene(Password, Actors)
+	OSANative.StartScene(Password, Actors, GetOSAStage())
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
