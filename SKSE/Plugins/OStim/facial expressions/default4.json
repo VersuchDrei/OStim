@@ -26,21 +26,21 @@
 	"male": {
 		"expression": {
 			"type": 0,
-			"baseValue": 50,
+			"baseValue": 40,
 			"excitementMultiplier": 0.2
 		},
 		"modifiers": [{
-			"type": 12,
-			"baseValue": 40,
+			"type": 2,
+			"baseValue": 20,
 			"excitementMultiplier": 0.3
 		}, {
-			"type": 13,
-			"baseValue": 40,
+			"type": 3,
+			"baseValue": 20,
 			"excitementMultiplier": 0.3
 		}],
 		"phonemes": [{
 			"type": 3,
-			"baseValue": 15
+			"baseValue": 20
 		}]
 	}
 }

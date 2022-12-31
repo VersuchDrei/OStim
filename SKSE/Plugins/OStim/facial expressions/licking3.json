@@ -15,10 +15,10 @@
 		},
 		"phonemes": [{
 			"type": 1,
-			"baseValue": 50
+			"baseValue": 70
 		}, {
 			"type": 8,
-			"baseValue": 60
+			"baseValue": 70
 		}],
 		"modifiers": [{
 			"type": 12,
@@ -30,22 +30,22 @@
 	},
 	"male": {
 		"expression": {
-			"type": 0,
-			"baseValue": 60
+			"type": 4,
+			"baseValue": 50
 		},
 		"phonemes": [{
 			"type": 1,
-			"baseValue": 50
+			"baseValue": 30
 		}, {
-			"type": 8,
-			"baseValue": 60
+			"type": 11,
+			"baseValue": 30
 		}],
 		"modifiers": [{
-			"type": 12,
-			"baseValue": 30
+			"type": 11,
+			"baseValue": 50
 		}, {
-			"type": 13,
-			"baseValue": 30
+			"type": 6,
+			"baseValue": 60
 		}]
 	}
 }

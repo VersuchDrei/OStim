@@ -33,17 +33,17 @@
 			"excitementMultiplier": 0.2
 		},
 		"modifiers": [{
-			"type": 12,
+			"type": 2,
 			"baseValue": 20,
 			"excitementMultiplier": 0.3
 		}, {
-			"type": 13,
+			"type": 3,
 			"baseValue": 20,
 			"excitementMultiplier": 0.3
 		}],
 		"phonemes": [{
-			"type": 9,
-			"baseValue": 15
+			"type": 4,
+			"baseValue": 20
 		}]
 	}
 }

@@ -57,11 +57,6 @@ Faction Property NVCustomOrgasmFaction Auto
 ; -------------------------------------------------------------------------------------------------
 ; SETTINGS  ---------------------------------------------------------------------------------------
 
-
-Bool Property EndOnDomOrgasm Auto
-Bool Property EndOnSubOrgasm Auto
-Bool Property RequireBothOrgasmsToFinish Auto
-
 Bool Property EnableDomBar Auto
 Bool Property EnableSubBar Auto
 Bool Property EnableThirdBar Auto
@@ -85,7 +80,6 @@ Int Property SubLightBrightness Auto
 Int Property DomLightBrightness Auto
 
 Bool Property LowLightLevelLightsOnly Auto
-Bool Property SlowMoOnOrgasm Auto
 
 Bool Property AlwaysUndressAtAnimStart Auto
 Bool Property TossClothesOntoGround Auto
@@ -197,6 +191,28 @@ Int[] Property StrippingSlots Auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; ORGASM SETTINGS  --------------------------------------------------------------------------------
+
+Bool Property EndOnDomOrgasm Auto
+Bool Property EndOnSubOrgasm Auto
+Bool Property RequireBothOrgasmsToFinish Auto
+Bool Property SlowMoOnOrgasm Auto
+
+GlobalVariable Property OStimAutoClimaxAnimations Auto
+bool Property AutoClimaxAnimations
+	bool Function Get()
+		Return OStimAutoClimaxAnimations.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAutoClimaxAnimations.value = 1
+		Else
+			OStimAutoClimaxAnimations.value = 0
+		EndIf
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; ALIGNMENT SETTINGS  -----------------------------------------------------------------------------
@@ -360,8 +376,6 @@ Int DomTimesOrgasm
 Int SubTimesOrgasm
 Int ThirdTimesOrgasm
 
-Actor MostRecentOrgasmedActor
-
 int FurnitureType
 ObjectReference CurrentFurniture
 
@@ -460,7 +474,7 @@ _oUI_Lockwidget LockWidget
 
 Faction BBLS_FaceLightFaction
 ActorBase Vayne
-; add Coralyn here when she is released
+ActorBase Coralyn
 
 
 ; -------------------------------------------------------------------------------------------------
@@ -588,9 +602,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	While i
 		i -= 1
 
-		TogglePrecisionForActor(Actors[i], false)
-
-		bool isFemale = IsFemale(Actors[i])
+		bool isFemale = AppearsFemale(Actors[i])
 
 		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
 			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
@@ -713,7 +725,7 @@ Event OnUpdate() ;OStim main logic loop
 			SelectFurniture()
 		Else
 			CurrentFurniture = FindBed(Actors[0])
-			If !SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
+			If CurrentFurniture && (!SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0)
 				FurnitureType == FURNITURE_TYPE_BED
 			Else
 				CurrentFurniture = None
@@ -870,7 +882,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	SendModEvent("ostim_start")
 
-	
+
 	If (UseFades && IsPlayerInvolved())
 		FadeFromBlack()
 	EndIf
@@ -894,32 +906,27 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 
 		If (GetActorExcitement(SubActor) >= 100.0)
-			MostRecentOrgasmedActor = SubActor
 			SubTimesOrgasm += 1
 			Orgasm(SubActor)
 			If (EndOnSubOrgasm)
-				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
+				If !RequireBothOrgasmsToFinish || DomTimesOrgasm > 0
 					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
 				EndIf
 			EndIf
 		EndIf
-				
-		DomActor.SetFactionRank(OStimExcitementFaction, GetActorExcitement(DomActor) as int)
 
 		If (GetActorExcitement(ThirdActor) >= 100.0)
-			MostRecentOrgasmedActor = ThirdActor
 			ThirdTimesOrgasm += 1
 			Orgasm(ThirdActor)
 		EndIf
 
 		If (GetActorExcitement(DomActor) >= 100.0)
-			MostRecentOrgasmedActor = DomActor
 			DomTimesOrgasm += 1
 			Orgasm(DomActor)
 			If (EndOnDomOrgasm)
-				If (!RequireBothOrgasmsToFinish) || (((DomTimesOrgasm > 0) && (SubTimesOrgasm > 0)))
+				If !RequireBothOrgasmsToFinish || SubTimesOrgasm > 0
 					SetCurrentAnimationSpeed(0)
 					Utility.Wait(4)
 					EndAnimation()
@@ -943,7 +950,6 @@ Event OnUpdate() ;OStim main logic loop
 			OUtils.RestoreOffset(Actors[i], Offsets[i])
 		EndIf
 
-		TogglePrecisionForActor(Actors[i], true)
 		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
 
@@ -1028,6 +1034,10 @@ Event OnUpdate() ;OStim main logic loop
 		CurrentFurniture.BlockActivation(false)
 	EndIf
 
+	If IsPlayerInvolved()
+		OSANative.EndPlayerDialogue()
+	EndIf
+
 EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
@@ -1077,7 +1087,7 @@ Bool Function IsActorInvolved(actor act)
 		return false 
 	endif
 
-	Return Actors.Find(act) != -1
+	Return Actors.Find(act) >= 0
 EndFunction
 
 Bool Function IsPlayerInvolved()
@@ -1181,6 +1191,12 @@ Bool Function ActorHasFacelight(Actor Act)
 		return (Game.GetFormFromFile(0x0004B26B, "CS_Vayne.esp") as GlobalVariable).GetValueInt() == 1
 	EndIf
 
+	If (Coralyn && Act.GetActorBase() == Coralyn)
+		; Coralyn's facelight can be turned on or off in her MCM menu
+		; The below GlobalVariable tells us if Coralyn's facelight is currently on or off
+		return (Game.GetFormFromFile(0x0004D91E, "CS_Coralyn.esp") as GlobalVariable).GetValueInt() == 1
+	EndIf
+
 	return false
 EndFunction
 
@@ -1261,6 +1277,20 @@ Function WarpToAnimation(String Animation)
 
 EndFunction
 
+bool Function AutoTransitionForPosition(int Position, string Type)
+	string SceneId = OMetadata.GetAutoTransitionForActor(CurrentSceneID, Position, Type)
+	If SceneId == ""
+		Return false
+	EndIf
+
+	WarpToAnimation(SceneId)
+	Return true
+EndFunction
+
+bool Function AutoTransitionForActor(Actor Act, string Type)
+	Return AutoTransitionForPosition(Actors.Find(Act), Type)
+EndFunction
+
 Function ToggleActorAI(bool enable)
 	int i = Actors.Length
 	While i
@@ -1270,7 +1300,7 @@ Function ToggleActorAI(bool enable)
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (AnimationRunning() && UseFades && SmoothEnding && Actors.Find(PlayerRef) != -1)
+	If (AnimationRunning() && UseFades && SmoothEnding && IsPlayerInvolved())
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
@@ -1342,10 +1372,6 @@ Function SwapActorOrder() ; Swaps dom position in animation for sub. Only effect
 EndFunction
 /;
 
-Actor Function GetMostRecentOrgasmedActor()
-	Return MostRecentOrgasmedActor
-EndFunction
-
 Function AddSceneMetadata(string MetaTag)
 	scenemetadata = PapyrusUtil.PushString(scenemetadata, MetaTag)
 EndFunction
@@ -1358,7 +1384,7 @@ bool Function HasSceneMetadata(string MetaTag)
 		metadata = oldscenemetadata
 	endif 
 
-	return metadata.Find(metatag) != -1
+	return metadata.Find(metatag) >= 0
 EndFunction
 
 string[] Function GetAllSceneMetadata()
@@ -2016,11 +2042,9 @@ Function OnAnimationChange()
 		While (i < max)
 			Actor Act = OControl.ActraInRange[i]
 
-			If (Act) && Actors.Find(Act) == -1 && (IsActorActive(Act))
+			If (Act) && !IsActorInvolved(Act) && (IsActorActive(Act))
 				ThirdActor = Act
 				OSANative.AddThirdActor(Password, ThirdActor)
-				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
-				TogglePrecisionForActor(ThirdActor, false)
 				i = max
 			Endif
 			i += 1
@@ -2036,7 +2060,7 @@ Function OnAnimationChange()
 
 			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
 			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
-			bool isFemale = IsFemale(Actors[2])
+			bool isFemale = AppearsFemale(Actors[2])
 			
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
@@ -2072,9 +2096,6 @@ Function OnAnimationChange()
 		If !DisableScaling
 			ThirdActor.SetScale(1.0)
 		EndIf
-
-		; Enable Precision mod collisions again for the actor that is leaving
-		TogglePrecisionForActor(ThirdActor, true)
 
 		ThirdActor = none
 		OSANative.RemoveThirdActor(Password)
@@ -2192,7 +2213,9 @@ Function AddActorExcitement(Actor Act, Float Value)
 	SetActorExcitement(Act, GetActorExcitement(Act) + Value)
 EndFunction
 
-Function Orgasm(Actor Act)
+Function Climax(Actor Act)
+	MostRecentOrgasmedActor = Act
+
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
@@ -2203,7 +2226,7 @@ Function Orgasm(Actor Act)
 			SetGameSpeed("1")
 		EndIf
 
-		If Actors.Find(PlayerRef) != -1
+		If UseScreenShake
 			ShakeCamera(1.00, 2.0)
 		EndIf
 
@@ -2219,7 +2242,7 @@ Function Orgasm(Actor Act)
 	EndWhile
 
 	int actorIndex = Actors.find(Act)
-	If actorIndex != -1
+	If actorIndex >= 0
 		int actionIndex = OMetadata.FindActionForTarget(CurrentSceneID, actorIndex, "vaginalsex")
 		If actionIndex != -1
 			Actor partner = GetActor(OMetadata.GetActionActor(CurrentSceneID, actionIndex))
@@ -2228,6 +2251,14 @@ Function Orgasm(Actor Act)
 	EndIf
 
 	Act.DamageActorValue("stamina", 250.0)
+EndFunction
+
+Function Orgasm(Actor Act)
+	If AutoClimaxAnimations && AutoTransitionForActor(Act, "climax")
+		Utility.Wait(5)
+	Else
+		Climax(Act)
+	EndIf
 EndFunction
 
 Event OstimOrgasm(String EventName, String sceneId, Float index, Form Sender)
@@ -2293,7 +2324,7 @@ Function UnMuteFaceData(Actor Act)
 	EndIf
 
 	int i = Actors.Find(Act)
-	If i != -1
+	If i >= 0
 		OSANative.UpdateExpression(CurrentSceneID, i, Act)
 	EndIf
 EndFunction
@@ -2500,7 +2531,7 @@ EndFunction
 */;
 Function SendExpressionEvent(Actor Act, string EventName)
 	int Position = Actors.find(Act)
-	If Position == -1
+	If Position < 0
 		Return
 	EndIf
 
@@ -2844,25 +2875,6 @@ Bool Function GetGameIsVR()
 	Return (PapyrusUtil.GetScriptVersion() == 36) ;obviously this no guarantee but it's the best we've got for now
 EndFunction
 
-Function TogglePrecisionForActor(Actor Act, bool Enable)
-	; Wrapper function to toggle Precision On or Off for the given Actor if Precision is installed
-	; if Enable is True, Precision will be enabled for the given Actor
-	; if Enable is False, Precision will be disabled for the given Actor
-	; if Actor has Precision enabled and Enable is True, this function won't call Precision Utility
-	; the same happens if Actor has Precision disabled and Enable is False
-	If (IsModLoaded("Precision.esp"))
-		If (Precision_Utility.IsActorActive(Act) != Enable)
-			Precision_Utility.ToggleDisableActor(Act, !Enable)
-			
-			If (Enable)
-				Console("Precision was re-enabled for actor " + Act.GetActorBase().GetName())
-			Else
-				Console("Precision was disabled for actor " + Act.GetActorBase().GetName())
-			EndIf
-		EndIf
-	EndIf
-EndFunction
-
 Function AcceptReroutingActors(Actor Act1, Actor Act2) ;compatibility thing, never call this one directly
 	ReroutedDomActor = Act1
 	ReroutedSubActor = Act2
@@ -3010,9 +3022,9 @@ Event OnKeyDown(Int KeyPress)
 			If (Target.IsInDialogueWithPlayer())
 				Return
 			EndIf
-			If (!Target.IsDead())
+			If (!Target.IsDead() && !Target.isChild() && Target.HasKeywordString("ActorTypeNPC"))
 				AddSceneMetadata("ostim_manual_start")
-				StartScene(PlayerRef,  Target)
+				StartScene(PlayerRef, Target)
 				return 
 			EndIf
 		Else
@@ -3338,6 +3350,7 @@ Function OnLoadGame()
 
 	BBLS_FaceLightFaction = Game.GetFormFromFile(0x00755331, "BBLS_SKSE64_Patch.esp") as Faction
 	Vayne = Game.GetFormFromFile(0x0000083D, "CS_Vayne.esp") as ActorBase
+	Coralyn = Game.GetFormFromFile(0x0000080A, "CS_Coralyn.esp") as ActorBase
 
 	FURNITURE_TYPE_STRINGS = new string[8]
 	FURNITURE_TYPE_STRINGS[0] = ""
@@ -3489,4 +3502,10 @@ EndFunction
 Int Function GetCurrentAnimationOID()
 	; don't use ODatabase, use OMetadata
 	Return CurrentOID
+EndFunction
+
+Actor MostRecentOrgasmedActor
+Actor Function GetMostRecentOrgasmedActor()
+	; use (sender As Actor) in the ostim_orgasm event instead
+	Return MostRecentOrgasmedActor
 EndFunction
