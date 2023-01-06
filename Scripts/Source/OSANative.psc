@@ -69,6 +69,8 @@ Function CheckOffset(Actor act, bool feetOnGround, float offset) Global
 	EndIf
 EndFunction
 
+bool Function IsWig(Actor act, Armor item) Global Native
+
 
 ;  ██████╗ █████╗ ███╗   ███╗███████╗██████╗  █████╗
 ; ██╔════╝██╔══██╗████╗ ████║██╔════╝██╔══██╗██╔══██╗

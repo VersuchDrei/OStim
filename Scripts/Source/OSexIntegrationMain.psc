@@ -72,19 +72,12 @@ Bool Property ResetPosAfterSceneEnd Auto
 
 Bool Property AllowUnlimitedSpanking Auto
 
-Bool Property AutoUndressIfNeeded Auto
-
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
 Int Property SubLightBrightness Auto
 Int Property DomLightBrightness Auto
 
 Bool Property LowLightLevelLightsOnly Auto
-
-Bool Property AlwaysUndressAtAnimStart Auto
-Bool Property TossClothesOntoGround Auto
-Bool Property UseStrongerUnequipMethod Auto
-Bool Property FullyAnimateRedress Auto
 
 bool disableosacontrolsbool
 
@@ -173,7 +166,6 @@ Int Property BedRealignment Auto
 
 Bool Property ForceFirstPersonAfter Auto
 
-Bool Property UseNativeFunctions Auto
 Bool Property BlockVRInstalls Auto
 
 Int Property AiSwitchChance Auto
@@ -186,11 +178,109 @@ Bool SMPInstalled
 
 Bool Property Installed auto
 
-Int[] Property StrippingSlots Auto
-
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; UNDRESSING SETTINGS  ----------------------------------------------------------------------------
+
+GlobalVariable Property OStimUndressAtStart Auto
+Bool Property AlwaysUndressAtAnimStart
+	bool Function Get()
+		Return OStimUndressAtStart.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUndressAtStart.value = 1
+		Else
+			OStimUndressAtStart.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimRemoveWeaponsAtStart Auto
+Bool Property RemoveWeaponsAtStart
+	bool Function Get()
+		Return OStimRemoveWeaponsAtStart.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimRemoveWeaponsAtStart.value = 1
+		Else
+			OStimRemoveWeaponsAtStart.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUndressMidScene Auto
+Bool Property AutoUndressIfNeeded
+	bool Function Get()
+		Return OStimUndressMidScene.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUndressMidScene.value = 1
+		Else
+			OStimUndressMidScene.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimPartialUndressing Auto
+Bool Property PartialUndressing
+	bool Function Get()
+		Return OStimPartialUndressing.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimPartialUndressing.value = 1
+		Else
+			OStimPartialUndressing.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimRemoveWeaponsWithSlot Auto
+int Property RemoveWeaponsWithSlot
+	int Function Get()
+		Return OStimRemoveWeaponsWithSlot.value as int
+	EndFunction
+	Function Set(int Value)
+		OStimRemoveWeaponsWithSlot.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAnimateRedress Auto
+Bool Property FullyAnimateRedress
+	bool Function Get()
+		Return OStimAnimateRedress.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAnimateRedress.value = 1
+		Else
+			OStimAnimateRedress.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUsePapyrusUndressing Auto
+Bool Property UsePapyrusUndressing
+	bool Function Get()
+		Return OStimUsePapyrusUndressing.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUsePapyrusUndressing.value = 1
+		Else
+			OStimUsePapyrusUndressing.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+; todo turn this into a slotmask
+Int[] Property StrippingSlots Auto
 
 ; -------------------------------------------------------------------------------------------------
 ; ORGASM SETTINGS  --------------------------------------------------------------------------------
@@ -657,6 +747,27 @@ EndFunction
 Event OnUpdate() ;OStim main logic loop
 	Console("Starting scene asynchronously")
 
+	If IsPlayerInvolved()
+		OSANative.EndPlayerDialogue()
+
+		bool InDialogue = false
+		int i = Actors.Length
+		While i
+			i -= 1
+			InDialogue = InDialogue || Actors[i].IsInDialogueWithPlayer()
+		EndWhile
+
+		While InDialogue
+			InDialogue = false
+			Utility.Wait(0.3)
+			i = Actors.Length
+			While i
+				i -= 1
+				InDialogue = InDialogue || Actors[i].IsInDialogueWithPlayer()
+			EndWhile
+		EndWhile
+	EndIf
+
 	If (UseFades && IsPlayerInvolved())
 		FadeToBlack()
 	EndIf
@@ -704,7 +815,7 @@ Event OnUpdate() ;OStim main logic loop
 	FirstAnimate = true
 
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
-	; OBarsScript already registers for the ostim_orgasm event and is attacked to the same quest
+	; OBarsScript already registers for the ostim_orgasm event and is attached to the same quest
 	; so this registration will not work, but renaming the listener to OstimOrgasm will, as that is what OBarsScript registered it to
 	; if we ever split the scripts up on different quests we have to register for the event here again
 	;RegisterForModEvent("ostim_orgasm", "OnOrgasm")
@@ -875,7 +986,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	If (UseFreeCam) && IsPlayerInvolved()
-		;Utility.Wait(1)
+		Utility.Wait(0) ; is waiting for the next frame, to make sure controls are reenabled before toggling free cam
 		ToggleFreeCam(True)
 	EndIf
 
@@ -894,7 +1005,6 @@ Event OnUpdate() ;OStim main logic loop
 
 	While (IsActorActive(Actors[0])) && !ForceCloseOStimThread ; Main OStim logic loop
 		If (LoopTimeTotal > 1)
-			;Console("Loop took: " + loopTimeTotal + " seconds")
 			LoopTimeTotal = 0
 		EndIf
 
@@ -934,8 +1044,6 @@ Event OnUpdate() ;OStim main logic loop
 			EndIf
 		EndIf
 
-		;Console("Dom excitement: " + DomExcitement)
-		;Console("Sub excitement: " + SubExcitement)
 		LoopTimeTotal = Utility.GetCurrentRealTime() - LoopStartTime
 	EndWhile
 
@@ -1308,14 +1416,10 @@ Function EndAnimation(Bool SmoothEnding = True)
 
 	If (IsNPCScene() && (Actors[0].GetParentCell() != playerref.GetParentCell()))
 		; Attempting to end the scene when the actors are not loaded will fail
-		;console("game loaded")
 		SendModEvent("0SA_GameLoaded")
 	else 
 		UI.Invoke("HUD Menu", diasa + ".endCommand")
-		;UI.InvokeInt("HUD Menu", o + ".com.endCommand", password)
-		;RunOsexCommand("$endscene")
 	endif 
-	;todo: 0SA_Gameloaded can be used exclusively instead of diasa end command??
 EndFunction
 
 Bool Function IsSceneAggressiveThemed() ; if the entire situation should be themed aggressively
@@ -1338,10 +1442,6 @@ Int Function GetTimesOrgasm(Actor Act) ; number of times the Actor has orgasmed
 	ElseIf (Act == ThirdActor)
 		return ThirdTimesOrgasm
 	EndIf
-EndFunction
-
-Bool Function IsNaked(Actor NPC) ; todo caching
-	Return (!(NPC.GetWornForm(0x00000004) as Bool))
 EndFunction
 
 Actor Function GetSexPartner(Actor Char)
@@ -1542,7 +1642,6 @@ Function ToggleFreeCam(Bool On = True)
 			game.ForceThirdPerson()
 			
 			if EnableImprovedCamSupport
-				;Console("using hack")
 				; Improved cam hack
 				int povkey = input.GetMappedKey("Toggle POV")
 
@@ -1608,8 +1707,6 @@ float Function GetStimMult(Actor Act)
 		Return SubStimMult
 	Elseif (Act == ThirdActor)
 		Return ThirdStimMult
-	Else
-		Console("Unknown actor")
 	EndIf
 EndFunction
 
@@ -1620,8 +1717,6 @@ Function SetStimMult(Actor Act, Float Value)
 		SubStimMult = Value
 	Elseif (Act == ThirdActor)
 		ThirdStimMult = Value
-	Else
-		Console("Unknown actor")
 	EndIf
 EndFunction
 
@@ -1808,13 +1903,10 @@ ObjectReference Function FindBed(ObjectReference CenterRef, Float Radius = 0.0)
 	EndWhile
 
 	If (NearRef)
-		Console("Bed found")
-		;PrintBedInfo(NearRef)
 		Return NearRef
 	EndIf
 
-	Console("Bed not found")
-	Return None ; Nothing found in search loop
+	Return None
 EndFunction
 
 Bool Function SameFloor(ObjectReference BedRef, Float Z, Float Tolerance = 128.0)
@@ -1840,15 +1932,6 @@ ObjectReference Function GetOSAStage() ; the stage is an invisible object that t
 	Int StageID = Actors[0].GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
 	Return Stage
-EndFunction
-
-Function PrintBedInfo(ObjectReference Bed)
-	Console("--------------------------------------------")
-	Console("BED - Name: " + Bed.GetDisplayName())
-	Console("BED - Enabled: " + Bed.IsEnabled())
-	Console("BED - 3D loaded: " + Bed.Is3DLoaded())
-	Console("BED - Bed roll: " + IsBedRoll(Bed))
-	Console("--------------------------------------------")
 EndFunction
 
 
@@ -2112,17 +2195,12 @@ Function OnAnimationChange()
 		SendModEvent("ostim_scenechanged_" + CurrentSceneID) ;register to scenes by scene
 	endif 
 
-	Console("Current animation: " + CurrentAnimation)
-	Console("Current speed: " + CurrentSpeed)
-	Console("Current animation class: " + CurrAnimClass)
 	Console("Current scene ID: " + CurrentSceneID)
 
 	;Profile("Animation change time")
 EndFunction
 
 Function OnSpank()
-	Console("Spank event recieved")
-
 	If (AllowUnlimitedSpanking)
 		SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)		
 	Else
@@ -2355,7 +2433,6 @@ Event OnMoThird(String EventName, String zType, Float zAmount, Form Sender)
 EndEvent
 
 Function OnMo(Actor Act, Int zType, Int zAmount) ; eye related face blending
-	;Console("Eye event: " + "Type: " + type + " Amount: " + amount)
 	_oGlobal.BlendMo(Act, zAmount, MfgConsoleFunc.GetModifier(Act, zType), zType, 3)
 EndFunction
 
@@ -2381,7 +2458,6 @@ Event OnPhThird(String EventName, String zType, Float zAmount, Form Sender)
 EndEvent
 
 Function OnPh(Actor Act, Int zType, Int zAmount) ;mouth related face blending
-	;Console("Mouth event: " + "Type: " + type + " Amount: " + amount)
 	_oGlobal.BlendPh(Act, zAmount, MfgConsoleFunc.GetPhoneme(Act, zType), zType, 3)
 EndFunction
 
@@ -2407,7 +2483,6 @@ Event OnExThird(String EventName, String zType, Float zAmount, Form Sender)
 EndEvent
 
 Function OnEx(Actor Act, Int zType, Int zAmount) ;expression related face blending
-	;Console("Expression event: " + "Type: " + type + " Amount: " + amount)
 	MfgConsoleFunc.SetPhonemeModifier(Act, 2, zType, zAmount)
 	Act.SetExpressionOverride(zType, zAmount)
 EndFunction
@@ -2463,8 +2538,6 @@ Event OnOSASound(String EventName, String Args, Float Nothing, Form Sender)
 	EndIf
 	Int FormID = Argz[1] as Int
 	Int SoundID = Argz[2] as Int
-
-	OsexIntegrationMain.Console("Actor: " + Char.GetDisplayName() + " FormID: " + formID + " SoundID: " + Argz[2])
 EndEvent
 /;
 
@@ -2556,7 +2629,6 @@ EndEvent
 
 Function PlayOSASound(Actor Act, Int FormlistID, Int SoundID)
 	PlaySound(Act, SoundFormlists[FormlistID].GetAt(SoundID) as Sound)
-	;Console("Playing sound " + soundid + " in form " + formlistID)
 EndFunction
 
 Function PlaySound(Actor Act, Sound Snd)
@@ -2729,7 +2801,6 @@ Function SetDefaultSettings()
 	HideBarsInNPCScenes = True
 	EnableActorSpeedControl = True
 	AllowUnlimitedSpanking = False
-	AutoUndressIfNeeded = true
 	ResetPosAfterSceneEnd = true 
 
 	PlayerAlwaysSubStraight = false
@@ -2748,10 +2819,13 @@ Function SetDefaultSettings()
 	DomLightPos = 0
 
 	CustomTimescale = 0
+
 	AlwaysUndressAtAnimStart = false
+	RemoveWeaponsAtStart = true
+	AutoUndressIfNeeded = true
+	PartialUndressing = true
+	RemoveWeaponsWithSlot = 32
 	FullyAnimateRedress = false
-	TossClothesOntoGround = false
-	UseStrongerUnequipMethod = false
 
 	LowLightLevelLightsOnly = False
 
@@ -2828,11 +2902,6 @@ UseFreeCam
 	Slots = PapyrusUtil.PushInt(Slots, 31)
 	Slots = PapyrusUtil.PushInt(Slots, 37)
 	StrippingSlots = Slots
-
-	UseNativeFunctions = (SKSE.GetPluginVersion("OSA") != -1)
-	If (!UseNativeFunctions)
-		Console("Native function DLL failed to load. Falling back to papyrus implementations")
-	EndIf
 
 	ShowTutorials = true 
 	
@@ -3039,8 +3108,6 @@ Event OnKeyDown(Int KeyPress)
 	EndIf
 
 	If (DisableOSAControls)
-		Console("OStim controls disabled by property")
-		
 		if AnimationRunning()
 			LockWidget.FlashVisibililty()
 		endif 
@@ -3090,7 +3157,6 @@ Event OnKeyDown(Int KeyPress)
 				AIRunning = False
 				PauseAI = True
 				Debug.Notification("Switched to manual control mode")
-				Console("Switched to manual control mode")
 			Else
 				If (PauseAI)
 					PauseAI = False
@@ -3099,17 +3165,14 @@ Event OnKeyDown(Int KeyPress)
 				EndIf
 				AIRunning = True
 				Debug.Notification("Switched to automatic control mode")
-				Console("Switched to automatic control mode")
 			EndIf
 		Else
 			If (UseAIControl)
 				UseAIControl = False
 				Debug.Notification("Switched to manual control mode")
-				Console("Switched to manual control mode")
 			Else
 				UseAIControl = True
 				Debug.Notification("Switched to automatic control mode")
-				Console("Switched to automatic control mode")
 			EndIf
 		EndIf
 		PlayTickBig()
@@ -3200,7 +3263,7 @@ Function Startup()
 		Return
 	EndIf
 
-	If (SKSE.GetPluginVersion("JContainers64") == -1)
+	If (SKSE.GetPluginVersion("JContainers64") == -1 && SKSE.GetPluginVersion("JContainersGOG") == -1)
 		Debug.MessageBox("OStim: JContainers is not installed, please exit the game and install it to allow Ostim to function.")
 		Return
 	EndIf
@@ -3224,10 +3287,6 @@ Function Startup()
 	Else
 		ODatabase.Unload()
 	EndIf
-
-	;If (ArousedFaction)
-	;	Console("Sexlab Aroused loaded")
-	;EndIf
 
 	If (SKSE.GetPluginVersion("ConsoleUtilSSE") == -1)
 		Debug.Notification("OStim: ConsoleUtil is not installed, a few features may not work")
@@ -3289,14 +3348,12 @@ Function RegisterForGameLoadEvent(form f)
 EndFunction 
 
 Function SendLoadGameEvent()
-	;Console(LoadRegistrations as string)
 	int l = LoadRegistrations.Length
 
 	if l > 0
 		int i = 0 
 
 		while i < l 
-			;Console("Loading: " + LoadRegistrations[i].getname())
 			LoadRegistrations[i].RegisterForModEvent("ostim_gameload", "OnGameLoad")
 			ModEvent.Send(ModEvent.Create("ostim_gameload"))
 			LoadRegistrations[i].UnregisterForModEvent("ostim_gameload")
@@ -3335,7 +3392,6 @@ Function OnLoadGame()
 
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
-		OUndress.OnGameLoad()
 		OControl.OPlayerControls()
 
 		SendLoadGameEvent()
@@ -3403,7 +3459,31 @@ EndFunction
 
 ; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
 
+Bool Property UseStrongerUnequipMethod
+	bool Function Get()
+		Return false
+	EndFunction
+	Function Set(bool Value)
+	EndFunction
+EndProperty
+
+Bool Property TossClothesOntoGround
+	bool Function Get()
+		Return false
+	EndFunction
+	Function Set(bool Value)
+	EndFunction
+EndProperty
+
 bool Property OrgasmIncreasesRelationship
+	bool Function Get()
+		Return false
+	EndFunction
+	Function Set(bool Value)
+	EndFunction
+EndProperty
+
+Bool Property UseNativeFunctions
 	bool Function Get()
 		Return false
 	EndFunction
@@ -3502,4 +3582,18 @@ Actor MostRecentOrgasmedActor
 Actor Function GetMostRecentOrgasmedActor()
 	; use (sender As Actor) in the ostim_orgasm event instead
 	Return MostRecentOrgasmedActor
+EndFunction
+
+Bool Function IsNaked(Actor NPC)
+	; now that there's partial stripping there isn't really a dedicated being naked condition
+	Return (!(NPC.GetWornForm(0x00000004) as Bool))
+EndFunction
+
+Function PrintBedInfo(ObjectReference Bed)
+	Console("--------------------------------------------")
+	Console("BED - Name: " + Bed.GetDisplayName())
+	Console("BED - Enabled: " + Bed.IsEnabled())
+	Console("BED - 3D loaded: " + Bed.Is3DLoaded())
+	Console("BED - Bed roll: " + IsBedRoll(Bed))
+	Console("--------------------------------------------")
 EndFunction
