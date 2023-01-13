@@ -32,11 +32,5 @@
   "SetAlwaysUndressAtStart": 1,
   "SetUseAutoFades": 1,
   "SetUseFades": 1,
-  "SetUseFreeCam": 1,
-  "Slots": [
-    32,
-    33,
-    31,
-    37
-  ]
+  "SetUseFreeCam": 1
 }

@@ -489,7 +489,6 @@ Actor AggressiveActor
 
 OAIScript AI
 OBarsScript OBars
-OUndressScript OUndress
 OStimUpdaterScript OUpdater
 
 Float DomStimMult
@@ -1140,6 +1139,8 @@ Event OnUpdate() ;OStim main logic loop
 
 	If (FurnitureType != FURNITURE_TYPE_NONE)
 		CurrentFurniture.BlockActivation(false)
+		FurnitureType = FURNITURE_TYPE_NONE
+		CurrentFurniture = None
 	EndIf
 
 	If IsPlayerInvolved()
@@ -1227,7 +1228,8 @@ OBarsScript Function GetBarScript()
 EndFunction
 
 OUndressScript function GetUndressScript()
-	return Oundress
+	; the script no longer exists
+	return None
 EndFunction
 
 Int Function GetCurrentAnimationSpeed()
@@ -3251,7 +3253,6 @@ Function Startup()
 
 	AI = ((Self as Quest) as OAiScript)
 	OBars = ((Self as Quest) as OBarsScript)
-	OUndress = ((Self as Quest) as OUndressScript)
 	;RegisterForModEvent("ostim_actorhit", "OnActorHit")
 	SetSystemVars()
 	SetDefaultSettings()

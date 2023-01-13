@@ -1297,6 +1297,7 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetRemoveWeaponsWithSlot", Main.RemoveWeaponsWithSlot as Int)
 	JMap.SetInt(OstimSettingsFile, "SetAnimateRedress", Main.FullyAnimateRedress as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUsePapyrusUndressing", Main.UsePapyrusUndressing as Int)
+	JMap.SetInt(OstimSettingsFile, "SetUndressingSlotMask", OData.GetUndressingSlotMask())
 
 	; Bar settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSubBar", Main.EnableSubBar as Int)
@@ -1365,9 +1366,6 @@ Function ExportSettings()
 
 	JMap.SetInt(OstimSettingsFile, "SetUseFades", Main.UseFades as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseAutoFades", Main.UseAutoFades as Int)
-
-	int clothes = JArray.objectWithInts(main.StrippingSlots)
-	JMap.setObj(OstimSettingsFile,"Slots", clothes)
 
 	; addon stuff
 	if main.IsModLoaded(ORomance)
@@ -1501,6 +1499,7 @@ Function ImportSettings(bool default = false)
 	Main.RemoveWeaponsWithSlot = JMap.GetInt(OstimSettingsFile, "SetRemoveWeaponsWithSlot", 32)
 	Main.FullyAnimateRedress = JMap.GetInt(OstimSettingsFile, "SetAnimateRedress")
 	Main.UsePapyrusUndressing = JMap.GetInt(OstimSettingsFile, "SetUsePapyrusUndressing")
+	OData.SetUndressingSlotMask(JMap.GetInt(OstimSettingsFile, "SetUndressingSlotMask", 0x3D8BC39D))
 	
 	; Bar settings import.
 	Main.EnableSubBar = JMap.GetInt(OstimSettingsFile, "SetSubBar")
@@ -1575,8 +1574,6 @@ Function ImportSettings(bool default = false)
 	Main.UseAutoFades = JMap.GetInt(OstimSettingsFile, "SetUseAutoFades")
 
 	Main.ShowTutorials = JMap.GetInt(OstimSettingsFile, "SetTutorialMessages")
-	
-	main.StrippingSlots = JArray.asIntArray((jmap.getObj(OstimSettingsFile, "Slots")))
 
 	if !default ; don't load addon settings for reset to default button
 	; addon stuff
