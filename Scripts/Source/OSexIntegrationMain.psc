@@ -265,17 +265,13 @@ Bool Property FullyAnimateRedress
 	EndFunction
 EndProperty
 
+; changing the value of this global does not change the undressing behavior
+; to change the undressing behavior you need to change the return value of OUndress.UsePapyrusUndressing()
+; this global has a purely informative purpose, so consider it to be read only
 GlobalVariable Property OStimUsePapyrusUndressing Auto
 Bool Property UsePapyrusUndressing
 	bool Function Get()
 		Return OStimUsePapyrusUndressing.value != 0
-	EndFunction
-	Function Set(bool Value)
-		If Value
-			OStimUsePapyrusUndressing.value = 1
-		Else
-			OStimUsePapyrusUndressing.value = 0
-		EndIf
 	EndFunction
 EndProperty
 
@@ -289,6 +285,7 @@ Bool Property EndOnDomOrgasm Auto
 Bool Property EndOnSubOrgasm Auto
 Bool Property RequireBothOrgasmsToFinish Auto
 Bool Property SlowMoOnOrgasm Auto
+Bool Property BlurrOnOrgasm Auto
 
 GlobalVariable Property OStimAutoClimaxAnimations Auto
 bool Property AutoClimaxAnimations
@@ -984,10 +981,11 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	If (UseFreeCam) && IsPlayerInvolved()
-		Utility.Wait(0) ; is waiting for the next frame, to make sure controls are reenabled before toggling free cam
-		ToggleFreeCam(True)
-	EndIf
+	; this is now done in _oActra after the player has been moved to the stage, so that you no longer have to search for your furniture scenes
+	;If (UseFreeCam) && IsPlayerInvolved()
+	;	Utility.Wait(0) ; is waiting for the next frame, to make sure controls are reenabled before toggling free cam
+	;	ToggleFreeCam(True)
+	;EndIf
 
 
 	SendModEvent("ostim_start")
@@ -2299,7 +2297,9 @@ Function Climax(Actor Act)
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
-		NutEffect.Apply()
+		If BlurrOnOrgasm
+			NutEffect.Apply()
+		EndIf
 		If (SlowMoOnOrgasm)
 			SetGameSpeed("0.3")
 			Utility.Wait(2.5)
@@ -2850,6 +2850,7 @@ UseFreeCam
 
 	DisableStimulationCalculation = false
 	SlowMoOnOrgasm = True
+	BlurrOnOrgasm = True
 
 	UseAIControl = False
 	OnlyGayAnimsInGayScenes = False

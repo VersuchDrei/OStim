@@ -223,6 +223,13 @@ Event OnAlignStage()
 	Actra.TranslateTo(PosObj.GetPositionX(), PosObj.GetPositionY(), PosObj.GetPositionZ(), PosObj.GetAngleX(), PosObj.GetAngleY(), PosObj.GetAngleZ() + 1, 500, 0.0001)
 	SendModEvent("ostim_setvehicle")
 	Aligned = True
+
+	If Actra == PlayerRef
+		OsexIntegrationMain OStim = OUtils.GetOstim()
+		If OStim.UseFreeCam
+			OStim.ToggleFreeCam(true)
+		EndIf
+	EndIf
 EndEvent
 
 Event OnTranslationComplete()

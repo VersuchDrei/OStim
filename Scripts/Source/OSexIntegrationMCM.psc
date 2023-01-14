@@ -21,7 +21,6 @@ Int SetUndressIfNeed
 int SetPartialUndressing
 int SetRemoveWeaponsWithSlot
 int SetAnimateRedress
-int SetUsePapyrusUndressing
 int[] SlotSets
 int UndressingSlotMask
 
@@ -41,6 +40,7 @@ int SetHideNPCOnNPCBars
 
 ; orgasm settings
 Int SetSlowMoOrgasms
+Int SetBlurrOrgasms
 Int SetEndOnOrgasm
 Int SetEndOnSubOrgasm
 Int SetEndOnBothOrgasm
@@ -307,6 +307,7 @@ Event OnPageReset(String Page)
 		SetEndOnSubOrgasm = AddToggleOption("$ostim_orgasm_end_sub", Main.EndOnSubOrgasm)
 		SetEndOnBothOrgasm = AddToggleOption("$ostim_orgasm_end_both", Main.RequireBothOrgasmsToFinish)
 		SetSlowMoOrgasms = AddToggleOption("$ostim_slowmo_orgasm", Main.SlowMoOnOrgasm)
+		SetBlurrOrgasms = AddToggleOption("$ostim_blurr_orgasm", Main.BlurrOnOrgasm)
 		SetAutoClimaxAnims = AddToggleOption("$ostim_auto_climax_anims", Main.AutoClimaxAnimations)
 		AddEmptyOption()
 
@@ -465,7 +466,6 @@ Event OnPageReset(String Page)
 		SetPartialUndressing = AddToggleOption("$ostim_partial_undressing", Main.PartialUndressing)
 		SetRemoveWeaponsWithSlot = AddSliderOption("$ostim_remove_weapons_slot", Main.RemoveWeaponsWithSlot, "{0}")
 		SetAnimateRedress= AddToggleOption("$ostim_animate_redress", Main.FullyAnimateRedress)
-		SetUsePapyrusUndressing = AddToggleOption("$ostim_papyrus_undressing", Main.UsePapyrusUndressing)
 
 		SetCursorPosition(10)
 		SetUndressingAbout = AddTextOption("$ostim_undress_about", "")
@@ -548,9 +548,6 @@ Event OnOptionSelect(Int Option)
 		ElseIf Option == SetAnimateRedress
 			Main.FullyAnimateRedress = !Main.FullyAnimateRedress
 			SetToggleOptionValue(Option, Main.FullyAnimateRedress)
-		ElseIf Option == SetUsePapyrusUndressing
-			Main.UsePapyrusUndressing = !Main.UsePapyrusUndressing
-			SetToggleOptionValue(Option, Main.UsePapyrusUndressing)
 		Else
 			OnSlotSelect(option)
 		EndIf
@@ -694,6 +691,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSlowMoOrgasms)
 		Main.SlowMoOnOrgasm = !Main.SlowMoOnOrgasm
 		SetToggleOptionValue(Option, Main.SlowMoOnOrgasm)
+	ElseIf (Option == SetBlurrOrgasms)
+		Main.BlurrOnOrgasm = !Main.BlurrOnOrgasm
+		SetToggleOptionValue(Option, Main.BlurrOnOrgasm)
 	ElseIf (Option == SetAutoClimaxAnims)
 		Main.AutoClimaxAnimations = !Main.AutoClimaxAnimations
 		SetToggleOptionValue(Option, Main.AutoClimaxAnimations)
@@ -751,8 +751,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_remove_weapons_slot")
 		ElseIf Option == SetAnimateRedress
 			SetInfoText("$ostim_tooltip_animate_redress")
-		ElseIf Option == SetUsePapyrusUndressing
-			SetInfoText("$ostim_tooltip_papyrus_undressing")
 		ElseIf Option == SetUndressingAbout
 			SetInfoText("$ostim_tooltip_undressing_about")
 		Else
@@ -878,6 +876,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_auto_hide_bar")
 	ElseIf (Option == SetSlowMoOrgasms)
 		SetInfoText("$ostim_tooltip_slowmo_orgasms")
+	ElseIf (Option == SetBlurrOrgasms)
+		SetInfoText("$ostim_tooltip_blurr_orgasms")
 	ElseIf (Option == SetAutoClimaxAnims)
 		SetInfoText("$ostim_tooltip_auto_climax_anims")
 	ElseIf (Option == SetDomLightMode)
@@ -1296,7 +1296,6 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetPartialUndressing", Main.PartialUndressing as Int)
 	JMap.SetInt(OstimSettingsFile, "SetRemoveWeaponsWithSlot", Main.RemoveWeaponsWithSlot as Int)
 	JMap.SetInt(OstimSettingsFile, "SetAnimateRedress", Main.FullyAnimateRedress as Int)
-	JMap.SetInt(OstimSettingsFile, "SetUsePapyrusUndressing", Main.UsePapyrusUndressing as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUndressingSlotMask", OData.GetUndressingSlotMask())
 
 	; Bar settings export.
@@ -1309,6 +1308,7 @@ Function ExportSettings()
 
 	; Orgasm settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSlowMoOrgasms", Main.SlowMoOnOrgasm as Int)
+	JMap.SetInt(OstimSettingsFile, "SetBlurrOrgasms", Main.BlurrOnOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetAutoClimaxAnims", Main.AutoClimaxAnimations as Int)
 
 	; Light settings export.
@@ -1498,7 +1498,6 @@ Function ImportSettings(bool default = false)
 	Main.PartialUndressing = JMap.GetInt(OstimSettingsFile, "SetPartialUndressing", 1)
 	Main.RemoveWeaponsWithSlot = JMap.GetInt(OstimSettingsFile, "SetRemoveWeaponsWithSlot", 32)
 	Main.FullyAnimateRedress = JMap.GetInt(OstimSettingsFile, "SetAnimateRedress")
-	Main.UsePapyrusUndressing = JMap.GetInt(OstimSettingsFile, "SetUsePapyrusUndressing")
 	OData.SetUndressingSlotMask(JMap.GetInt(OstimSettingsFile, "SetUndressingSlotMask", 0x3D8BC39D))
 	
 	; Bar settings import.
@@ -1550,7 +1549,8 @@ Function ImportSettings(bool default = false)
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
 	
 	;Orgasm settings
-	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms")
+	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms", 1)
+	Main.BlurrOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetBlurrOrgasms", 1)
 	Main.AutoClimaxAnimations = JMap.GetInt(OstimSettingsFile, "SetAutoClimaxAnims")
 	
 	; Ai/Control settings export.
