@@ -91,7 +91,6 @@ bool Function StartScene(actor dom, actor sub = none, actor third = none, float 
 	actorlist =  PapyrusUtil.removeactor(actro, none)
 
 	ScaleActors()
-	Strip()
 
 
 	string StartingAnimation = GetRandomAnimationForScene()
@@ -145,8 +144,6 @@ bool Function InheritFromMain()
 	currentbed = ostim.GetBed()
 
 	currScene = ostim.GetScene()
-
-	GetClothesFromMain()
 
 	timePerSpeed = (ostim.GetEstimatedTimeUntilEnd() / maxSpeed) + OSANative.RandomFloat(-2.0, 2.0)
 	if timePerSpeed < 1
@@ -210,63 +207,6 @@ Function Orgasm()
 	DecreaseAnimationSpeed()
 	Utility.Wait(5)
 	endanimation()
-EndFunction
-
-Function Strip()
-	OUndressScript oundress = ostim.GetUndressScript()
-
-	domclothes = oundress.storeequipmentforms(domactor, true)
-	oundress.UnequipForms(domactor, domclothes)
-	if subactor
-		subclothes = oundress.storeequipmentforms(subactor, true)
-		oundress.UnequipForms(subactor, subclothes)
-		if thirdactor
-			thirdclothes = oundress.storeequipmentforms(thirdactor, true)
-			oundress.UnequipForms(thirdactor, thirdclothes)
-		endif 
-	endif 
-
-EndFunction
-
-Function Redress() 
-	OUndressScript oundress = ostim.GetUndressScript()
-	bool object = (domclothes[0] as ObjectReference) != none 
-	Console("Subthread redress with objects: " + object)
-
-	if object
-		oundress.PickUpThings(domactor, outils.FormArrToObjRefArr(domclothes))
-	else 
-		oundress.EquipForms(domactor, domclothes)
-	endif 
-	if subactor
-		if object
-			oundress.PickUpThings(subactor, outils.FormArrToObjRefArr(subclothes))
-		else 
-			oundress.EquipForms(subactor, subclothes)
-		endif 
-		if thirdactor
-			if object
-				oundress.PickUpThings(thirdactor, outils.FormArrToObjRefArr(thirdclothes))
-			else 
-				oundress.EquipForms(thirdactor, thirdclothes)
-			endif 
-		endif 
-	endif
-EndFunction
-
-Function GetClothesFromMain()
-	OUndressScript oundress = ostim.GetUndressScript()
-
-	if ostim.TossClothesOntoGround
-		domclothes = outils.ObjRefArrToFormArr( oundress.getdrops(actorlist[0]) )
-		subclothes = outils.ObjRefArrToFormArr( oundress.getdrops(actorlist[1]) )
-		thirdclothes = outils.ObjRefArrToFormArr( oundress.getdrops(actorlist[2]) )
-	else 
-		domclothes = oundress.DomEquipmentForms
-		subclothes = oundress.SubEquipmentForms
-		thirdclothes = oundress.ThirdEquipmentForms
-	endif 
-
 EndFunction
 
 function runOsexCommand(string cmd)
@@ -357,9 +297,7 @@ Function EndAnimation() ;todo - isloaded check, see osexintegrationmain endanima
 	UnregisterForAllModEvents()
 	if !ostim.AnimationRunning()
 		ODatabase.Unload()
-	endif 
-
-	Redress()
+	endif
 
 	SendModEvent("ostim_end", numArg = id)
 
