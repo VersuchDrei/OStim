@@ -285,7 +285,7 @@ Bool Property EndOnDomOrgasm Auto
 Bool Property EndOnSubOrgasm Auto
 Bool Property RequireBothOrgasmsToFinish Auto
 Bool Property SlowMoOnOrgasm Auto
-Bool Property BlurrOnOrgasm Auto
+Bool Property BlurOnOrgasm Auto
 
 GlobalVariable Property OStimAutoClimaxAnimations Auto
 bool Property AutoClimaxAnimations
@@ -2297,7 +2297,7 @@ Function Climax(Actor Act)
 	SetActorExcitement(Act, -3.0)
 	Act.SendModEvent("ostim_orgasm", CurrentSceneID, Actors.Find(act))
 	If (Act == PlayerRef)
-		If BlurrOnOrgasm
+		If BlurOnOrgasm
 			NutEffect.Apply()
 		EndIf
 		If (SlowMoOnOrgasm)
@@ -2850,7 +2850,7 @@ UseFreeCam
 
 	DisableStimulationCalculation = false
 	SlowMoOnOrgasm = True
-	BlurrOnOrgasm = True
+	BlurOnOrgasm = True
 
 	UseAIControl = False
 	OnlyGayAnimsInGayScenes = False

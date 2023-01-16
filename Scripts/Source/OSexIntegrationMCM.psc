@@ -40,7 +40,7 @@ int SetHideNPCOnNPCBars
 
 ; orgasm settings
 Int SetSlowMoOrgasms
-Int SetBlurrOrgasms
+Int SetBlurOrgasms
 Int SetEndOnOrgasm
 Int SetEndOnSubOrgasm
 Int SetEndOnBothOrgasm
@@ -307,7 +307,7 @@ Event OnPageReset(String Page)
 		SetEndOnSubOrgasm = AddToggleOption("$ostim_orgasm_end_sub", Main.EndOnSubOrgasm)
 		SetEndOnBothOrgasm = AddToggleOption("$ostim_orgasm_end_both", Main.RequireBothOrgasmsToFinish)
 		SetSlowMoOrgasms = AddToggleOption("$ostim_slowmo_orgasm", Main.SlowMoOnOrgasm)
-		SetBlurrOrgasms = AddToggleOption("$ostim_blurr_orgasm", Main.BlurrOnOrgasm)
+		SetBlurOrgasms = AddToggleOption("$ostim_blur_orgasm", Main.BlurOnOrgasm)
 		SetAutoClimaxAnims = AddToggleOption("$ostim_auto_climax_anims", Main.AutoClimaxAnimations)
 		AddEmptyOption()
 
@@ -691,9 +691,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetSlowMoOrgasms)
 		Main.SlowMoOnOrgasm = !Main.SlowMoOnOrgasm
 		SetToggleOptionValue(Option, Main.SlowMoOnOrgasm)
-	ElseIf (Option == SetBlurrOrgasms)
-		Main.BlurrOnOrgasm = !Main.BlurrOnOrgasm
-		SetToggleOptionValue(Option, Main.BlurrOnOrgasm)
+	ElseIf (Option == SetBlurOrgasms)
+		Main.BlurOnOrgasm = !Main.BlurOnOrgasm
+		SetToggleOptionValue(Option, Main.BlurOnOrgasm)
 	ElseIf (Option == SetAutoClimaxAnims)
 		Main.AutoClimaxAnimations = !Main.AutoClimaxAnimations
 		SetToggleOptionValue(Option, Main.AutoClimaxAnimations)
@@ -876,8 +876,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_auto_hide_bar")
 	ElseIf (Option == SetSlowMoOrgasms)
 		SetInfoText("$ostim_tooltip_slowmo_orgasms")
-	ElseIf (Option == SetBlurrOrgasms)
-		SetInfoText("$ostim_tooltip_blurr_orgasms")
+	ElseIf (Option == SetBlurOrgasms)
+		SetInfoText("$ostim_tooltip_blur_orgasms")
 	ElseIf (Option == SetAutoClimaxAnims)
 		SetInfoText("$ostim_tooltip_auto_climax_anims")
 	ElseIf (Option == SetDomLightMode)
@@ -1308,7 +1308,7 @@ Function ExportSettings()
 
 	; Orgasm settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSlowMoOrgasms", Main.SlowMoOnOrgasm as Int)
-	JMap.SetInt(OstimSettingsFile, "SetBlurrOrgasms", Main.BlurrOnOrgasm as Int)
+	JMap.SetInt(OstimSettingsFile, "SetBlurOrgasms", Main.BlurOnOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetAutoClimaxAnims", Main.AutoClimaxAnimations as Int)
 
 	; Light settings export.
@@ -1550,7 +1550,7 @@ Function ImportSettings(bool default = false)
 	
 	;Orgasm settings
 	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms", 1)
-	Main.BlurrOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetBlurrOrgasms", 1)
+	Main.BlurOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetBlurOrgasms", 1)
 	Main.AutoClimaxAnimations = JMap.GetInt(OstimSettingsFile, "SetAutoClimaxAnims")
 	
 	; Ai/Control settings export.
