@@ -125,29 +125,8 @@ Event OnKeyDown(Int KeyPress)
     ElseIf (KeyPress == OKey[1])
         ;UI.Invoke("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.ctr.MENU")
         OSANative.Control(7, Glyph)
-    ElseIf (KeyPress == OKey[9])
-        InspectActra()
-    ElseIf (KeyPress == OKey[13])
-        API_TestingFunction()
     EndIf
 EndEvent
-
-Function API_TestingFunction()
-    Actor InspectActra = Game.GetCurrentCrosshairRef() as Actor
-    If (InspectActra)
-        String[] MyStage = OSA.MakeStage()
-        OSA.SetModule(myStage, "0Sex")
-
-        Actor[] MyActors = new Actor[2]
-        MyActors[0] = PlayerRef
-        MyActors[1] = InspectActra
-
-        PlanString(MyStage)
-
-        OSA.SetActors(MyStage, MyActors)
-        OSA.Start(MyStage)
-    EndIf
-EndFunction
 
 Function PlanArr(String[] MyStage)
     String[] MyPlan = new String[22]
@@ -266,20 +245,6 @@ Event OnKeyUp(Int KeyPress, Float HoldTime)
     EndIf
 EndEvent
 
-Function InspectActra()
-    Actor InspectActra = Game.GetCurrentCrosshairRef() as Actor
-    If (InspectActra)
-        If (!InspectActra.IsChild() && InspectActra.HasKeywordString("ActorTypeNPC"))
-            ActorBase ActraBase = InspectActra.GetActorBase()
-            UI.InvokeString("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.hud.addSigInspect", ActraBase.GetName())
-
-            String ActraID = _oGlobal.GetFormID_S(ActraBase)
-            OSO.ProcessActraAll(InspectActra, ActraID)
-            _oGlobal.SendEQSuite(InspectActra, ActraID, Glyph, OSO.CodePage)
-            UI.InvokeString("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.ctr.INSPECT", ActraID)
-        EndIf
-    EndIf
-EndFunction
 
 Event OnInspectActraTrue(String EventName, String FormID, Float Arg, Form Actra)
     Actor InspectedActor = Actra as Actor
