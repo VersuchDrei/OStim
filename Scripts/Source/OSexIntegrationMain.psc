@@ -518,34 +518,6 @@ ODatabaseScript ODatabase
 bool FirstAnimate
 
 ;--------- ID shortcuts
-;Animation classifications
-String ClassSex
-String ClassEmbracing
-String ClassCunn
-String ClassHolding
-String ClassApart
-String ClassApartUndressing
-String ClassApartHandjob
-String ClassHandjob
-String ClassClitRub
-String ClassOneFingerPen
-String ClassTwoFingerPen
-String ClassBlowjob
-String ClassPenisjob
-String ClassMasturbate
-String ClassRoughHolding
-String ClassSelfSuck
-String ClassHeadHeldBlowjob
-String ClassHeadHeldPenisjob
-String ClassHeadHeldMasturbate
-String ClassDualHandjob
-String Class69Blowjob
-String Class69Handjob
-
-String ClassAnal
-String ClassBoobjob
-String ClassBreastFeeding
-String ClassFootjob
 
 String o
 Int Password
@@ -809,6 +781,7 @@ Event OnUpdate() ;OStim main logic loop
 	MostRecentOrgasmedActor = None
 	SpankMax = osanative.RandomInt(1, 6)
 	FirstAnimate = true
+	MostRecentOSexInteractionTime = Utility.GetCurrentRealTime()
 
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
 	; OBarsScript already registers for the ostim_orgasm event and is attached to the same quest
@@ -902,7 +875,7 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	CurrentAnimation = ""
+	CurrentAnimation = OMetadata.GetAnimationId(StartingAnimation, 0)
 	CurrentSceneID = StartingAnimation
 	LastHubSceneID = ""
 	;OnAnimationChange()
@@ -931,14 +904,13 @@ Event OnUpdate() ;OStim main logic loop
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
 
-	;/
+	
 	int AEvent = ModEvent.Create(EventName)
 	Modevent.PushString(AEvent, EventName)
 	ModEvent.PushString(AEvent, CurrentAnimation)
 	ModEvent.PushFloat(AEvent, 0.0)
 	ModEvent.PushForm(AEvent, self)
 	ModEvent.Send(AEvent)
-	/;
 
 
 	StartTime = Utility.GetCurrentRealTime()
@@ -2761,38 +2733,6 @@ Event DisplayToastEvent(string txt, float time)
 	outils.DisplayToastText(txt, time)
 EndEvent
 
-Function SetSystemVars()
-	; vanilla OSex class library
-	ClassSex = "Sx"
-	ClassCunn = "VJ" ;Cunnilingus
-	ClassApartHandjob = "ApHJ"
-	ClassHandjob = "HJ"
-	ClassClitRub = "Cr"
-	ClassOneFingerPen = "Pf1"
-	ClassTwoFingerPen = "Pf2"
-	ClassBlowjob = "BJ"
-	ClassPenisjob = "ApPJ" ;Blowjob with jerking at the same time
-	ClassMasturbate = "Po" ; masturbation
-	ClassHolding = "Ho" ;
-	ClassApart = "Ap" ;standing apart
-	ClassApartUndressing = "ApU"
-	ClassEmbracing = "Em"
-	ClassRoughHolding = "Ro"
-	ClassSelfSuck = "SJ"
-	ClassHeadHeldPenisjob = "HhPJ"
-	ClassHeadHeldBlowjob = "HhBJ"
-	ClassHeadHeldMasturbate = "HhPo"
-	ClassDualHandjob = "DHJ"
-	Class69Blowjob = "VBJ"
-	Class69Handjob = "VHJ"
-
-	; OStim extended library
-	ClassAnal = "An"
-	ClassBoobjob = "BoJ"
-	ClassBreastFeeding = "BoF"
-	ClassFootjob = "FJ"
-EndFunction
-
 Function SetDefaultSettings()
 	EndOnDomOrgasm = True
 	EndOnSubOrgasm = False 
@@ -3255,7 +3195,6 @@ Function Startup()
 	AI = ((Self as Quest) as OAiScript)
 	OBars = ((Self as Quest) as OBarsScript)
 	;RegisterForModEvent("ostim_actorhit", "OnActorHit")
-	SetSystemVars()
 	SetDefaultSettings()
 	BuildSoundFormlists()
 	scenemetadata = PapyrusUtil.StringArray(0)

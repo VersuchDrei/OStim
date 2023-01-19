@@ -41,6 +41,17 @@ int Function GetMaxSpeed(string Id) Global Native
 */;
 int Function GetActorCount(string Id) Global Native
 
+;/* GetAnimationId
+* * returns the id of the animation of a speed
+* * note: this is the generic id, you still have to add _0, _1, etc. to get the actual animation events to send
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the speed
+* *
+* * @return: the animation id
+*/;
+string Function GetAnimationId(string Id, int Index) Global Native
+
 ;/* GetAutoTransitionForActor
 * * returns the of the respective type for the actor in the scene
 * *
