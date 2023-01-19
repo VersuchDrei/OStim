@@ -63,9 +63,15 @@ event onAlignTo(string eventName, string actorLocHub, float alignStyle, Form sen
 int style = alignStyle as int
 	if style == 0
 		align = true
-		OsexIntegrationMain OStim = OUtils.GetOStim()
-    	If OStim.UsingFurniture() && OStim.IsActorInvolved(Actra[0])
-    		ObjectReference FurnitureRef = OStim.GetFurniture()
+
+		; Event name will be something like 0SAO55_AlignTo
+		; So, split the name on the '_' character to get the Password reliably
+		string[] eventNameSplit = StringUtil.Split(eventName, "_")
+		int scenePassword = StringUtil.Substring(eventNameSplit[0], 4) as int
+
+		ObjectReference FurnitureRef = OSO.GetSceneFurniture(scenePassword, Actra[0])
+
+		If FurnitureRef != none
     		float X = FurnitureRef.GetPositionX()
     		float Y = FurnitureRef.GetPositionY()
     		float Z = FurnitureRef.GetPositionZ()

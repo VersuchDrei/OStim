@@ -564,15 +564,20 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	if !installed 
 		debug.Notification("OStim not ready or installation failed")
 		return false
-	endif 
+	endif
+
+	; If Player isn't involved, it's an NPC scene, so start it on a subthread instead
+	If PlayerRef != Dom && PlayerRef != Sub && PlayerRef != zThirdActor
+		if !GetUnusedSubthread().StartSubthreadScene(Dom, Sub, zThirdActor = zThirdActor, startingAnimation = zStartingAnimation, furnitureObj = Bed, withAI = true, isAggressive = Aggressive, aggressingActor = AggressingActor)
+			Debug.Notification("OStim: Thread overload, please report this on discord")
+			return False
+		endif 
+		return True
+	EndIf
 
 	If (SceneRunning)
-		if IsNPCScene()
-			ConvertToSubthread()
-		else 
-			Debug.Notification("OSA scene already running")
-			Return False
-		endif 
+		Debug.Notification("OSA scene already running")
+		Return False
 	EndIf
 
 	If IsActorActive(dom) || (sub && IsActorActive(sub))
@@ -581,7 +586,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	EndIf
 	If !dom.Is3DLoaded()
 		console("Dom actor is not loaded")
-		return false
+		return False
 	EndIf
 
 	; Default OSex gender order
@@ -607,7 +612,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	EndIf
 
 
-	If SubActor && IsPlayerInvolved()
+	If SubActor
 		;special reordering settings
 		;todo: clean up all of the ordering code around here
 		bool gay = (AppearsFemale(dom) == AppearsFemale(sub))
@@ -715,28 +720,26 @@ EndFunction
 Event OnUpdate() ;OStim main logic loop
 	Console("Starting scene asynchronously")
 
-	If IsPlayerInvolved()
-		OSANative.EndPlayerDialogue()
+	OSANative.EndPlayerDialogue()
 
-		bool InDialogue = false
-		int i = Actors.Length
+	bool InDialogue = false
+	int i = Actors.Length
+	While i
+		i -= 1
+		InDialogue = InDialogue || Actors[i].IsInDialogueWithPlayer()
+	EndWhile
+
+	While InDialogue
+		InDialogue = false
+		Utility.Wait(0.3)
+		i = Actors.Length
 		While i
 			i -= 1
 			InDialogue = InDialogue || Actors[i].IsInDialogueWithPlayer()
 		EndWhile
+	EndWhile
 
-		While InDialogue
-			InDialogue = false
-			Utility.Wait(0.3)
-			i = Actors.Length
-			While i
-				i -= 1
-				InDialogue = InDialogue || Actors[i].IsInDialogueWithPlayer()
-			EndWhile
-		EndWhile
-	EndIf
-
-	If (UseFades && IsPlayerInvolved())
+	If (UseFades)
 		FadeToBlack()
 	EndIf
 
@@ -755,7 +758,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	SendModEvent("ostim_prestart") ; fires as soon as the screen goes black. be careful, some settings you normally expect may not be set yet. Use ostim_start to run code when the OSA scene begins.
 
-	If (EnableImprovedCamSupport) && IsPlayerInvolved()
+	If (EnableImprovedCamSupport)
 		Game.DisablePlayerControls(abCamswitch = True, abMenu = False, abFighting = False, abActivate = False, abMovement = False, aiDisablePOVType = 0)
 	EndIf
 
@@ -805,7 +808,7 @@ Event OnUpdate() ;OStim main logic loop
 			SelectFurniture()
 		Else
 			CurrentFurniture = FindBed(Actors[0])
-			If CurrentFurniture && (!SelectFurniture || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0)
+			If CurrentFurniture && (!SelectFurniture || OStimBedConfirmationMessage.Show() == 0)
 				FurnitureType == FURNITURE_TYPE_BED
 			Else
 				CurrentFurniture = None
@@ -858,6 +861,7 @@ Event OnUpdate() ;OStim main logic loop
 	;profile()
 
 	CurrScene = OSA.MakeStage()
+	Password = CurrScene[0] as int
 	OSA.SetActorsStim(currScene, Actors)
 	OSA.SetModule(CurrScene, "0Sex", StartingAnimation, "")
 	OSA.StimStart(CurrScene)
@@ -866,14 +870,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	; "Diasa" is basically an OSA scene thread. We need to mount it here so OStim can communicate with OSA.
 	; (I didn't pick the nonsense name, it's called that in OSA)
-	; Unfortunately, the method used for mounting an NPC on NPC scene is a bit involved.
-	if IsNPCScene()
-		diasa = GetNPCDiasa(DomActor)
-		Console("Scene is a NPC on NPC scene")
-		disableOSAControls = true
-	Else
-		diasa = o + ".viewStage"
-	endif
+	diasa = o + ".viewStage"
 
 	CurrentAnimation = OMetadata.GetAnimationId(StartingAnimation, 0)
 	CurrentSceneID = StartingAnimation
@@ -882,8 +879,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	Int OldTimescale = 0
 
-;	If (CustomTimescale >= 1) && IsPlayerInvolved()
-	If (CustomTimescale > 0) && IsPlayerInvolved()
+	If (CustomTimescale > 0)
 		OldTimescale = GetTimeScale()
 		SetTimeScale(CustomTimescale)
 		Console("Using custom Timescale: " + CustomTimescale)
@@ -898,7 +894,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	Password = DomActor.GetFactionRank(OsaFactionStage)
 	OSANative.StartScene(Password, Actors)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
@@ -933,10 +928,6 @@ Event OnUpdate() ;OStim main logic loop
 			Console("Masturbation scene detected. Starting AI")
 			AI.StartAI()
 			AIRunning = True
-		ElseIf (SubActor && IsNPCScene() && UseAINPConNPC)
-			Console("NPC on NPC scene detected. Starting AI")
-			AI.StartAI()
-			AIRunning = True
 		ElseIf (SubActor && (AggressiveActor == PlayerRef) && UseAIPlayerAggressor)
 			Console("Player aggressor. Starting AI")
 			AI.StartAI()
@@ -961,9 +952,8 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	SendModEvent("ostim_start")
-
-
-	If (UseFades && IsPlayerInvolved())
+	
+	If (UseFades)
 		FadeFromBlack()
 	EndIf
 
@@ -1019,7 +1009,7 @@ Event OnUpdate() ;OStim main logic loop
 	Console("Ending scene")
 
 
-	int i = Actors.Length
+	i = Actors.Length
 	While i
 		i -= 1
 
@@ -1036,7 +1026,7 @@ Event OnUpdate() ;OStim main logic loop
 		RestoreScales()
 	EndIf
 
-	If (EnableImprovedCamSupport) && IsPlayerInvolved()
+	If (EnableImprovedCamSupport)
 		Game.EnablePlayerControls(abCamSwitch = True)
 	EndIf
 
@@ -1053,7 +1043,7 @@ Event OnUpdate() ;OStim main logic loop
 			SubActor.StopTranslation()
 			SubActor.SetPosition(subcoords[0], subcoords[1], subcoords[2]) ;return
 		EndIf
-		If (UseFades && EndedProper && IsPlayerInvolved())
+		If (UseFades && EndedProper)
 			Game.FadeOutGame(False, True, 25.0, 25.0) ; keep the screen black
 		EndIf
 	EndIf
@@ -1062,8 +1052,7 @@ Event OnUpdate() ;OStim main logic loop
 		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
 
-	If (ForceFirstPersonAfter && IsPlayerInvolved())
-
+	If (ForceFirstPersonAfter)
 		While IsInFreeCam()
 			Utility.Wait(0.1)
 		EndWhile
@@ -1071,7 +1060,7 @@ Event OnUpdate() ;OStim main logic loop
 		Game.ForceFirstPerson()
 	EndIf
 
-	If (UseFades && EndedProper && IsPlayerInvolved() && !SkipEndingFadein)
+	If (UseFades && EndedProper && !SkipEndingFadein)
 		FadeFromBlack(2)
 	EndIf
 
@@ -1107,15 +1096,18 @@ Event OnUpdate() ;OStim main logic loop
 	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
 
+	Password = 0
+
 	If (FurnitureType != FURNITURE_TYPE_NONE)
 		CurrentFurniture.BlockActivation(false)
 		FurnitureType = FURNITURE_TYPE_NONE
 		CurrentFurniture = None
 	EndIf
 
-	If IsPlayerInvolved()
-		OSANative.EndPlayerDialogue()
-	EndIf
+	FurnitureType = 0
+	CurrentFurniture = none
+
+	OSANative.EndPlayerDialogue()
 
 EndEvent
 
@@ -1169,13 +1161,9 @@ Bool Function IsActorInvolved(actor act)
 	Return Actors.Find(act) >= 0
 EndFunction
 
-Bool Function IsPlayerInvolved()
-	return IsActorInvolved(playerref)
-EndFunction
-
-Bool Function IsNPCScene()
-	return !IsPlayerInvolved()
-EndFunction
+int Function GetScenePassword()
+	return Password
+endfunction
 
 Bool Function IsSoloScene()
 	return SubActor == None
@@ -1380,18 +1368,13 @@ Function ToggleActorAI(bool enable)
 EndFunction
 
 Function EndAnimation(Bool SmoothEnding = True)
-	If (AnimationRunning() && UseFades && SmoothEnding && IsPlayerInvolved())
+	If (AnimationRunning() && UseFades && SmoothEnding)
 		FadeToBlack(1.5)
 	EndIf
 	EndedProper = SmoothEnding
-	Console("Trying to end scene")	
+	Console("Trying to end scene")
 
-	If (IsNPCScene() && (Actors[0].GetParentCell() != playerref.GetParentCell()))
-		; Attempting to end the scene when the actors are not loaded will fail
-		SendModEvent("0SA_GameLoaded")
-	else 
-		UI.Invoke("HUD Menu", diasa + ".endCommand")
-	endif 
+	UI.Invoke("HUD Menu", diasa + ".endCommand")
 EndFunction
 
 Bool Function IsSceneAggressiveThemed() ; if the entire situation should be themed aggressively
@@ -1581,30 +1564,6 @@ Function AllowVehicleReset()
 	EndWhile
 EndFunction
 
-
-;Is this even used or necessary?
-float function GetEstimatedTimeUntilEnd()
-	float total = 120
-	total /= MaleSexExcitementMult ; This will no longer work
-
-	float dom = 99999.0
-	float sub = 99999.0
-
-	if EndOnDomOrgasm
-		dom = total * (1 - (GetActorExcitement( DomActor)/100.0))
-	endif 
-	if EndOnSubOrgasm
-		sub = total * (1 - (GetActorExcitement( SubActor)/100.0))
-	endif 
-
-	if sub < dom
-		return sub
-	else 
-		return dom
-	endif
-
-EndFunction
-
 Function ToggleFreeCam(Bool On = True)
 	outils.lock("mtx_tfc")
 
@@ -1782,22 +1741,6 @@ OStimSubthread Function GetSubthread(int id)
 	return ret
 EndFunction
 
-Function ConvertToSubthread()
-{Turn the current thread into a subthread and wait to return}
-	if SceneRunning
-		if !GetUnusedSubthread().InheritFromMain()
-			Debug.Notification("OStim: Thread overload, please report this on discord")
-		endif 
-
-		while SceneRunning
-			Utility.Wait(0.5)
-		endwhile 
-		Utility.Wait(1.0)
-	else 
-		Console("Nothing running...")
-	endif 
-EndFunction
-
 float Function GetTimeSinceStart()
 	return Utility.GetCurrentRealTime() - StartTime
 EndFunction
@@ -1814,7 +1757,7 @@ EndFunction
 
 Function SelectFurniture()
 	ObjectReference[] Furnitures = OFurniture.FindFurniture(Actors.Length, Actors[0], (FurnitureSearchDistance + 1) * 100.0, 96)
-	If !SelectFurniture || !IsPlayerInvolved()
+	If !SelectFurniture
 		int i = 0
 		While i < Furnitures.Length
 			If Furnitures[i]
@@ -3044,7 +2987,7 @@ Event OnKeyDown(Int KeyPress)
 			return
 		EndIf
 	elseif (KeyPress == freecamkey)
-		if animationrunning() && IsPlayerInvolved()
+		if animationrunning()
 			ToggleFreeCam()
 			return
 		endif 
@@ -3537,4 +3480,16 @@ Function PrintBedInfo(ObjectReference Bed)
 	Console("BED - 3D loaded: " + Bed.Is3DLoaded())
 	Console("BED - Bed roll: " + IsBedRoll(Bed))
 	Console("--------------------------------------------")
+EndFunction
+
+Bool Function IsPlayerInvolved()
+	; NPC scenes no longer run on main thread ever. They will always run in subthreads
+	; Some addons might still use this function, so we'll keep it here for now
+	return True
+EndFunction
+
+Bool Function IsNPCScene()
+	; NPC scenes no longer run on main thread ever. They will always run in subthreads
+	; Some addons might still use this function, so we'll keep it here for now
+	return False
 EndFunction

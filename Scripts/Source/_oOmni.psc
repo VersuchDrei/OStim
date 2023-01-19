@@ -261,10 +261,11 @@ Function PrepActra(String[] sceneSuite, Actor[] Actra)
         GlobalPosition[StageID].Delete()
     EndIf
 
-    OsexIntegrationMain OStim = OUtils.GetOStim()
-    If OStim.UsingFurniture() && OStim.IsActorInvolved(Actra[0])
-        GlobalPosition[StageID] = OStim.GetBed().PlaceAtMe(OBlankStatic) As ObjectReference
-        GlobalPosition[StageID].MoveTo(OStim.GetBed())
+    ObjectReference FurnitureRef = GetSceneFurniture(StageID, Actra[0])
+
+    If FurnitureRef != none
+        GlobalPosition[StageID] = FurnitureRef.PlaceAtMe(OBlankStatic) As ObjectReference
+        GlobalPosition[StageID].MoveTo(FurnitureRef)
     Else
         GlobalPosition[StageID] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
     EndIf
@@ -394,10 +395,11 @@ Function ActraReadyByKey(Actor[] Actra, String StageID, Int Index, Bool Solo = F
         GlobalPosition[StageIDInt].Delete()
     EndIf
 
-    OsexIntegrationMain OStim = OUtils.GetOStim()
-    If OStim.UsingFurniture() && OStim.IsActorInvolved(Actra[0])
-        GlobalPosition[StageIDint] = OStim.GetBed().PlaceAtMe(OBlankStatic) As ObjectReference
-        GlobalPosition[StageIDint].MoveTo(OStim.GetBed())
+    ObjectReference FurnitureRef = GetSceneFurniture(StageIDint, Actra[0])
+
+    If FurnitureRef != none
+        GlobalPosition[StageIDint] = FurnitureRef.PlaceAtMe(OBlankStatic) As ObjectReference
+        GlobalPosition[StageIDint].MoveTo(FurnitureRef)
     Else
         GlobalPosition[StageIDint] = Actra[0].PlaceAtMe(OBlankStatic) as ObjectReference
     EndIf
@@ -624,6 +626,29 @@ String[] Function SetOINI(Actor Player) Global
     Return OIN
 EndFunction
 
+ObjectReference Function GetSceneFurniture(int ScenePassword, actor Act)
+    OsexIntegrationMain OStim = OUtils.GetOStim()
 
+    if (OStim.GetScenePassword() == ScenePassword)
+        if (OStim.IsActorActive(Act))
+            return OStim.GetFurniture()
+        endif
 
+        return none
+    endif
 
+    int i = 0
+    int max = OStim.subthreadquest.GetNumAliases()
+
+    while i < max 
+        OStimSubthread thread = OStim.subthreadquest.GetNthAlias(i) as OStimSubthread
+
+        if (thread.IsInUse() && thread.GetScenePassword() == ScenePassword && OStim.IsActorActive(Act))
+            return thread.GetFurniture()
+        endif
+
+        i += 1
+    endwhile
+
+    return none
+EndFunction

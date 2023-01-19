@@ -1,5 +1,7 @@
 ScriptName OAiScript Extends Quest
 
+import OAIUtils
+
 ; modules & other goodies
 OsexIntegrationMain OStim
 Actor PlayerRef
@@ -34,10 +36,13 @@ Event AI_Thread(String EventName, String strArg, Float NumArg, Form Sender)
 	Actor DomActor = OStim.GetDomActor()
 	Actor SubActor = OStim.GetSubActor()
 
+	string SceneID = OStim.GetCurrentAnimationSceneID()
+
 	string FurnitureType = OStim.GetFurnitureType()
 	
 	Actor AggressiveActor = OStim.GetAggressiveActor()
 	int Aggressor = Actors.Find(AggressiveActor)
+	bool isAggressorFemale = false
 
 	Lesbian = False
 	Gay = False
@@ -59,6 +64,7 @@ Event AI_Thread(String EventName, String strArg, Float NumArg, Form Sender)
 
 	Int PulloutChance
 	If (Aggressor != -1)
+		isAggressorFemale = OStim.isFemale(AggressiveActor)
 		PulloutChance = 0
 	Else
 		Int Rel = Agent.GetRelationshipRank(OStim.GetSexPartner(Agent))
@@ -120,7 +126,10 @@ Event AI_Thread(String EventName, String strArg, Float NumArg, Form Sender)
 
 		If (NumActors > 1 && OStim.GetActorExcitement(DomActor) > 95)
 			If (ChanceRoll(PulloutChance))
-				ChangeToPulledOutVersion(Actors, FurnitureType)
+				String Animation = GetPulledOutVersion(Actors, FurnitureType, SceneID, OStim.POSITION_TAGS)
+				If (Animation != "")
+					Warp(Animation)
+				EndIf
 			EndIf
 			Stage = 4
 		EndIf
@@ -133,7 +142,7 @@ Event AI_Thread(String EventName, String strArg, Float NumArg, Form Sender)
 			If (ChangeAnimation)
 				ChangeAnimation = False
 				Console("Changing to other foreplay animation")
-				String Animation = GetRandomForeplayAnimation(Actors, FurnitureType, Aggressor)
+				String Animation = GetRandomForeplayAnimation(Actors, FurnitureType, Aggressor, isAggressorFemale, Lesbian, Gay)
 				If (Animation != "")
 					Warp(Animation)
 				EndIf
@@ -152,7 +161,7 @@ Event AI_Thread(String EventName, String strArg, Float NumArg, Form Sender)
 			If (ChangeAnimation)
 				ChangeAnimation = False
 				Console("Changing to other sex animation")
-				String Animation = getRandomSexAnimation(Actors, FurnitureType, Aggressor)
+				String Animation = getRandomSexAnimation(Actors, FurnitureType, Aggressor, Lesbian, Gay)
 				If (Animation != "")
 					Warp(animation)
 				EndIf
@@ -189,111 +198,6 @@ EndEvent
 Function StartAI()
 	Console("Firing off AI thread")
 	SendModEvent("ostim_start_ai")
-EndFunction
-
-string Function SceneTags()
-	If OStim.OnlyGayAnimsInGayScenes
-		If Lesbian
-			Return "lesbian"
-		ElseIf Gay
-			Return "gay"
-		EndIf
-	EndIf
-
-	Return ""
-EndFunction
-
-string Function GetPositionTagsCSV(string SceneID, int Position)
-	OCSV.ToCSVList(OMetadata.GetActorTagOverlap(SceneID, Position, OStim.POSITION_TAGS))
-EndFunction
-
-String Function GetRandomForeplayAnimation(Actor[] Actors, string FurnitureType, int Aggressor = -1)
-	string sceneTags = SceneTags()
-	string typesAny = ""
-	string typesBlacklist = "analsex,tribbing,vaginalsex"
-
-	string standingTag = ""
-	If FurnitureType == ""
-		standingTag = OCSV.CreateCSVMatrix(Actors.Length, "standing")
-	EndIf
-
-	string actorTagBlacklist = ""
-	If FurnitureType == "bed"
-		actorTagBlacklist = OCSV.CreateCSVMatrix(Actors.Length, "standing")
-	EndIf
-
-	If Aggressor != -1
-		string id = ""
-		string aggSceneTags = OCSV.ConcatCSVLists(sceneTags, "aggressive")
-		string aggressorTag = OCSV.CreateSingleCSVMatrixEntry(Aggressor, "aggressor")
-		string aggressorList = OCSV.CreateCSVList(4, Aggressor)
-
-		If OStim.IsFemale(Actors[Aggressor])
-			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "cunnilingus,grindingthigh", AnyActionActor = "," + Aggressor, AnyActionTarget = Aggressor, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
-		Else
-			id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "blowjob,boobjob,buttjob,thighjob", AnyActionTarget = AggressorList, AnyActionPerformer = AggressorList, ActionBlacklistTypes = typesBlacklist)
-		EndIf
-
-		If id != ""
-			Return id
-		EndIf
-	EndIf
-
-	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, AnyActorTagForAny = standingTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = "analfingering,blowjob,boobjob,buttjob,cunnilingus,footjob,grindingthigh,handjob,lickingnipples,lickingpenis,lickingtesticles,rimjob,rubbingclitoris,rubbingpenisagainstface,suckingnipples,thighjob,vaginalfingering", ActionBlacklistTypes = typesBlacklist)
-EndFunction
-
-String Function GetRandomSexAnimation(Actor[] Actors, string FurnitureType, int Aggressor = -1)
-	string sceneTags = SceneTags()
-	string typesAny = "analsex,vaginalsex"
-
-	string standingTag = ""
-	If FurnitureType == ""
-		standingTag = OCSV.CreateCSVMatrix(Actors.Length, "standing")
-	EndIf
-
-	string actorTagBlacklist = ""
-	If FurnitureType == "bed"
-		actorTagBlacklist = OCSV.CreateCSVMatrix(Actors.Length, "standing")
-	EndIf
-
-	If OStim.IsFemale(Actors[0])
-		typesAny += ",tribbing"
-	EndIf
-
-	If Aggressor != -1
-		string aggSceneTags = OCSV.ConcatCSVLists(sceneTags, "aggressive")
-		string aggressorTag = OCSV.CreateSingleCSVMatrixEntry(Aggressor, "aggressor")
-		string aggressorList = OCSV.CreateCSVList(3, Aggressor)
-
-		string id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = aggSceneTags, AnyActorTagForAny = standingTag, AllActorTagsForAll = aggressorTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny, AnyActionPerformer = AggressorList)
-
-		If id != ""
-			Return id
-		EndIf
-	EndIf
-
-	Return OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllSceneTags = sceneTags, AnyActorTagForAny = standingTag, ActorTagBlacklistForAll = actorTagBlacklist, AnyActionType = typesAny)
-EndFunction
-
-Function ChangeToPulledOutVersion(Actor[] Actors, string FurnitureType)
-	Console("trying pullout")
-
-	string SceneID = OStim.GetCurrentAnimationSceneID()
-	string[] ActorTags = PapyrusUtil.StringArray(Actors.Length)
-
-	int i = Actors.Length
-	While i
-		i -= 1
-		ActorTags[i] = GetPositionTagsCSV(SceneID, i)
-	EndWhile
-
-	string ActorTagsCSV = OCSV.ToCSVMatrix(ActorTags)
-
-	string Id = OLibrary.GetRandomSceneSuperloadCSV(Actors, FurnitureType, AllActorTagsForAll = ActorTagsCSV, AnyActionType = "malemasturbation", AnyActionActor = "0")
-	
-	If Id != ""
-		OStim.WarpToAnimation(Id)
-	EndIf
 EndFunction
 
 Function Warp(String aScene)
