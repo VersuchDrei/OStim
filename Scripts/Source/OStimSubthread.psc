@@ -94,6 +94,8 @@ bool Function StartSubthreadScene(actor dom, actor sub = none, actor zThirdActor
 		return false
 	endif
 
+	InUse = true
+
 	if withAI
 		RegisterForModEvent("ostim_start_subthread_ai", "AI_Thread")
 		UseAI = withAI
@@ -101,11 +103,19 @@ bool Function StartSubthreadScene(actor dom, actor sub = none, actor zThirdActor
 
 	Console("Starting subthread with ID: " + id)
 
-	InUse = true
-
 	DomActor = dom 
 	SubActor = sub 
 	ThirdActor = zThirdActor
+
+	If !DomActor.Is3DLoaded() || (SubActor && !SubActor.Is3DLoaded()) || (ThirdActor && !ThirdActor.Is3DLoaded())
+		Console("One of the actors was not loaded. Closing subthread.")
+
+		UnregisterForAllModEvents()
+		UseAI = False
+		InUse = False
+
+		return False
+	EndIf
 
 	If (SubActor && AppearsFemale(dom) && !AppearsFemale(sub))
 		DomActor = sub
@@ -192,8 +202,6 @@ bool Function StartSubthreadScene(actor dom, actor sub = none, actor zThirdActor
 		CurrentAnimation = "AUTO"
 	EndIf
 
-	Console("Starting Animation on thread " + id + " is " + CurrentAnimation)
-
 	CurrentSpeed = 1
 
 	RegisterForSingleUpdate(0.01)
@@ -210,7 +218,6 @@ Event OnInit()
 EndEvent
 
 Function StartAI()
-	Console("Firing off AI subthread")
 	SendModEvent("ostim_start_subthread_ai", numArg = id)
 EndFunction
 
@@ -247,15 +254,6 @@ Event OnUpdate()
 	int numberLoops = 0
 
 	While (!DidAnyActorDie() && !ActorWasHit && numberLoops < 300 && OStim.IsActorActive(DomActor) && DomActor.GetParentCell() == PlayerRef.GetParentCell() && inUse)
-
-		; TODO: REMOVE THESE LOGS BEFORE MERGE
-		; They're only here to help testing/debugging
-		Console("--------------------------------------------------")
-		Console("Thread number: " + id)
-		Console("Dom Actor excitement " + GetActorExcitement(DomActor))
-		Console("Sub Actor excitement " + GetActorExcitement(SubActor))
-		Console("--------------------------------------------------")
-
 		numberLoops += 1
 
 		AutoIncreaseSpeed()
