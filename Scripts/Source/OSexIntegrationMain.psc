@@ -872,8 +872,8 @@ Event OnUpdate() ;OStim main logic loop
 	; (I didn't pick the nonsense name, it's called that in OSA)
 	diasa = o + ".viewStage"
 
-	CurrentAnimation = OMetadata.GetAnimationId(StartingAnimation, 0)
-	CurrentSceneID = StartingAnimation
+	CurrentAnimation = ""
+	CurrentSceneID = ""
 	LastHubSceneID = ""
 	;OnAnimationChange()
 
@@ -902,7 +902,7 @@ Event OnUpdate() ;OStim main logic loop
 	
 	int AEvent = ModEvent.Create(EventName)
 	Modevent.PushString(AEvent, EventName)
-	ModEvent.PushString(AEvent, CurrentAnimation)
+	ModEvent.PushString(AEvent, OMetadata.GetAnimationId(StartingAnimation, 0))
 	ModEvent.PushFloat(AEvent, 0.0)
 	ModEvent.PushForm(AEvent, self)
 	ModEvent.Send(AEvent)
