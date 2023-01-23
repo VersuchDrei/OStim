@@ -48,7 +48,6 @@ RegisterForModEvent("0SA"+"_GameLoaded", "OnGameLoaded")
 RegisterForModEvent("0SAO"+Password+"_OEnd", "OnOEnd")
 RegisterForModEvent("0SAO"+Password+"_ActraSync", "OnActraSync")
 RegisterForModEvent("0SAO"+Password+"_AlignTo", "OnAlignTo")
-RegisterForModEvent("0SAO"+Password+"_AnimateStage", "OnAnimateStage")
 RegisterForModEvent("0SAO"+Password+"_ActraReveal", "OnActraReveal")
 RegisterForModEvent("0SAO"+Password+"_ActraJoin", "OnActraJoin")
 RegisterForModEvent("0SAO"+Password+"_ActraRemove", "OnActraRemove")
@@ -101,18 +100,6 @@ int style = alignStyle as int
 		endWhile
 	endif
 endEvent
-
-
-event OnAnimateStage(string eventName, string zAnimation, float numArg, Form sender)
-int count = 0
-while count < totalActra
-Debug.SendAnimationEvent(Actra[count], zAnimation+"_"+count)
-Debug.SendAnimationEvent(Actra[count], "sosfasterect")
-count+=1
-endWhile
-endEvent
-
-
 
 event OnActraSync(string eventName, string ComboString, float numArg, Form sender)
 

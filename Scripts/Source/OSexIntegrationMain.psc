@@ -875,7 +875,6 @@ Event OnUpdate() ;OStim main logic loop
 	CurrentAnimation = ""
 	CurrentSceneID = ""
 	LastHubSceneID = ""
-	;OnAnimationChange()
 
 	Int OldTimescale = 0
 
@@ -1918,28 +1917,17 @@ EndFunction
 ;				Event hooks that receive data from OSA
 
 
-Event OnAnimate(String EventName, String zAnimation, Float NumArg, Form Sender)
-	;Console("Event received")
-	If (CurrentAnimation != zAnimation) || FirstAnimate
-		FirstAnimate = false
-		if zAnimation == "undefined"
-			Console("---------------------- Warning ----------------------")
-			Console("A broken animation is attempting to be played. Printing last valid animation data")
-			Console(" ")
-			Console(">	Last valid animation: " + CurrentAnimation)
-			Console(">	Last valid speed: " + CurrentSpeed)
-			Console(">	Probable broken speed: " + (CurrentSpeed + 1))
-			Console(">	Last valid animation class: " + CurrAnimClass)
-			Console(">	Last valid scene ID: " + GetCurrentAnimationSceneID())
-			Console(" ")
-			Console("Speed control will be broken until scene is changed")
-			Console("Please report this information on discord")
-			Console("-----------------------------------------------------")
+Event OnAnimate(String EventName, String SceneId, Float Speed, Form Sender)
+	If Speed == -1
+		Debug.MessageBox("fuck me")
+	EndIf
 
-			return
-		endif 
-		CurrentAnimation = zAnimation
-		OnAnimationChange()
+	;Console("Event received")
+	If (CurrentSceneId != SceneId) || CurrentSpeed != Speed || FirstAnimate
+		FirstAnimate = false
+
+		CurrentAnimation = OMetadata.GetAnimationId(SceneId, Speed As int)
+		OnAnimationChange(SceneId, Speed As int)
 
 		SendModEvent("ostim_animationchanged")
 	EndIf
@@ -2002,7 +1990,7 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 	endif
 endEvent
 
-Function OnAnimationChange()
+Function OnAnimationChange(string newScene, int newSpeed)
 	
 	Console("Changing animation...")
 
@@ -2010,7 +1998,6 @@ Function OnAnimationChange()
 	
 	bool sceneChange = false 
 
-	string newScene = OSANative.GetSceneIdFromAnimId(CurrentAnimation)
 	if newScene != CurrentSceneID
 		sceneChange = true 
 	endif 
@@ -2023,7 +2010,7 @@ Function OnAnimationChange()
 		Console("On new hub animation")
 	EndIf
 
-	CurrentSpeed = OSANative.GetSpeedFromAnimId(CurrentAnimation)
+	CurrentSpeed = newSpeed
 	OSANative.UpdateSpeed(Password, CurrentSpeed)
 
 	CurrAnimClass = OSANative.GetAnimClass(CurrentSceneID)

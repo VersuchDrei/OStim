@@ -230,6 +230,8 @@ Event OnUpdate()
 	OSA.StimStart(CurrentScene)
 
 	OSANative.StartScene(Password, Actors)
+	OSANative.ChangeAnimation(Password, CurrentAnimation)
+	OSANative.UpdateSpeed(Password, OMetadata.GetDefaultSpeed(CurrentAnimation))
 
 	If CurrentFurniture
 		if OStim.ResetClutter
@@ -539,7 +541,7 @@ Function WarpToAnimation(String Animation)
 	; this is a bit hacky but other ways to change animation either break or introduce other bugs
 	CurrentAnimation = Animation
 	OSA.SetModule(CurrentScene, "0Sex", CurrentAnimation, "")
-	CurrentSpeed = 1
+	CurrentSpeed = OMetadata.GetDefaultSpeed(Animation)
 	runOsexCommand("$Speed,0," + CurrentSpeed)
 	OSA.StimStart(CurrentScene)
 
@@ -672,6 +674,7 @@ Function AdjustAnimationSpeed(float amount)
 		CurrentSpeed += amount
 		runOsexCommand("$Speed,0," + CurrentSpeed)
 	EndIf
+	OSANative.UpdateSpeed(password, CurrentSpeed as int)
 EndFunction
 
 Function IncreaseAnimationSpeed()

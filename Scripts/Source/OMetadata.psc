@@ -23,6 +23,15 @@ ScriptName OMetadata
 */;
 bool Function IsTransition(string Id) Global Native
 
+;/* GetDefaultSpeed
+* * returns the index of the default speed of the scene
+* *
+* * @param: Id, the id if the scene
+* *
+* * @return: the index of the default speed
+*/;
+int Function GetDefaultSpeed(string Id) Global Native
+
 ;/* GetMaxSpeed
 * * returns the index of the fastest speed of the scene
 * *
