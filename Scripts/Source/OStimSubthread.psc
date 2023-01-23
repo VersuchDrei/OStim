@@ -253,7 +253,7 @@ Event OnUpdate()
 	; safety net in case the scene is taking too long so it doesn't run forever
 	int numberLoops = 0
 
-	While (!DidAnyActorDie() && !ActorWasHit && numberLoops < 300 && OStim.IsActorActive(DomActor) && DomActor.GetParentCell() == PlayerRef.GetParentCell() && inUse)
+	While (!DidAnyActorDie() && !ActorWasHit && !IsAnyActorInCombat() && numberLoops < 300 && OStim.IsActorActive(DomActor) && DomActor.GetParentCell() == PlayerRef.GetParentCell() && inUse)
 		numberLoops += 1
 
 		AutoIncreaseSpeed()
@@ -523,7 +523,12 @@ Event OnActorHit(String EventName, String zAnimation, Float NumArg, Form Sender)
 	int i = Actors.Length
 	While i
 		i -= 1
-		If Actors[i].IsInCombat()
+		; GetCombatState() returns the following values
+		; 0: Not in combat
+		; 1: In combat
+		; 2: Searching
+		; So we should consider as being in combat if actor is in either actual combat or searching for combat target
+		If Actors[i].GetCombatState() != 0
 			ActorWasHit = True
 			Return
 		EndIf
@@ -575,7 +580,11 @@ Bool Function DidAnyActorDie()
 	return DomActor.IsDead() || (SubActor && SubActor.IsDead()) || (ThirdActor && ThirdActor.IsDead())
 EndFunction
 
-function runOsexCommand(string cmd)
+Bool Function IsAnyActorInCombat()
+	return DomActor.GetCombatState() != 0 || (SubActor && SubActor.GetCombatState() != 0) || (ThirdActor && ThirdActor.GetCombatState() != 0)
+EndFunction
+
+Function runOsexCommand(string cmd)
 	string[] Plan = new string[2]
 	Plan[1] = cmd
 

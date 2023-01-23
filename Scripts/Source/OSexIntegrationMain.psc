@@ -2137,7 +2137,12 @@ Event OnActorHit(String EventName, String zAnimation, Float NumArg, Form Sender)
 		int i = Actors.Length
 		While i
 			i -= 1
-			If Actors[i].IsInCombat()
+			; GetCombatState() returns the following values
+			; 0: Not in combat
+			; 1: In combat
+			; 2: Searching
+			; So we should consider as being in combat if actor is in either actual combat or searching for combat target
+			If Actors[i].GetCombatState() != 0
 				EndAnimation(False)
 				Return
 			EndIf
