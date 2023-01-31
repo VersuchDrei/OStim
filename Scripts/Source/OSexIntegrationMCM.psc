@@ -163,13 +163,6 @@ int GVORColorblind = 0x73D0
 int GVORStationaryMode = 0x73D1
 int GVORNakadashi = 0x73D4
 
-string ONights = "ONights.esp"
-int GVONFreqMult = 0x000D65
-int GVONStopWhenFound = 0x000D64
-
-int SetONStopWhenFound
-int SetONFreqMult
-
 string OCrime = "ocrime.esp"
 int SetOCBounty
 string SUOCBounty = "ocrime.bounty"
@@ -412,13 +405,6 @@ Event OnPageReset(String Page)
 			SetORNakadashi = AddToggleOption("$ostim_addon_or_nakadashi", GetExternalBool(ORomance, GVORNakadashi))
 		endif 
 
-		if main.IsModLoaded(ONights)
-			AddColoredHeader("ONights")
-			SetONStopWhenFound = AddToggleOption("$ostim_addon_on_stop", GetExternalBool(ONights, GVONStopWhenFound))
-			SetONFreqMult = AddSliderOption("$ostim_addon_on_freq_mult", GetExternalFloat(ONights, GVONFreqMult), "{2} x")
-			
-		endif 
-
 		if main.IsModLoaded(OSearch)
 			AddColoredHeader("OSearch")
 			SetOSKey = AddKeyMapOption("$ostim_addon_os_key", StorageUtil.GetIntValue(none, SUOSKey))
@@ -564,9 +550,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetORStationary
 			SetExternalBool(oromance, GVORStationaryMode, !GetExternalBool(oromance, GVORStationaryMode))
 			SetToggleOptionValue(SetORStationary, GetExternalBool(oromance, GVORStationaryMode))
-		elseif option == SetONStopWhenFound
-			SetExternalBool(ONights, GVONStopWhenFound, !GetExternalBool(ONights, GVONStopWhenFound))
-			SetToggleOptionValue(SetONStopWhenFound, GetExternalBool(ONights, GVONStopWhenFound))
 		elseif option == SetOSAllowSex
 			StorageUtil.SetIntValue(none, SUOSAllowSex, (!(StorageUtil.GetIntValue(none, SUOSAllowSex) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowSex, StorageUtil.GetIntValue(none, SUOSAllowSex))
@@ -776,14 +759,10 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_or_right_key")
 		elseif (option == SetORNakadashi)
 			SetInfoText("$ostim_tooltip_or_nakadashi")
-		ElseIf (Option == SetONFreqMult)
-			SetInfoText("$ostim_tooltip_on_freq_mult")
 		ElseIf (Option == SetOCBounty)
 			SetInfoText("$ostim_tooltip_oc_bounty")
 		ElseIf (Option == SetOPFreq)
 			SetInfoText("$ostim_tooltip_op_freq")
-		Elseif (Option == SetONStopWhenFound)
-			SetInfoText("$ostim_tooltip_on_stop")
 		Elseif (Option == SetOARequireLowArousalBeforeEnd)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
@@ -1054,11 +1033,6 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(0.0)
 		SetSliderDialogRange(-100, 150)
 		SetSliderDialogInterval(1)
-	elseif (option == SetONFreqMult)
-		SetSliderDialogStartValue(GetExternalFloat(ONights, GVONFreqMult))
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 5.0)
-		SetSliderDialogInterval(0.1)
 	elseif (option == SetOCBounty)
 		SetSliderDialogStartValue(StorageUtil.GetIntValue(none, SUOCBounty))
 		SetSliderDialogDefaultValue(200)
@@ -1093,9 +1067,6 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 	Elseif (option == SetORDifficulty)
 		SetExternalInt(oromance, GVORDifficulty, value as int)
 		SetSliderOptionValue(SetORDifficulty, Value as int, "{0}")
-	Elseif (option == SetONFreqMult)
-		SetExternalFloat(ONights, GVONFreqMult, value)
-		SetSliderOptionValue(SetONFreqMult, Value, "{2} x")
 	Elseif (option == SetOCBounty)
 		StorageUtil.SetIntValue(none, SUOCBounty, value as int)
 		SetSliderOptionValue(SetOCBounty, Value, "{0} Gold")
@@ -1382,15 +1353,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "savedORomance", 0)
 	endif
 
-	if main.IsModLoaded(ONights)
-		osexintegrationmain.Console("Saving Onights settings.")
-		JMap.setInt(OstimSettingsFile, "savedOnights", 1)
-		JMap.setInt(OstimSettingsFile, "SetONStopWhenFound", GetExternalBool(ONights, GVONStopWhenFound) as int)
-		JMap.setFlt(OstimSettingsFile, "SetONFreqMult", GetExternalFloat(ONights, GVONFreqMult))
-	Else
-		JMap.setInt(OstimSettingsFile, "savedOnights settings.", 0)
-	endif
-
 	if main.IsModLoaded(OSearch)
 		osexintegrationmain.Console("Saving OSearch settings.")
 		JMap.setInt(OstimSettingsFile, "savedOSearch", 1)
@@ -1586,12 +1548,6 @@ Function ImportSettings(bool default = false)
 			SetExternalInt(ORomance, GVORLeft, JMap.getInt(OstimSettingsFile, "SetORLeft"))
 			SetExternalInt(ORomance, GVORRight, JMap.getInt(OstimSettingsFile, "SetORRight"))
 			SetExternalBool(ORomance, GVORNakadashi, JMap.getInt(OstimSettingsFile, "SetORNakadashi") as bool)
-		endif
-
-		if main.IsModLoaded(ONights) && JMap.getInt(OstimSettingsFile, "savedONights") == 1
-			osexintegrationmain.Console("Loading ONights settings.")
-			SetExternalBool(ONights, GVONStopWhenFound, JMap.getInt(OstimSettingsFile, "SetONStopWhenFound") as bool)
-			SetExternalFloat(ONights, GVONFreqMult, JMap.getFlt(OstimSettingsFile, "SetONFreqMult"))
 		endif
 
 		if main.IsModLoaded(OSearch) && JMap.getInt(OstimSettingsFile, "savedOSearch") == 1
