@@ -5,29 +5,38 @@
 */;
 ScriptName OActor
 
+; ███████╗██╗  ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗ ██████╗ ███╗   ██╗███████╗
+; ██╔════╝╚██╗██╔╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║██╔═══██╗████╗  ██║██╔════╝
+; █████╗   ╚███╔╝ ██████╔╝██████╔╝█████╗  ███████╗███████╗██║██║   ██║██╔██╗ ██║███████╗
+; ██╔══╝   ██╔██╗ ██╔═══╝ ██╔══██╗██╔══╝  ╚════██║╚════██║██║██║   ██║██║╚██╗██║╚════██║
+; ███████╗██╔╝ ██╗██║     ██║  ██║███████╗███████║███████║██║╚██████╔╝██║ ╚████║███████║
+; ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
 ;/* PlayExpression
 * * plays the facial expression event on the actor
-* * this does not automatically reset the face again, for that you need to call UpdateExpression
+* * this does not automatically reset the face again, for that you need to call ClearExpression
 * *
 * * @param: Act, the actor to play the expression on
 * * @param: Expression, the name of the expression event to play
 * *
 * * @return: the duration defined in the events json file
 */;
-float Function PlayExpression(Actor Act, string Expression) Global
-	OSexIntegrationMain OStim = OUtils.GetOstim()
-	Return OSANative.PlayExpressionEvent(OStim.GetCurrentAnimationSceneID(), OStim.GetActors().Find(Act), Act, Expression)
-EndFunction
+float Function PlayExpression(Actor Act, string Expression) Global Native
 
-;/* UpdateExpression
+;/* ClearExpression
 * * resets the factial expression to the underlying expression based on the scenes actions, clearing all event expressions
 * *
 * * @param: Act, the actor to update the expression for
 */;
-Function UpdateExpression(Actor Act) Global
-	OSexIntegrationMain OStim = OUtils.GetOStim()
-	OSANative.UpdateExpression(Ostim.GetCurrentAnimationSceneID(), OStim.GetActors().Find(Act), Act)
-EndFunction
+Function ClearExpression(Actor Act) Global Native
+
+
+; ██╗   ██╗███╗   ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗███╗   ██╗ ██████╗ 
+; ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝ 
+; ██║   ██║██╔██╗ ██║██║  ██║██████╔╝█████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗
+; ██║   ██║██║╚██╗██║██║  ██║██╔══██╗██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║
+; ╚██████╔╝██║ ╚████║██████╔╝██║  ██║███████╗███████║███████║██║██║ ╚████║╚██████╔╝
+;  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
 ;/* Undress
 * * fully undresses the actor
@@ -74,3 +83,17 @@ Function RemoveWeapons(Actor Act) Global Native
 * * @param: Act, the actor to add the weapons to
 */;
 Function AddWeapons(Actor Act) Global Native
+
+
+; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
+; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
+; ██║  ██║█████╗  ██████╔╝██████╔╝█████╗  ██║     ███████║   ██║   █████╗  ██║  ██║
+; ██║  ██║██╔══╝  ██╔═══╝ ██╔══██╗██╔══╝  ██║     ██╔══██║   ██║   ██╔══╝  ██║  ██║
+; ██████╔╝███████╗██║     ██║  ██║███████╗╚██████╗██║  ██║   ██║   ███████╗██████╔╝
+; ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝ 
+
+; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
+
+Function UpdateExpression(Actor Act) Global
+	ClearExpression(Act)
+EndFunction

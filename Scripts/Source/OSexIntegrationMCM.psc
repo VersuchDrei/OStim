@@ -2,8 +2,6 @@ ScriptName OsexIntegrationMCM Extends SKI_ConfigBase
 
 ; sex settings
 Int SetActorSpeedControl
-Int SetMaleSexExcitementMult
-Int SetFemaleSexExcitementMult
 Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
@@ -163,13 +161,6 @@ int GVORColorblind = 0x73D0
 int GVORStationaryMode = 0x73D1
 int GVORNakadashi = 0x73D4
 
-string ONights = "ONights.esp"
-int GVONFreqMult = 0x000D65
-int GVONStopWhenFound = 0x000D64
-
-int SetONStopWhenFound
-int SetONFreqMult
-
 string OCrime = "ocrime.esp"
 int SetOCBounty
 string SUOCBounty = "ocrime.bounty"
@@ -227,13 +218,25 @@ Function Init()
 
 	playerref = game.getplayer()
 
-	string[] pagearr = PapyrusUtil.StringArray(0)
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_configuration")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_undress")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_addons")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_about")
+	SetupPages()
+EndFunction
 
-	Pages = pagearr
+int Function GetVersion()
+	Return 2
+EndFunction
+
+Event OnVersionUpdate(int version)
+	SetupPages()
+EndEvent
+
+Function SetupPages()
+	Pages = new string[6]
+	Pages[0] = "$ostim_page_configuration"
+	Pages[1] = "$ostim_page_excitement"
+	Pages[2] = "$ostim_page_undress"
+	Pages[3] = "$ostim_page_expression"
+	Pages[4] = "$ostim_page_addons"
+	Pages[5] = "$ostim_page_about"
 EndFunction
 
 Event OnConfigRegister()
@@ -258,7 +261,13 @@ Event OnPageReset(String Page)
 
 	If (Page == "")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
-	ElseIf (Page == "$ostim_page_configuration")
+		Return
+	Else
+		UnloadCustomContent()
+		SetInfoText(" ")
+	EndIf
+
+	If (Page == "$ostim_page_configuration")
 		If (!Main)
 			Init()
 			If (!Main.EndOnDomOrgasm)
@@ -267,7 +276,6 @@ Event OnPageReset(String Page)
 			Debug.MessageBox("$ostim_message_main_not_initialized")
 		EndIf
 
-		UnloadCustomContent()
 		SetInfoText(" ")
 		Main.playTickBig()
 		SetCursorFillMode(TOP_TO_BOTTOM)
@@ -279,8 +287,6 @@ Event OnPageReset(String Page)
 		;=============================================================================================
 		AddColoredHeader("$ostim_header_sex_scenes")
 		SetActorSpeedControl = AddToggleOption("$ostim_speed_control", Main.EnableActorSpeedControl)
-		SetMaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_male", Main.MaleSexExcitementMult, "{2} x")
-		SetFemaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_female", Main.FemaleSexExcitementMult, "{2} x")
 		SetClipinglessFirstPerson = AddToggleOption("$ostim_clippingless", Main.EnableImprovedCamSupport)
 		SetCustomTimescale = AddSliderOption("$ostim_timescale", Main.CustomTimescale, "{0}")
 		SetUseFades = AddToggleOption("$ostim_use_fades", Main.UseFades)
@@ -410,14 +416,7 @@ Event OnPageReset(String Page)
 			SetORLeft = AddKeyMapOption("$ostim_addon_or_left_key", GetExternalInt(oromance, GVORLeft))
 			SetORRight = AddKeyMapOption("$ostim_addon_or_right_key", GetExternalInt(oromance, GVORRight))
 			SetORNakadashi = AddToggleOption("$ostim_addon_or_nakadashi", GetExternalBool(ORomance, GVORNakadashi))
-		endif 
-
-		if main.IsModLoaded(ONights)
-			AddColoredHeader("ONights")
-			SetONStopWhenFound = AddToggleOption("$ostim_addon_on_stop", GetExternalBool(ONights, GVONStopWhenFound))
-			SetONFreqMult = AddSliderOption("$ostim_addon_on_freq_mult", GetExternalFloat(ONights, GVONFreqMult), "{2} x")
-			
-		endif 
+		endif
 
 		if main.IsModLoaded(OSearch)
 			AddColoredHeader("OSearch")
@@ -450,7 +449,8 @@ Event OnPageReset(String Page)
 			SetOANudityBroadcast = AddToggleOption("$ostim_addon_oa_nudity_bc", StorageUtil.GetIntValue(none, SUOANudityBroadcast))
 
 		endif
-
+	ElseIf Page == "$ostim_page_excitement"
+		DrawExcitementPage()
 	ElseIf (Page == "$ostim_page_undress")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
 		Main.PlayTickBig()
@@ -476,6 +476,9 @@ Event OnPageReset(String Page)
 		AddColoredHeader("")
 
 		DrawSlotPage()
+
+	ElseIf Page == "$ostim_page_expression"
+		DrawExpressionPage()
 	ElseIf (Page == "$ostim_page_about")
 		UnloadCustomContent()
 		SetInfoText(" ")
@@ -564,9 +567,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetORStationary
 			SetExternalBool(oromance, GVORStationaryMode, !GetExternalBool(oromance, GVORStationaryMode))
 			SetToggleOptionValue(SetORStationary, GetExternalBool(oromance, GVORStationaryMode))
-		elseif option == SetONStopWhenFound
-			SetExternalBool(ONights, GVONStopWhenFound, !GetExternalBool(ONights, GVONStopWhenFound))
-			SetToggleOptionValue(SetONStopWhenFound, GetExternalBool(ONights, GVONStopWhenFound))
 		elseif option == SetOSAllowSex
 			StorageUtil.SetIntValue(none, SUOSAllowSex, (!(StorageUtil.GetIntValue(none, SUOSAllowSex) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowSex, StorageUtil.GetIntValue(none, SUOSAllowSex))
@@ -776,14 +776,10 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_or_right_key")
 		elseif (option == SetORNakadashi)
 			SetInfoText("$ostim_tooltip_or_nakadashi")
-		ElseIf (Option == SetONFreqMult)
-			SetInfoText("$ostim_tooltip_on_freq_mult")
 		ElseIf (Option == SetOCBounty)
 			SetInfoText("$ostim_tooltip_oc_bounty")
 		ElseIf (Option == SetOPFreq)
 			SetInfoText("$ostim_tooltip_op_freq")
-		Elseif (Option == SetONStopWhenFound)
-			SetInfoText("$ostim_tooltip_on_stop")
 		Elseif (Option == SetOARequireLowArousalBeforeEnd)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
@@ -900,10 +896,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_control_toggle_key")
 	ElseIf (Option == SetOnlyLightInDark)
 		SetInfoText("$ostim_tooltip_dark_light")
-	ElseIf (Option == SetMaleSexExcitementMult)
-		SetInfoText("$ostim_tooltip_excitement_mult_male")
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		SetInfoText("$ostim_tooltip_excitement_mult_female")
 	ElseIf (Option == SetKeymap)
 		SetInfoText("$ostim_tooltip_main_key")
 	ElseIf (Option == SetKeyUp)
@@ -999,17 +991,7 @@ Event OnOptionSliderOpen(Int Option)
 		Return
 	EndIf
 
-	If (Option == SetMaleSexExcitementMult)
-		SetSliderDialogStartValue(Main.MaleSexExcitementMult)
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 3.0)
-		SetSliderDialogInterval(0.1)
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		SetSliderDialogStartValue(Main.FemaleSexExcitementMult)
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 3.0)
-		SetSliderDialogInterval(0.1)
-	ElseIf (Option == SetFurnitureSearchDistance)
+	If (Option == SetFurnitureSearchDistance)
 		SetSliderDialogStartValue(Main.FurnitureSearchDistance)
 		SetSliderDialogDefaultValue(15.0)
 		SetSliderDialogRange(1, 30)
@@ -1054,11 +1036,6 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(0.0)
 		SetSliderDialogRange(-100, 150)
 		SetSliderDialogInterval(1)
-	elseif (option == SetONFreqMult)
-		SetSliderDialogStartValue(GetExternalFloat(ONights, GVONFreqMult))
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 5.0)
-		SetSliderDialogInterval(0.1)
 	elseif (option == SetOCBounty)
 		SetSliderDialogStartValue(StorageUtil.GetIntValue(none, SUOCBounty))
 		SetSliderDialogDefaultValue(200)
@@ -1084,18 +1061,9 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 		Return
 	EndIf
 
-	If (Option == SetMaleSexExcitementMult)
-		Main.MaleSexExcitementMult = Value
-		SetSliderOptionValue(SetMaleSexExcitementMult, Value, "{2} x")
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		Main.FemaleSexExcitementMult = Value
-		SetSliderOptionValue(SetFemaleSexExcitementMult, Value, "{2} x")
-	Elseif (option == SetORDifficulty)
+	if (option == SetORDifficulty)
 		SetExternalInt(oromance, GVORDifficulty, value as int)
 		SetSliderOptionValue(SetORDifficulty, Value as int, "{0}")
-	Elseif (option == SetONFreqMult)
-		SetExternalFloat(ONights, GVONFreqMult, value)
-		SetSliderOptionValue(SetONFreqMult, Value, "{2} x")
 	Elseif (option == SetOCBounty)
 		StorageUtil.SetIntValue(none, SUOCBounty, value as int)
 		SetSliderOptionValue(SetOCBounty, Value, "{0} Gold")
@@ -1334,6 +1302,10 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetResetClutterRadius", Main.ResetClutterRadius)
 	JMap.SetInt(OstimSettingsFile, "SetBedRealignment", Main.BedRealignment as Int)
 
+	; Expressions
+	JMap.SetInt(OstimSettingsFile, "SetExpressionDurationMin", Main.ExpressionDurationMin)
+	JMap.SetInt(OstimSettingsFile, "SetExpressionDurationMax", Main.ExpressionDurationMax)
+
 	; Ai/Control settings export.
 	JMap.SetInt(OstimSettingsFile, "SetAIControl", Main.UseAIControl as Int)
 	JMap.SetInt(OstimSettingsFile, "SetForceAIIfAttacking", Main.UseAIPlayerAggressor as Int)
@@ -1380,15 +1352,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "SetORNakadashi", GetExternalBool(ORomance, GVORNakadashi) as int)
 	Else
 		JMap.setInt(OstimSettingsFile, "savedORomance", 0)
-	endif
-
-	if main.IsModLoaded(ONights)
-		osexintegrationmain.Console("Saving Onights settings.")
-		JMap.setInt(OstimSettingsFile, "savedOnights", 1)
-		JMap.setInt(OstimSettingsFile, "SetONStopWhenFound", GetExternalBool(ONights, GVONStopWhenFound) as int)
-		JMap.setFlt(OstimSettingsFile, "SetONFreqMult", GetExternalFloat(ONights, GVONFreqMult))
-	Else
-		JMap.setInt(OstimSettingsFile, "savedOnights settings.", 0)
 	endif
 
 	if main.IsModLoaded(OSearch)
@@ -1547,6 +1510,10 @@ Function ImportSettings(bool default = false)
 	Main.ResetClutterRadius = JMap.GetInt(OstimSettingsFile, "SetResetClutterRadius", 5)
 	Main.BedRealignment = JMap.GetInt(OstimSettingsFile, "SetBedRealignment")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
+
+	; Expressions
+	Main.ExpressionDurationMin = JMap.GetInt(OstimSettingsFile, "SetExpressionDurationMin", 1000)
+	Main.ExpressionDurationMin = JMap.GetInt(OstimSettingsFile, "SetExpressionDurationMin", 3000)
 	
 	;Orgasm settings
 	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms", 1)
@@ -1586,12 +1553,6 @@ Function ImportSettings(bool default = false)
 			SetExternalInt(ORomance, GVORLeft, JMap.getInt(OstimSettingsFile, "SetORLeft"))
 			SetExternalInt(ORomance, GVORRight, JMap.getInt(OstimSettingsFile, "SetORRight"))
 			SetExternalBool(ORomance, GVORNakadashi, JMap.getInt(OstimSettingsFile, "SetORNakadashi") as bool)
-		endif
-
-		if main.IsModLoaded(ONights) && JMap.getInt(OstimSettingsFile, "savedONights") == 1
-			osexintegrationmain.Console("Loading ONights settings.")
-			SetExternalBool(ONights, GVONStopWhenFound, JMap.getInt(OstimSettingsFile, "SetONStopWhenFound") as bool)
-			SetExternalFloat(ONights, GVONFreqMult, JMap.getFlt(OstimSettingsFile, "SetONFreqMult"))
 		endif
 
 		if main.IsModLoaded(OSearch) && JMap.getInt(OstimSettingsFile, "savedOSearch") == 1
@@ -1646,3 +1607,159 @@ Function resetOsaKeysToDefaults()
 	OSAControl.osaEndKey = osaEndKeyDefault
 	SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
 EndFunction
+
+
+; ███████╗██╗  ██╗ ██████╗██╗████████╗███████╗███╗   ███╗███████╗███╗   ██╗████████╗
+; ██╔════╝╚██╗██╔╝██╔════╝██║╚══██╔══╝██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+; █████╗   ╚███╔╝ ██║     ██║   ██║   █████╗  ██╔████╔██║█████╗  ██╔██╗ ██║   ██║   
+; ██╔══╝   ██╔██╗ ██║     ██║   ██║   ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   
+; ███████╗██╔╝ ██╗╚██████╗██║   ██║   ███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
+; ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝   ╚═╝   ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
+
+Function DrawExcitementPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddSliderOptionST("OID_MaleExcitementMult", "$ostim_excitement_mult_male", Main.MaleSexExcitementMult, "{1} x")
+	SetCursorPosition(2)
+	AddSliderOptionST("OID_FemaleExcitementMult", "$ostim_excitement_mult_female", Main.FemaleSexExcitementMult, "{1} x")
+
+	SetCursorPosition(1)
+	AddSliderOptionST("OID_ExcitementDecayRate", "$ostim_excitement_decay_rate", Main.ExcitementDecayRate, "{2} /s")
+	SetCursorPosition(3)
+	AddSliderOptionST("OID_ExcitementDecayGracePeriod", "$ostim_excitement_decay_grace_period", Main.ExcitementDecayGracePeriod / 1000, "{1} s")
+EndFunction
+
+State OID_MaleExcitementMult
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_mult_male")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.MaleSexExcitementMult)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 3.0)
+		SetSliderDialogInterval(0.1)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.MaleSexExcitementMult = Value
+		SetSliderOptionValueST(Value, "{1} x")
+	EndEvent
+EndState
+
+State OID_FemaleExcitementMult
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_mult_female")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.FemaleSexExcitementMult)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 3.0)
+		SetSliderDialogInterval(0.1)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.FemaleSexExcitementMult = Value
+		SetSliderOptionValueST(Value, "{1} x")
+	EndEvent
+EndState
+
+State OID_ExcitementDecayRate
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_decay_rate")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExcitementDecayRate)
+		SetSliderDialogDefaultValue(0.5)
+		SetSliderDialogRange(0.1, 5.0)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExcitementDecayRate = Value
+		SetSliderOptionValueST(Value, "{2} /s")
+	EndEvent
+EndState
+
+State OID_ExcitementDecayGracePeriod
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_decay_grace_period")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExcitementDecayGracePeriod / 1000)
+		SetSliderDialogDefaultValue(5)
+		SetSliderDialogRange(0.0, 20.0)
+		SetSliderDialogInterval(0.5)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExcitementDecayGracePeriod = (Value * 1000) as int
+		SetSliderOptionValueST(Value, "{1} s")
+	EndEvent
+EndState
+
+
+; ██╗   ██╗███╗   ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗███╗   ██╗ ██████╗ 
+; ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝ 
+; ██║   ██║██╔██╗ ██║██║  ██║██████╔╝█████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗
+; ██║   ██║██║╚██╗██║██║  ██║██╔══██╗██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║
+; ╚██████╔╝██║ ╚████║██████╔╝██║  ██║███████╗███████║███████║██║██║ ╚████║╚██████╔╝
+;  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+
+
+
+; ███████╗██╗  ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗ ██████╗ ███╗   ██╗███████╗
+; ██╔════╝╚██╗██╔╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║██╔═══██╗████╗  ██║██╔════╝
+; █████╗   ╚███╔╝ ██████╔╝██████╔╝█████╗  ███████╗███████╗██║██║   ██║██╔██╗ ██║███████╗
+; ██╔══╝   ██╔██╗ ██╔═══╝ ██╔══██╗██╔══╝  ╚════██║╚════██║██║██║   ██║██║╚██╗██║╚════██║
+; ███████╗██╔╝ ██╗██║     ██║  ██║███████╗███████║███████║██║╚██████╔╝██║ ╚████║███████║
+; ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
+Function DrawExpressionPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddSliderOptionST("OID_ExpressionDurationMin", "$ostim_expression_duration_min", Main.ExpressionDurationMin / 1000.0, "{2} s")
+	SetCursorPosition(2)
+	AddSliderOptionST("OID_ExpressionDurationMax", "$ostim_expression_duration_max", Main.ExpressionDurationMax / 1000.0, "{2} s")
+EndFunction
+
+State OID_ExpressionDurationMin
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_expression_duration_min")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExpressionDurationMin / 1000.0)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 10)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExpressionDurationMin = (Value * 1000) as int
+		SetSliderOptionValueST(Main.ExpressionDurationMin / 1000.0, "{2} s")
+		SetSliderOptionValueST(Main.ExpressionDurationMax / 1000.0, "{2} s", false, "OID_ExpressionDurationMax")
+	EndEvent
+EndState
+
+State OID_ExpressionDurationMax
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_expression_duration_max")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExpressionDurationMax / 1000.0)
+		SetSliderDialogDefaultValue(3)
+		SetSliderDialogRange(0.1, 10)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExpressionDurationMax = (Value * 1000) as int
+		SetSliderOptionValueST(Main.ExpressionDurationMin / 1000.0, "{2} s", false, "OID_ExpressionDurationMin")
+		SetSliderOptionValueST(Main.ExpressionDurationMax / 1000.0, "{2} s")
+	EndEvent
+EndState

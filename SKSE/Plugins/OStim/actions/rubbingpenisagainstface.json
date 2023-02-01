@@ -16,6 +16,7 @@
 		"maxStimulation":50,
 		"strippingSlots":[
 			30,
+			31,
 			44,
 			55
 		]

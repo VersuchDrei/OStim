@@ -70,8 +70,6 @@ Bool Property EnableActorSpeedControl Auto
 
 Bool Property ResetPosAfterSceneEnd Auto
 
-Bool Property AllowUnlimitedSpanking Auto
-
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
 Int Property SubLightBrightness Auto
@@ -97,25 +95,6 @@ Float SpeedUpSpeed
 
 Int Property CustomTimescale Auto
 
-GlobalVariable Property OStimMaleSexExcitementMult Auto
-float Property MaleSexExcitementMult
-	float Function Get()
-		Return OStimMaleSexExcitementMult.value
-	EndFunction
-	Function Set(float value)
-		OStimMaleSexExcitementMult.value = value
-	EndFunction
-EndProperty
-
-GlobalVariable Property OStimFemaleSexExcitementMult Auto
-float Property FemaleSexExcitementMult
-	float Function Get()
-		Return OStimFemaleSexExcitementMult.value
-	EndFunction
-	Function Set(float value)
-		OStimFemaleSexExcitementMult.value = value
-	EndFunction
-EndProperty
 Int Property KeyMap Auto
 
 int property FreecamKey auto 
@@ -181,6 +160,49 @@ Bool Property Installed auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; EXCITEMENT SETTINGS  ----------------------------------------------------------------------------
+
+GlobalVariable Property OStimMaleSexExcitementMult Auto
+float Property MaleSexExcitementMult
+	float Function Get()
+		Return OStimMaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimMaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFemaleSexExcitementMult Auto
+float Property FemaleSexExcitementMult
+	float Function Get()
+		Return OStimFemaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimFemaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExcitementDecayRate Auto
+float Property ExcitementDecayRate
+	float Function Get()
+		Return OStimExcitementDecayRate.value
+	EndFunction
+	Function Set(float Value)
+		OStimExcitementDecayRate.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExcitementDecayGracePeriod Auto
+int Property ExcitementDecayGracePeriod
+	int Function Get()
+		Return OStimExcitementDecayGracePeriod.value as int
+	EndFunction
+	Function Set(int Value)
+		OStimExcitementDecayGracePeriod.value = Value
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; UNDRESSING SETTINGS  ----------------------------------------------------------------------------
@@ -416,6 +438,39 @@ Message Property OStimFurnitureSelectionMessage Auto
 GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 ; -------------------------------------------------------------------------------------------------
+; EXPRESSION SETTINGS  ----------------------------------------------------------------------------
+
+GlobalVariable Property OStimExpressionDurationMin Auto
+int Property ExpressionDurationMin
+	int Function Get()
+		Return OStimExpressionDurationMin.value As int
+	EndFunction
+	Function Set(int Value)
+		If ExpressionDurationMax < Value
+			OStimExpressionDurationMin.value = OStimExpressionDurationMax.value
+			OStimExpressionDurationMax.value = Value
+		Else
+			OStimExpressionDurationMin.value = Value
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExpressionDurationMax Auto
+int Property ExpressionDurationMax
+	int Function Get()
+		Return OStimExpressionDurationMax.value As int
+	EndFunction
+	Function Set(int Value)
+		If ExpressionDurationMin > Value
+			OStimExpressionDurationMax.value = OStimExpressionDurationMin.value
+			OStimExpressionDurationMin.value = Value
+		Else
+			OStimExpressionDurationMax.value = Value
+		EndIf
+	EndFunction
+EndProperty
+
+; -------------------------------------------------------------------------------------------------
 ; SCRIPTWIDE VARIABLES ----------------------------------------------------------------------------
 
 
@@ -424,8 +479,6 @@ Actor SubActor
 Actor ThirdActor
 
 Actor[] Actors
-float[] Offsets
-float[] RMHeights
 
 String diasa
 
@@ -643,41 +696,18 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 		Actors[2] = ThirdActor
-
-		Offsets = new float[3]
-		RMHeights = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
-
-		Offsets = new float[2]
-		RMHeights = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
-
-		Offsets = new float[1]
-		RMHeights = new float[1]
 	EndIf
 
 	int i = Actors.Length
 	While i
 		i -= 1
-
-		bool isFemale = AppearsFemale(Actors[i])
-
-		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
-			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
-		Else
-			Offsets[i] = 0
-		EndIf
-
-		If nioverride.HasNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-			RMHeights[i] = nioverride.GetNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-		Else
-			RMHeights[i] = 1
-		EndIf
 
 		Actors[i].AddToFaction(OStimExcitementFaction)
 	EndWhile
@@ -956,7 +986,6 @@ Event OnUpdate() ;OStim main logic loop
 		FadeFromBlack()
 	EndIf
 
-	Rescale()
 	If CurrentFurniture && ResetClutter
 		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
@@ -1011,10 +1040,6 @@ Event OnUpdate() ;OStim main logic loop
 	i = Actors.Length
 	While i
 		i -= 1
-
-		If Offsets[i] != 0
-			OUtils.RestoreOffset(Actors[i], Offsets[i])
-		EndIf
 
 		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
@@ -2043,18 +2068,6 @@ Function OnAnimationChange(string newScene, int newSpeed)
 
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 
-			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
-			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
-			bool isFemale = AppearsFemale(Actors[2])
-			
-			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
-				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
-			EndIf
-
-			If nioverride.HasNodeTransformScale(Actors[2], False, isFemale, "NPC", "RSMPlugin")
-				RMHeights[2] = nioverride.GetNodeTransformScale(Actors[2], false, isFemale, "NPC", "RSMPlugin")
-			EndIf
-
 			ThirdActor.AddToFaction(OStimExcitementFaction)
 
 			SendModEvent("ostim_thirdactor_join")
@@ -2069,14 +2082,7 @@ Function OnAnimationChange(string newScene, int newSpeed)
 
 		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
 
-		If Offsets[2] != 0
-			OUtils.RestoreOffset(Actors[2], Offsets[2])
-		EndIf
-
 		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
-
-		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
-		RMHeights = PapyrusUtil.ResizeFloatArray(RMHeights, 2)
 
 		If !DisableScaling
 			ThirdActor.SetScale(1.0)
@@ -2089,8 +2095,6 @@ Function OnAnimationChange(string newScene, int newSpeed)
 	EndIf
 
 	if sceneChange
-		Rescale()
-		
 		SendModEvent("ostim_scenechanged")
 
 		SendModEvent("ostim_scenechanged_" + CurrAnimClass) ;register to scenes by class
@@ -2103,16 +2107,7 @@ Function OnAnimationChange(string newScene, int newSpeed)
 EndFunction
 
 Function OnSpank()
-	If (AllowUnlimitedSpanking)
-		SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)		
-	Else
-		If (SpankCount < SpankMax)
-			SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)
-		Else
-
-			SubActor.DamageActorValue("health", 5.0)
-		EndIf
-	EndIf
+	SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)	
 
 	SpankCount += 1
 	SendModEvent("ostim_spank")
@@ -2143,10 +2138,6 @@ Function RestoreScales()
 		i -= 1
 		Actors[i].SetScale(1.0)
 	EndWhile
-EndFunction
-
-Function Rescale()
-	OSANative.UpdateForScene(CurrentSceneID, Actors, RMHeights, Offsets)
 EndFunction
 
 ;
@@ -2312,7 +2303,7 @@ Function UnMuteFaceData(Actor Act)
 
 	int i = Actors.Find(Act)
 	If i >= 0
-		OSANative.UpdateExpression(CurrentSceneID, i, Act)
+		OActor.ClearExpression(Act)
 	EndIf
 EndFunction
 
@@ -2517,10 +2508,10 @@ Function SendExpressionEvent(Actor Act, string EventName)
 		Return
 	EndIf
 
-	float Duration = OSANative.PlayExpressionEvent(CurrentSceneID, Position, Act, EventName)
+	float Duration = OActor.PlayExpression(Act, EventName)
 	If Duration != -1
 		Utility.Wait(Duration)
-		OSANative.UpdateExpression(CurrentSceneID, Position, Act)
+		OActor.ClearExpression(Act)
 	EndIf
 EndFunction
 
@@ -2677,7 +2668,6 @@ Function SetDefaultSettings()
 	EnableThirdBar = True
 	HideBarsInNPCScenes = True
 	EnableActorSpeedControl = True
-	AllowUnlimitedSpanking = False
 	ResetPosAfterSceneEnd = true 
 
 	PlayerAlwaysSubStraight = false
@@ -2708,6 +2698,8 @@ Function SetDefaultSettings()
 
 	MaleSexExcitementMult = 1.0
 	FemaleSexExcitementMult = 1.0
+	ExcitementDecayRate = 0.5
+	ExcitementDecayGracePeriod = 5000
 
 	SoundFormNumberWhitelist = new int[1]
 	SoundFormNumberWhitelist[0] = 9999 ;initializing to avoid array-related bugs
@@ -2722,6 +2714,9 @@ UseFreeCam
 	FurnitureSearchDistance = 15
 	ResetClutter = True
 	ResetClutterRadius = 5
+
+	ExpressionDurationMin = 1000
+	ExpressionDurationMAx = 3000
 
 	DisableStimulationCalculation = false
 	SlowMoOnOrgasm = True
@@ -3321,10 +3316,6 @@ Function OnLoadGame()
 
 EndFunction
 
-Function UnsetOffset(int Index)
-	Offsets[Index] = 0
-EndFunction
-
 
 ; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
 ; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
@@ -3382,6 +3373,14 @@ bool Property UseBed
 	EndFunction
 	Function Set(bool Value)
 		UseFurniture = Value
+	EndFunction
+EndProperty
+
+bool Property AllowUnlimitedSpanking
+	bool Function Get()
+		Return true
+	EndFunction
+	Function Set(bool Value)
 	EndFunction
 EndProperty
 
@@ -3484,4 +3483,8 @@ Bool Function IsNPCScene()
 	; NPC scenes no longer run on main thread ever. They will always run in subthreads
 	; Some addons might still use this function, so we'll keep it here for now
 	return False
+EndFunction
+
+Function Rescale()
+	; C++ handles scaling
 EndFunction
