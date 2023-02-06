@@ -105,9 +105,6 @@ Function RegisterEvents()
 	osexintegrationmain ostim = outils.getostim()
 	if !ostim.animationrunning() || !ostim.isactorinvolved(actra)
 		; subthread events
-		RegisterForModEvent("0SAA" + FormID + "_BlendMo", "OnBlendMo")
-		RegisterForModEvent("0SAA" + FormID + "_BlendPh", "OnBlendPh")
-		RegisterForModEvent("0SAA" + FormID + "_BlendEx", "OnBlendEx")
 		RegisterForModEvent("0SSO" + FormID + "_Sound", "OnSound")
 	endif 
 EndFunction
@@ -236,26 +233,6 @@ Event OnTranslationComplete()
 EndEvent
 
 ;Phoneme, Modifier, and Node Scale Blends
-
-;For Softly Blending Modifiers to a new alignment
-Event OnBlendMo(String EventName, String zType, Float zAmount, Form Sender)
-	Int zTy = zType as Int
-	_oGlobal.BlendMo(Actra, zAmount as Int, MfgConsoleFunc.GetModifier(Actra, zTy), zTy, ThrottleMFG)
-EndEvent
-
-;For Softly Blending Phonemes to a new alignment
-Event OnBlendPh(String EventName, String zType, Float zAmount, Form Sender)
-	Int zTy = zType as Int
-	_oGlobal.BlendPh(Actra, zAmount as Int, MfgConsoleFunc.GetPhoneme(Actra, zTy), zTy, ThrottleMFG)
-
-	;osexintegrationmain ostim = game.GetFormFromFile(0x000801, "Ostim.esp") as OsexIntegrationMain
-	;osexintegrationmain.console("Type: " + zType + " Amount: " + zAmount + " Anim: " + ostim.getcurrentanimation())
-EndEvent
-
-;For Receiving Expressions
-Event OnBlendEx(String EventName, String zType, Float zAmount, Form Sender)
-	Actra.SetExpressionOverride(zType as Int, zAmount as Int)
-EndEvent
 
 ;For Blending NodeScale softly to a new scale
 Event OnBlendSc(String EventName, String zType, Float zAmount, Form Sender)

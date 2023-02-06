@@ -187,9 +187,9 @@ Function EndScene(int stageId) Global Native
 
 Function ChangeAnimation(int stageId, string animation) Global Native
 
-Function AddThirdActor(int stageId, Actor actor) Global Native
+Function AddActor(int stageId, Actor Act) Global Native
 
-Function RemoveThirdActor(int stageId) Global Native
+Function RemoveActor(int stageId) Global Native
 
 Function UpdateSpeed(int stageId, int speed) Global Native
 

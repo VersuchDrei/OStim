@@ -927,6 +927,8 @@ Event OnUpdate() ;OStim main logic loop
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
+	RegisterForModEvent("0SAO" + Password + "_ActraJoin", "ActraJoin")
+	RegisterForModEvent("0SAO" + Password + "_ActraRemove", "ActraRemove")
 
 	
 	int AEvent = ModEvent.Create(EventName)
@@ -1030,6 +1032,14 @@ Event OnUpdate() ;OStim main logic loop
 				EndIf
 			EndIf
 		EndIf
+
+		i = 3
+		While i < Actors.Length
+			If GetActorExcitement(Actors[i])
+				Orgasm(Actors[i])
+			EndIf
+			i += 1
+		EndWhile
 
 		LoopTimeTotal = Utility.GetCurrentRealTime() - LoopStartTime
 	EndWhile
@@ -2015,91 +2025,72 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 	endif
 endEvent
 
+Event ActraJoin(string eventName, string actorID, float arg, Form ActraInc)
+	Actor newActor = ActraInc as Actor
+	OSANative.AddActor(Password, newActor)
+	Actors = PapyrusUtil.PushActor(Actors, newActor)
+	newActor.AddToFaction(OStimExcitementFaction)
+
+	If Actors.Length == 3
+		ThirdActor = newActor
+		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
+		RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
+		SendModEvent("ostim_thirdactor_join")
+	EndIf
+
+	newActor.SendModEvent("ostim_actor_join", "", Actors.Length - 1)
+
+	Console("actor joined")
+EndEvent
+
+Event ActraRemove(string eventName, string actraIX, float arg, Form actraInc)
+	OSANative.RemoveActor(Password)
+	int newSize = Actors.Length - 1
+	Actor oldActor = Actors[newSize]
+	oldActor.RemoveFromFaction(OStimExcitementFaction)
+	Actors = PapyrusUtil.ResizeActorArray(Actors, newSize)
+
+	If Actors.Length == 2
+		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
+		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
+		ThirdActor = none
+		SendModEvent("ostim_thirdactor_leave")
+	EndIf
+
+	oldActor.SendModEvent("ostim_actor_leave", "", Actors.Length)
+
+	Console("actor left")
+EndEvent
+
 Function OnAnimationChange(string newScene, int newSpeed)
 	
 	Console("Changing animation...")
 
 	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 	
-	bool sceneChange = false 
-
-	if newScene != CurrentSceneID
-		sceneChange = true 
-	endif 
+	bool sceneChange = newScene != CurrentSceneID
 	CurrentSceneID = newScene
 		
 	OSANative.ChangeAnimation(Password, CurrentSceneID)
+
+	CurrentSpeed = newSpeed
+	OSANative.UpdateSpeed(Password, CurrentSpeed)
 
 	If OMetadata.GetMaxSpeed(CurrentSceneID) == 0 && !OMetadata.IsTransition(CurrentSceneID)
 		LastHubSceneID = CurrentSceneID
 		Console("On new hub animation")
 	EndIf
 
-	CurrentSpeed = newSpeed
-	OSANative.UpdateSpeed(Password, CurrentSpeed)
-
 	CurrAnimClass = OSANative.GetAnimClass(CurrentSceneID)
 
-	Int CorrectActorCount = OMetadata.GetActorCount(CurrentSceneID)
-
-	If (!ThirdActor && (CorrectActorCount == 3)) ; no third actor, but there should be
-		Console("Third actor has joined scene ")
-
-		Actor[] NearbyActors = MiscUtil.ScanCellNPCs(Actors[0], Radius = 64.0) ;epic hackjob time
-		int max = OControl.ActraInRange.Length
-		int i = 0
-
-		While (i < max)
-			Actor Act = OControl.ActraInRange[i]
-
-			If (Act) && !IsActorInvolved(Act) && (IsActorActive(Act))
-				ThirdActor = Act
-				OSANative.AddThirdActor(Password, ThirdActor)
-				i = max
-			Endif
-			i += 1
-		EndWhile
-
-		If ThirdActor
-			Console("Third actor: + " + ThirdActor.GetDisplayName() + " has joined the scene")
-
-			ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
-			RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
-
-			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
-
-			ThirdActor.AddToFaction(OStimExcitementFaction)
-
-			SendModEvent("ostim_thirdactor_join")
-		Else
-			Console("Warning - Third Actor not found")
-		EndIf
-	ElseIf (ThirdActor && (CorrectActorCount == 2)) ; third actor, but there should not be.
-		Console("Third actor has left the scene")
-
-		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
-		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
-
-		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
-
-		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
-
-		If !DisableScaling
-			ThirdActor.SetScale(1.0)
-		EndIf
-
-		ThirdActor = none
-		OSANative.RemoveThirdActor(Password)
-
-		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
-	EndIf
+	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 
 	if sceneChange
 		SendModEvent("ostim_scenechanged")
 
 		SendModEvent("ostim_scenechanged_" + CurrAnimClass) ;register to scenes by class
 		SendModEvent("ostim_scenechanged_" + CurrentSceneID) ;register to scenes by scene
-	endif 
+	endif
 
 	Console("Current scene ID: " + CurrentSceneID)
 
