@@ -923,21 +923,14 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	OSANative.StartScene(Password, Actors)
+	OSANative.StartScene(Password, CurrentFurniture, Actors)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
 	RegisterForModEvent("0SAO" + Password + "_ActraJoin", "ActraJoin")
 	RegisterForModEvent("0SAO" + Password + "_ActraRemove", "ActraRemove")
 
-	
-	int AEvent = ModEvent.Create(EventName)
-	Modevent.PushString(AEvent, EventName)
-	ModEvent.PushString(AEvent, OMetadata.GetAnimationId(StartingAnimation, 0))
-	ModEvent.PushFloat(AEvent, 0.0)
-	ModEvent.PushForm(AEvent, self)
-	ModEvent.Send(AEvent)
-
+	SendModEvent(EventName, StartingAnimation, OMetadata.GetDefaultSpeed(StartingAnimation))
 
 	StartTime = Utility.GetCurrentRealTime()
 

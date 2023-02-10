@@ -181,7 +181,7 @@ form[] Function RemoveFormsBelowValue(form[] forms, int goldvalue) Global Native
 ; ███████║╚██████╗███████╗██║ ╚████║███████╗       ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗██║██║ ╚████║╚██████╔╝
 ; ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
-Function StartScene(int stageId, Actor[] actors) Global Native
+Function StartScene(int StageId, ObjectReference Furniture, Actor[] Actors) Global Native
 
 Function EndScene(int stageId) Global Native
 

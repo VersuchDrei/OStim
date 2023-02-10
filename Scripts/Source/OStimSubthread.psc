@@ -205,7 +205,7 @@ Event OnUpdate()
 	OSA.SetModule(CurrentScene, "0Sex", CurrentAnimation, "")
 	OSA.StimStart(CurrentScene)
 
-	OSANative.StartScene(Password, Actors)
+	OSANative.StartScene(Password, CurrentFurniture, Actors)
 	OSANative.ChangeAnimation(Password, CurrentAnimation)
 	OSANative.UpdateSpeed(Password, OMetadata.GetDefaultSpeed(CurrentAnimation))
 

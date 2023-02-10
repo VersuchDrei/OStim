@@ -4,6 +4,11 @@
 * * all functions taking lists of parameters have two versions:
 * * the regular version takes an array (for example ["tag1", "tag2", "tag3"])
 * * the CSV version takes a csv-string, CSV stands for comma separated value (for example "tag1,tag2,tag3")
+* *
+* * some functions need to return lists of lists and therefore only have CSV versions
+* * to separate lists semicoli are used (for example "tag1,tag2,tag3;tag3,tag4")
+* *
+* * for easier CSV-string handling use the OCSV.psc script
 */;
 ScriptName OMetadata
 
@@ -1627,4 +1632,201 @@ int[] Function GetActionPerformers(string Id) Global Native
 * * @return: the position in the scene of the performer
 */;
 int Function GetActionPerformer(string Id, int Index) Global Native
-                                                                                                                                                                 
+
+
+;  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗    ████████╗ █████╗  ██████╗ ███████╗
+; ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║    ╚══██╔══╝██╔══██╗██╔════╝ ██╔════╝
+; ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║       ██║   ███████║██║  ███╗███████╗
+; ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║       ██║   ██╔══██║██║   ██║╚════██║
+; ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║       ██║   ██║  ██║╚██████╔╝███████║
+; ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝       ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+
+; unlike scene and actor tags action tags are not defined in the scene file, but in the action file
+
+;/* GetActionTags
+* * returns all tags for an action in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* *
+* * @return: an array containing all tags of the action in the scene
+*/;
+string[] Function GetActionTags(string Id, int Index) Global Native
+
+;/* GetAllActionsTags
+* * returns all tags for all actions in the scene
+* * the list will not contain any duplicates if multiple actions have the same tag
+* *
+* * @param: ID, the id of the scene
+* *
+* * @return: an array containing all tags of all actions
+*/;
+string[] Function GetAllActionsTags(string Id) Global Native
+
+;/* HasActionTag
+* * checks if an action has a tag
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* * @param: Tag, the tag
+* *
+* * @return: true if the action has the tag, otherwise false
+*/;
+bool Function HasActionTag(string Id, int Index, string Tag) Global Native
+
+;/* HasActionTagOnAny
+* * checks if any action in the scene has a tag
+* *
+* * @param: Id, the id of the scene
+* * @param: Tag, the tag
+* * 
+* * @return: true if any action has the tag, otherwise false
+*/;
+bool Function HasActionTagOnAny(string Id, string Tag) Global Native
+
+;/* HasAnyActionTag
+* * checks if an action has at least one of a list of tags
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the actor in the scene
+* * @param: Tags, an array of tags
+* *
+* * @return: true if the action has at least one of the tags, otherwise false
+*/;
+bool Function HasAnyActionTag(string Id, int Index, string[] Tags) Global Native
+
+;/* HasAnyActionTagCSV
+* * same as HasAnyActionTag, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: true if the action has at least one of the tags, otherwise false
+*/;
+bool Function HasAnyActionTagCSV(string Id, int Index, string Tags) Global Native
+
+;/* HasAnyActionTagOnAny
+* * checks if any action in the scene has at least one of a list of tags
+* *
+* * @param Id, the id of the scene
+* * @param Tags, an array of tags
+* * 
+* * @return: true if any action has at least one of the tags, otherwise false
+*/;
+bool Function HasAnyActionTagOnAny(string Id, string[] Tags) Global Native
+
+;/* HasAnyActionTagOnAnyCSV
+* * same as HasAnyActionTagOnAny, except tags are passed as a csv-string
+* *
+* * @param: id, the id of the scene
+* * @param: tags, a csv-string of tags
+* *
+* * @return: true if any action has at least one of the tags, otherwise false
+*/;
+bool Function HasAnyActionTagOnAnyCSV(string Id, string Tags) Global Native
+
+;/* HasAllActionTags
+* * checks if an action has all of a list of tags
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* * @param: Tags, an array of tags
+* *
+* * @return: true if the action has all the tags, otherwise false
+*/;
+bool Function HasAllActionTags(string Id, int Index, string[] Tags) Global Native
+
+;/* HasAllActionTagsCSV
+* * same as HasAllActionTags, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: true if the action has all the tags, otherwise false
+*/;
+bool Function HasAllActionTagsCSV(string Id, int Index, string Tags) Global Native
+
+;/* HasAllActionTagsOnAny
+* * checks if any action in the scene has all of a list of tags
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, an array of tags
+* *
+* * @return: true if any action has all of the tags, otherwise false
+*/;
+bool Function HasAllActionTagsOnAny(string Id, string[] Tags) Global Native
+
+;/* HasAllActionTagsOnAnyCSV
+* * same as HasAllActionTagsOnAny, except tags are passed as a csv-string
+* * 
+* * @param: Id, the id of the scene
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: true if any action has all of the tags, otherwise false
+*/;
+bool Function HasAllActionTagsOnAnyCSV(string Id, string Tags) Global Native
+
+;/* HasAllActionTagsOverAll
+* * checks if all actions in the scene together have all of a list of tags
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, an array of tags
+* *
+* * @return: true if all actions together have all of the tags, otherwise false
+*/;
+bool Function HasAllActionTagsOverAll(string Id, string[] Tags) Global Native
+
+;/* HasAllActionTagsOverAllCSV
+* * same as HasAllActionTagsOverAll, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, a csv-string of tags
+* *
+* * @return: true if all actions together have all of the tags, otherwise false
+*/;
+bool Function HasAllActionTagsOverAllCSV(string Id, string Tags) Global Native
+
+;/* GetActionTagOverlap
+* * returns all action tags that overlap with the list
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action in the scene
+* * @param: Tags, an array with all the tags to check for
+* *
+* * @return: an array of tags that appear in the action tags and the given list
+*/;
+string[] Function GetActionTagOverlap(string Id, int Index, string[] Tags) Global Native
+
+;/* GetActionTagOverlapCSV
+* * same as GetActionTagOverlap, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Index, the index of the action
+* * @param: Tags, a csv-string of all the tags to check for
+* *
+* * @return: a csv-string of tags that appear in the action tags and the given list
+*/;
+string Function GetActionTagOverlapCSV(string Id, int Index, string Tags) Global Native
+
+;/* GetActionTagOverlapOverAll
+* * returns all actions tags of all actions that overlap with with the list
+* * the list does not contain duplicates if more than one action has the same tag
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, an array with all the tags to check for
+* *
+* * @return: an array of tags that appear in any actions tags and the given list
+*/;
+string[] Function GetActionTagOverlapOverAll(string Id, string[] Tags) Global Native
+
+;/* GetActionTagOverlapOverAllCSV
+* * same as GetActioNTagOverlap, except tags are passed as a csv-string
+* *
+* * @param: Id, the id of the scene
+* * @param: Tags, a csv-string of all the tags to check for
+* *
+* * @return: an array of tags that appear in any actions tags and the given list
+*/;
+string Function GetActionTagOverlapOverAllCSV(string Id, string Tags) Global Native

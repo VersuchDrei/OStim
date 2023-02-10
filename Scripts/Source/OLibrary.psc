@@ -13,6 +13,8 @@
 * * some functions need to take lists of lists and therefore only have CSV versions
 * * to separate lists use semicoli (for example "tag1,tag2,tag3;tag3,tag4")
 * *
+* * for easier CSV-string handling use the OCSV.psc script
+* *
 * * since scene conditions need to be checked against individual actors those have to be passed as an array still
 */;
 ScriptName OLibrary
