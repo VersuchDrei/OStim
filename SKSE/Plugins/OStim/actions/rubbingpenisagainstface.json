@@ -1,7 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.75,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],
@@ -20,7 +20,12 @@
 			31,
 			44,
 			55
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"face"
+			]
+		}
 	},
 	"performer":{
 		"floats":{

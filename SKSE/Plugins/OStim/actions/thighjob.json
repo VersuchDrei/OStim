@@ -1,7 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.2,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],
@@ -11,11 +11,16 @@
 			52,
 			53,
 			54
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"thighs"
+			]
+		}
 	},
 	"target":{
 		"stimulation":0.9,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 		],
 		"strippingSlots":[

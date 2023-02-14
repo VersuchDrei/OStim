@@ -1,7 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.75,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"vagina"
 		],
@@ -14,7 +14,7 @@
 	},
 	"target":{
 		"stimulation":0.75,
-		"fullStrip":1,
+		"fullStrip":true,
 		"strippingSlots":[
 			32,
 			49,

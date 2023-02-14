@@ -1,6 +1,5 @@
 {
 	"actor":{
-		"stimulation":1.0,
 		"fullStrip":true,
 		"requirements":[
 			"penis"
@@ -13,29 +12,22 @@
 		]
 	},
 	"target":{
-		"stimulation":1.0,
-		"fullStrip":true,
-		"requirements":[
-			"vagina"
-		],
+		"stimulation":0.5,
+		"maxStimulation":75,
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			30,
+			31,
+			44,
+			55
 		],
 		"stringLists":{
 			"cum":[
-				"vagina"
+				"face"
 			]
 		}
 	},
-	"performer":{
-		"floats":{
-			"stamina":1.0
-		}
-	},
 	"tags":[
+		"climax",
 		"sexual"
 	]
 }

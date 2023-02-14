@@ -12,7 +12,7 @@
 	"target":{
 		"stimulation":0.4,
 		"maxStimulation":50,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"testicles"
 		],

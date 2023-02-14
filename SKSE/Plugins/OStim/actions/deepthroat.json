@@ -1,24 +1,24 @@
 {
 	"actor":{
 		"stimulation":0.1,
-		"maxStimulation":50,
-		"fullStrip":true,
+		"maxStimulation":75,
 		"requirements":[
+			"mouth"
 		],
 		"strippingSlots":[
-			32,
-			49,
-			52,
-			53
+			30,
+			31,
+			44,
+			55
 		],
 		"stringLists":{
 			"cum":[
-				"butt"
+				"throat"
 			]
 		}
 	},
 	"target":{
-		"stimulation":0.8,
+		"stimulation":1.4,
 		"fullStrip":true,
 		"requirements":[
 			"penis"

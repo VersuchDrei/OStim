@@ -1,7 +1,7 @@
 {
 	"actor":{
 		"stimulation":1.0,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],
@@ -14,7 +14,7 @@
 	},
 	"target":{
 		"stimulation":0.3,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"anus"
 		],
@@ -23,7 +23,12 @@
 			49,
 			52,
 			53
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"rectum"
+			]
+		}
 	},
 	"performer":{
 		"floats":{

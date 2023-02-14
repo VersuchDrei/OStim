@@ -13,7 +13,7 @@
 	},
 	"target":{
 		"stimulation":0.3,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"anus"
 		],

@@ -1,7 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.6,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"vagina"
 		],

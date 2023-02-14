@@ -14,7 +14,7 @@
 	},
 	"target":{
 		"stimulation":0.6,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"nipple"
 		],

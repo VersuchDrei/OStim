@@ -10,11 +10,16 @@
 			31,
 			44,
 			55
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"mouth"
+			]
+		}
 	},
 	"target":{
 		"stimulation":1.4,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],

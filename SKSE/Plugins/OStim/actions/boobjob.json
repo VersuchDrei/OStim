@@ -2,7 +2,7 @@
 	"actor":{
 		"stimulation":0.1,
 		"maxStimulation":50,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"breasts"
 		],
@@ -10,11 +10,16 @@
 			32,
 			46,
 			56
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"boobs"
+			]
+		}
 	},
 	"target":{
 		"stimulation":0.8,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],

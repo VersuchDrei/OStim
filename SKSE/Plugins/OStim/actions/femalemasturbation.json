@@ -10,7 +10,7 @@
 	},
 	"target":{
 		"stimulation":0.9,
-		"fullStrip":1,
+		"fullStrip":true,
 		"requirements":[
 			"vagina"
 		],
