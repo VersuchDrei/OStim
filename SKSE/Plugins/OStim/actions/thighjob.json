@@ -1,6 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.2,
+		"fullStrip":1,
 		"requirements":[
 			"penis"
 		],
@@ -14,6 +15,7 @@
 	},
 	"target":{
 		"stimulation":0.9,
+		"fullStrip":1,
 		"requirements":[
 		],
 		"strippingSlots":[

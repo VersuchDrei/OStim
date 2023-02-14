@@ -1,6 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.75,
+		"fullStrip":1,
 		"requirements":[
 			"penis"
 		],
