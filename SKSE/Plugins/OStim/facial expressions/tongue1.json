@@ -20,6 +20,9 @@
 				"type": 11,
 				"baseValue": 50
 			}
+		],
+		"phonemeObjects":[
+			"tongue"
 		]
 	},
 	"male": {
@@ -40,6 +43,9 @@
 				"type": 11,
 				"baseValue": 50
 			}
+		],
+		"phonemeObjects":[
+			"tongue"
 		]
 	}
 }

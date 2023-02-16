@@ -13,15 +13,15 @@
 	},
 	"target":{
 		"stimulation":0.5,
+		"fullStrip":true,
 		"strippingSlots":[
-			30,
-			31,
-			44,
-			55
+			32,
+			46,
+			56
 		],
 		"stringLists":{
 			"cum":[
-				"face",
+				"chest",
 				"neck"
 			]
 		}
