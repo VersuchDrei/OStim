@@ -85,6 +85,67 @@ Function RemoveWeapons(Actor Act) Global Native
 Function AddWeapons(Actor Act) Global Native
 
 
+; ███████╗ ██████╗ ██╗   ██╗██╗██████╗      ██████╗ ██████╗      ██╗███████╗ ██████╗████████╗███████╗
+; ██╔════╝██╔═══██╗██║   ██║██║██╔══██╗    ██╔═══██╗██╔══██╗     ██║██╔════╝██╔════╝╚══██╔══╝██╔════╝
+; █████╗  ██║   ██║██║   ██║██║██████╔╝    ██║   ██║██████╔╝     ██║█████╗  ██║        ██║   ███████╗
+; ██╔══╝  ██║▄▄ ██║██║   ██║██║██╔═══╝     ██║   ██║██╔══██╗██   ██║██╔══╝  ██║        ██║   ╚════██║
+; ███████╗╚██████╔╝╚██████╔╝██║██║         ╚██████╔╝██████╔╝╚█████╔╝███████╗╚██████╗   ██║   ███████║
+; ╚══════╝ ╚══▀▀═╝  ╚═════╝ ╚═╝╚═╝          ╚═════╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   ╚══════╝
+
+; Equip objects refer to OStims version of anim objects. Some are equipped automatically by OStim.
+; They can also be equipped with the below functions or by annotations.
+; You can define your own by adding .json files to "SKSE/plugins/OStim/equip objects"
+; Equip objects will be automatically removed at scene end if not removed manually.
+
+;/* EquipObject
+* * equips an object on an actor
+* *
+* * @param: Act, the actor to equip the object on
+* * @param: Type, the type of the object to equip
+* *
+* * @return: true if the object was equipped, false if the object type is unknown
+*/;
+bool Function EquipObject(Actor Act, string Type) Global Native
+
+;/* UnequipObject
+* * unequips an object on from actor
+* *
+* * @param: Act, the actor to unequip the item from
+* * @param: Type, the type of the object to unequip
+*/;
+Function UnequipObject(Actor Act, string Type) Global Native
+
+;/* IsObjectEquipped
+* * checks if an object type is currently equipped on an actor
+* *
+* * @param: Act, the actor to check on
+* * @param: Type, the type of the object to check for
+* *
+* * @return: true if the type is currently equipped
+*/;
+bool Function IsObjectEquipped(Actor Act, string Type) Global Native
+
+;/* SetObjectVariant
+* * sets the variant of an object on an actor
+* *
+* * @param: Act, the actor to set the variant on
+* * @param: Type, the type of the object to set the variant for
+* * @param: Variant, the variant to set
+* * @param: Duration, the duration the variant stays on, if 0.0 it will stay until removed
+* *
+* * @return: true if the variant was set, false if the object type is unknown or the object does not have the variant
+*/;
+bool Function SetObjectVariant(Actor Act, string Type, string Variant, float Duration = 0.0) Global Native
+
+;/* UnsetObjectVariant
+* * sets the objects variant back to the default one
+* *
+* * @param: Act, the actor to unset the variant on
+* * @param: Type, the type of the object to unset the variant for
+*/;
+Function UnsetObjectVariant(Actor Act, string Type) Global Native
+
+
 ; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
 ; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
 ; ██║  ██║█████╗  ██████╔╝██████╔╝█████╗  ██║     ███████║   ██║   █████╗  ██║  ██║

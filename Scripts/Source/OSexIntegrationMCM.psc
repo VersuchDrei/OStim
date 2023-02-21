@@ -10,7 +10,6 @@ Int SetScaling
 Int SetSchlongBending
 int SetUseIntroScenes
 int SetResetPosition
-int SetOnlyGayAnimsInGayScenes
 
 ; clothes settings
 Int SetAlwaysUndressAtStart
@@ -23,10 +22,6 @@ int[] SlotSets
 int UndressingSlotMask
 
 ; actor role settings
-Int setPlayerAlwaysDomStraight
-Int setPlayerAlwaysSubStraight
-Int setPlayerAlwaysDomGay
-Int setPlayerAlwaysSubGay
 
 ; bar settings
 Int SetSubBar
@@ -222,7 +217,7 @@ Function Init()
 EndFunction
 
 int Function GetVersion()
-	Return 2
+	Return 3
 EndFunction
 
 Event OnVersionUpdate(int version)
@@ -230,13 +225,14 @@ Event OnVersionUpdate(int version)
 EndEvent
 
 Function SetupPages()
-	Pages = new string[6]
+	Pages = new string[7]
 	Pages[0] = "$ostim_page_configuration"
 	Pages[1] = "$ostim_page_excitement"
-	Pages[2] = "$ostim_page_undress"
-	Pages[3] = "$ostim_page_expression"
-	Pages[4] = "$ostim_page_addons"
-	Pages[5] = "$ostim_page_about"
+	Pages[2] = "$ostim_page_gender_roles"
+	Pages[3] = "$ostim_page_undress"
+	Pages[4] = "$ostim_page_expression"
+	Pages[5] = "$ostim_page_addons"
+	Pages[6] = "$ostim_page_about"
 EndFunction
 
 Event OnConfigRegister()
@@ -279,7 +275,7 @@ Event OnPageReset(String Page)
 		SetInfoText(" ")
 		Main.playTickBig()
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetThanks = AddTextOption("$ostim_thanks", "")
+		SetThanks = AddTextOption("$ostim_configuration", "")
 		SetCursorPosition(1)
 		AddTextOption("$ostim_config_text", "")
 		SetCursorPosition(2)
@@ -298,14 +294,6 @@ Event OnPageReset(String Page)
 		SetSchlongBending = AddToggleOption("$ostim_schlong_bending", Main.DisableSchlongBending)
 		SetUseIntroScenes = AddToggleOption("$ostim_use_intro_scenes", Main.UseIntroScenes)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
-		AddEmptyOption()
-
-		AddColoredHeader("$ostim_header_player_roles")
-		SetOnlyGayAnimsInGayScenes = AddToggleOption("$ostim_force_gay_anims", Main.OnlyGayAnimsInGayScenes)
-		setPlayerAlwaysDomStraight = AddToggleOption("$ostim_always_dom_straight", Main.PlayerAlwaysDomStraight)
-		setPlayerAlwaysSubStraight = AddToggleOption("$ostim_always_sub_straight", Main.PlayerAlwaysSubStraight)
-		setPlayerAlwaysDomGay = AddToggleOption("$ostim_always_dom_gay", Main.PlayerAlwaysDomGay)
-		setPlayerAlwaysSubGay = AddToggleOption("$ostim_always_sub_gay", Main.PlayerAlwaysSubGay)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_orgasms")
@@ -451,6 +439,8 @@ Event OnPageReset(String Page)
 		endif
 	ElseIf Page == "$ostim_page_excitement"
 		DrawExcitementPage()
+	ElseIf Page == "$ostim_page_gender_roles"
+		DrawGenderRolesPage()
 	ElseIf (Page == "$ostim_page_undress")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
 		Main.PlayTickBig()
@@ -485,19 +475,23 @@ Event OnPageReset(String Page)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 
-		AddTextOption("OStim ", "-")
+		AddTextOption("OStimNG ", "-")
 		
 		AddTextOption("", "")
 		AddColoredHeader("$ostim_authors")
+		AddTextOption("OStimNG ", "$ostim_by{Aietos, Kannonfodder}")
+		AddTextOption("- ", "$ostim_and{VersuchDrei}")
 		AddTextOption("OStim ", "$ostim_by{Sairion}")
-		AddTextOption("OSA + OSex", "$ostim_by{CE0}")
+		AddTextOption("OSA ", "$ostim_by{CE0}")
+		AddTextOption("OpenSex ", "$ostim_by{Ace Animations}")
 
 		SetCursorPosition(1)
-		AddTextOption("OSA Overhaul & API", "")
+		AddTextOption("Powered By Sswaye's Reshade", "")
 
 		AddTextOption("", "")
 		AddColoredHeader("$ostim_links")
-		AddTextOption("discord.gg/RECvhVaRcU", "")
+		AddTextOption("discord.gg/ostim", "")
+		AddTextOption("https://github.com/VersuchDrei/OStim", "")
 
 		Main.PlayDing()
 	EndIf
@@ -703,21 +697,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetOnlyLightInDark)
 		Main.LowLightLevelLightsOnly = !Main.LowLightLevelLightsOnly
 		SetToggleOptionValue(Option, Main.LowLightLevelLightsOnly)
-	ElseIf (Option == SetPlayerAlwaysSubStraight)
-		Main.PlayerAlwaysSubStraight = !Main.PlayerAlwaysSubStraight
-		SetToggleOptionValue(Option, Main.PlayerAlwaysSubStraight)
-	ElseIf (Option == SetPlayerAlwaysSubGay)
-		Main.PlayerAlwaysSubGay = !Main.PlayerAlwaysSubGay
-		SetToggleOptionValue(Option, Main.PlayerAlwaysSubGay)
-	ElseIf (Option == SetPlayerAlwaysDomStraight)
-		Main.PlayerAlwaysDomStraight = !Main.PlayerAlwaysDomStraight
-		SetToggleOptionValue(Option, Main.PlayerAlwaysDomStraight)
-	ElseIf (Option == SetPlayerAlwaysDomGay)
-		Main.PlayerAlwaysDomGay = !Main.PlayerAlwaysDomGay
-		SetToggleOptionValue(Option, Main.PlayerAlwaysDomGay)
-	ElseIf (Option == SetOnlyGayAnimsInGayScenes)
-		Main.OnlyGayAnimsInGayScenes = !Main.OnlyGayAnimsInGayScenes
-		SetToggleOptionValue(Option, Main.OnlyGayAnimsInGayScenes)
 	ElseIf (Option == ExportSettings)
 		If ShowMessage("$ostim_message_export_confirm", true)
 			ExportSettings()
@@ -910,16 +889,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_pullout_key")
 	ElseIf (Option == SetThanks)
 		SetInfoText("$ostim_tooltip_thanks")
-	ElseIf (Option == SetPlayerAlwaysSubStraight)
-		SetInfoText("$ostim_tooltip_always_sub_straight")
-	ElseIf (Option == SetPlayerAlwaysSubGay)
-		SetInfoText("$ostim_tooltip_always_sub_gay")
-	ElseIf (Option == SetPlayerAlwaysDomStraight)
-		SetInfoText("$ostim_tooltip_always_dom_straight")
-	ElseIf (Option == SetPlayerAlwaysDomGay)
-		SetInfoText("$ostim_tooltip_always_dom_gay")
-	ElseIf (Option == SetOnlyGayAnimsInGayScenes)
-		SetInfoText("$ostim_tooltip_force_gay_anims")
 	ElseIf (Option == ExportSettings)
 		SetInfoText("$ostim_tooltip_export")
 	ElseIf (Option == ImportSettings)
@@ -1698,6 +1667,141 @@ State OID_ExcitementDecayGracePeriod
 	Event OnSliderAcceptST(float Value)
 		Main.ExcitementDecayGracePeriod = (Value * 1000) as int
 		SetSliderOptionValueST(Value, "{1} s")
+	EndEvent
+EndState
+
+
+;  ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██████╗     ██████╗  ██████╗ ██╗     ███████╗███████╗
+; ██╔════╝ ██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗    ██╔══██╗██╔═══██╗██║     ██╔════╝██╔════╝
+; ██║  ███╗█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝    ██████╔╝██║   ██║██║     █████╗  ███████╗
+; ██║   ██║██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗    ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║
+; ╚██████╔╝███████╗██║ ╚████║██████╔╝███████╗██║  ██║    ██║  ██║╚██████╔╝███████╗███████╗███████║
+;  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
+
+Function DrawGenderRolesPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddColoredHeader("$ostim_header_animation_settings")
+	SetCursorPosition(2)
+	AddToggleOptionST("OID_ForceGayAnims", "$ostim_force_gay_anims", Main.OnlyGayAnimsInGayScenes)
+
+	SetCursorPosition(6)
+	AddColoredHeader("$ostim_header_player_roles")
+	SetCursorPosition(8)
+	AddToggleOptionST("OID_PlayerAlwaysDomStraight", "$ostim_always_dom_straight", Main.PlayerAlwaysDomStraight)
+	SetCursorPosition(10)
+	AddToggleOptionST("OID_PlayerAlwaysSubStraight", "$ostim_always_sub_straight", Main.PlayerAlwaysSubStraight)
+	SetCursorPosition(12)
+	AddToggleOptionST("OID_PlayerAlwaysDomGay", "$ostim_always_dom_gay", Main.PlayerAlwaysDomGay)
+	SetCursorPosition(14)
+	AddToggleOptionST("OID_PlayerAlwaysSubGay", "$ostim_always_sub_gay", Main.PlayerAlwaysSubGay)
+
+
+	SetCursorPosition(1)
+	AddColoredHeader("$ostim_header_strap_ons")
+	SetCursorPosition(3)
+	AddToggleOptionST("OID_EquipStrapOnIfNeeded", "$ostim_equip_strap_on_if_needed", Main.EquipStrapOnIfNeeded)
+	SetCursorPosition(5)
+	AddToggleOptionST("OID_UnequipStrapOnIfNotNeeded", "$ostim_unequip_strap_on_if_not_needed", Main.UnequipStrapOnIfNotNeeded)
+	SetCursorPosition(7)
+	int UnequipStrapOnIfInWayFlags = OPTION_FLAG_NONE
+	If Main.UnequipStrapOnIfNotNeeded
+		UnequipStrapOnIfInWayFlags = OPTION_FLAG_DISABLED
+	EndIf
+	AddToggleOptionST("OID_UnequipStrapOnIfInWay", "$ostim_unequip_strap_on_if_in_way", Main.UnequipStrapOnIfInWay, UnequipStrapOnIfInWayFlags)
+EndFunction
+
+State OID_ForceGayAnims
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_force_gay_anims")
+	EndEvent
+
+	Event OnSelectST()
+		Main.OnlyGayAnimsInGayScenes = !Main.OnlyGayAnimsInGayScenes
+		SetToggleOptionValueST(Main.OnlyGayAnimsInGayScenes)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysDomStraight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_dom_straight")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysDomStraight = !Main.PlayerAlwaysDomStraight
+		SetToggleOptionValueST(Main.PlayerAlwaysDomStraight)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysSubStraight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_sub_straight")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysSubStraight = !Main.PlayerAlwaysSubStraight
+		SetToggleOptionValueST(Main.PlayerAlwaysSubStraight)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysDomGay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_dom_gay")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysDomGay = !Main.PlayerAlwaysDomGay
+		SetToggleOptionValueST(Main.PlayerAlwaysDomGay)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysSubGay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_sub_gay")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysSubGay = !Main.PlayerAlwaysSubGay
+		SetToggleOptionValueST(Main.PlayerAlwaysSubGay)
+	EndEvent
+EndState
+
+State OID_EquipStrapOnIfNeeded
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_equip_strap_on_if_needed")
+	EndEvent
+
+	Event OnSelectST()
+		Main.EquipStrapOnIfNeeded = !Main.EquipStrapOnIfNeeded
+		SetToggleOptionValueST(Main.EquipStrapOnIfNeeded)
+	EndEvent
+EndState
+
+State OID_UnequipStrapOnIfNotNeeded
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_unequip_strap_on_if_not_needed")
+	EndEvent
+
+	Event OnSelectST()
+		Main.UnequipStrapOnIfNotNeeded = !Main.UnequipStrapOnIfNotNeeded
+		SetToggleOptionValueST(Main.UnequipStrapOnIfNotNeeded)
+
+		int UnequipStrapOnIfInWayFlags = OPTION_FLAG_NONE
+		If Main.UnequipStrapOnIfNotNeeded
+			UnequipStrapOnIfInWayFlags = OPTION_FLAG_DISABLED
+		EndIf
+		SetOptionFlagsST(UnequipStrapOnIfInWayFlags, false, "OID_UnequipStrapOnIfInWay")
+	EndEvent
+EndState
+
+State OID_UnequipStrapOnIfInWay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_unequip_strap_on_if_in_way")
+	EndEvent
+
+	Event OnSelectST()
+		Main.UnequipStrapOnIfInWay = !Main.UnequipStrapOnIfInWay
+		SetToggleOptionValueST(Main.UnequipStrapOnIfInWay)
 	EndEvent
 EndState
 

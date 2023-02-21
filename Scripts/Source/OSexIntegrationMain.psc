@@ -108,13 +108,7 @@ Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
 
 Bool Property UseAIControl Auto
-Bool Property OnlyGayAnimsInGayScenes auto
 Bool Property PauseAI Auto
-
-Bool Property PlayerAlwaysSubStraight auto ;mcm
-Bool Property PlayerAlwaysSubGay Auto
-Bool Property PlayerAlwaysDomStraight Auto 
-Bool Property PlayerAlwaysDomGay auto
 
 Bool Property UseAINPConNPC Auto
 Bool Property UseAIPlayerAggressor Auto
@@ -319,6 +313,58 @@ bool Property AutoClimaxAnimations
 			OStimAutoClimaxAnimations.value = 1
 		Else
 			OStimAutoClimaxAnimations.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+; -------------------------------------------------------------------------------------------------
+; GENDER ROLE SETTINGS  ---------------------------------------------------------------------------
+
+Bool Property PlayerAlwaysSubStraight auto ;mcm
+Bool Property PlayerAlwaysSubGay Auto
+Bool Property PlayerAlwaysDomStraight Auto 
+Bool Property PlayerAlwaysDomGay auto
+
+Bool Property OnlyGayAnimsInGayScenes auto
+
+GlobalVariable Property OStimEquipStrapOnIfNeeded Auto
+bool Property EquipStrapOnIfNeeded
+	bool Function Get()
+		Return OStimEquipStrapOnIfNeeded.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimEquipStrapOnIfNeeded.value = 1
+		Else
+			OStimEquipStrapOnIfNeeded.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUnequipStrapOnIfNotNeeded Auto
+bool Property UnequipStrapOnIfNotNeeded
+	bool Function Get()
+		Return OStimUnequipStrapOnIfNotNeeded.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUnequipStrapOnIfNotNeeded.value = 1
+		Else
+			OStimUnequipStrapOnIfNotNeeded.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUnequipStrapOnIfInWay Auto
+bool Property UnequipStrapOnIfInWay
+	bool Function Get()
+		Return OStimUnequipStrapOnIfInWay.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUnequipStrapOnIfInWay.value = 1
+		Else
+			OStimUnequipStrapOnIfInWay.value = 0
 		EndIf
 	EndFunction
 EndProperty
