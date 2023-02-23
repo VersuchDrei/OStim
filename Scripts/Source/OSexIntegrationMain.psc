@@ -541,7 +541,6 @@ String CurrentSceneID
 
 Bool AnimSpeedAtMax
 Int SpankCount
-Int SpankMax
 
 _oOmni OSAOmni
 _oControl OControl
@@ -661,31 +660,31 @@ EndEvent
 */;
 Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zUndressSub = False, Bool zAnimateUndress = False, String zStartingAnimation = "", Actor zThirdActor = None, ObjectReference Bed = None, Bool Aggressive = False, Actor AggressingActor = None)
 	if !installed 
-		debug.Notification("OStim not ready or installation failed")
+		debug.Notification("OStim not ready or installation failed.")
 		return false
 	endif
 
 	; If Player isn't involved, it's an NPC scene, so start it on a subthread instead
 	If PlayerRef != Dom && PlayerRef != Sub && PlayerRef != zThirdActor
 		if !GetUnusedSubthread().StartSubthreadScene(Dom, Sub, zThirdActor = zThirdActor, startingAnimation = zStartingAnimation, furnitureObj = Bed, withAI = true, isAggressive = Aggressive, aggressingActor = AggressingActor)
-			Debug.Notification("OStim: Thread overload, please report this on discord")
-			return False
+			Debug.Notification("OStim: Thread overload, please report this on Discord.")
+			return false
 		endif 
-		return True
+		return true
 	EndIf
 
-	If (SceneRunning)
+	If SceneRunning
 		Debug.Notification("OSA scene already running")
-		Return False
+		Return false
 	EndIf
 
-	If IsActorActive(dom) || (sub && IsActorActive(sub))
-		Debug.Notification("One of the actors is already in a OSA scene")
-		Return False
+	If IsActorActive(Dom) || Sub && IsActorActive(Sub) || ThirdActor && IsActorActive(ThirdActor)
+		Debug.Notification("At least one of the actors is already in an OSA scene.")
+		Return false
 	EndIf
 	If !dom.Is3DLoaded()
-		console("Dom actor is not loaded")
-		return False
+		console("Dom actor is not loaded.")
+		return false
 	EndIf
 
 	; Default OSex gender order
@@ -701,7 +700,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	UndressSub = zUndressSub
 	StartingAnimation = zStartingAnimation
 	ThirdActor = zThirdActor
-	PauseAI = False
+	PauseAI = false
 
 	If zThirdActor
 		If AppearsFemale(ThirdActor) && !AppearsFemale(SubActor)
@@ -749,6 +748,11 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
+	EndIf
+
+	If !OSA.CheckActors(Actors)
+		Debug.Notification("At least one of the actors is invalid.")
+		Return false
 	EndIf
 
 	int i = Actors.Length
@@ -858,7 +862,6 @@ Event OnUpdate() ;OStim main logic loop
 	DomTimesOrgasm = 0
 	ThirdTimesOrgasm = 0
 	MostRecentOrgasmedActor = None
-	SpankMax = osanative.RandomInt(1, 6)
 	FirstAnimate = true
 	MostRecentOSexInteractionTime = Utility.GetCurrentRealTime()
 
@@ -1739,16 +1742,6 @@ EndFunction
 Int Function GetSpankCount() ; 
 	{Number of spankings so far this scene}
 	Return SpankCount
-EndFunction
-
-Int Function GetMaxSpanksAllowed()  
-	{maximum number of spankings before it deals damage}
-	Return SpankMax
-EndFunction
-
-Function SetSpankMax(Int Max) 
-	{maximum number of spankings before it deals damage}
-	SpankMax = Max
 EndFunction
 
 Function SetSpankCount(Int Count) 
@@ -3517,4 +3510,11 @@ EndFunction
 
 Function Rescale()
 	; C++ handles scaling
+EndFunction
+
+Int Function GetMaxSpanksAllowed()  
+	Return 0
+EndFunction
+
+Function SetSpankMax(Int Max) 
 EndFunction

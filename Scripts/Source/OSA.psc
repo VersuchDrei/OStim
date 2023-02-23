@@ -249,38 +249,35 @@ Bool Function SetActors(String[] SceneSuite, Actor[] Actra) Global
     Return True
 EndFunction
 
-Bool Function SetActorsStim(String[] SceneSuite, Actor[] Actra) Global
+Bool Function CheckActors(Actor[] Actra) Global
+    Faction StatusFaction = Game.GetFormFromFile(0x00006190, "OSA.esm") as Faction
 
+    Bool Approved = True
+
+    int i = 0
+    Int L = Actra.length
+    While (i < L)
+        If (!_oGlobal.CheckActra(0, Actra[i], StatusFaction))
+            Approved = False
+        EndIf
+        i += 1
+    EndWhile
+
+    Return Approved
+EndFunction
+
+Bool Function SetActorsStim(String[] SceneSuite, Actor[] Actra) Global
     Int i = 0
     Int L = Actra.length
     While (i < L)
         SceneSuite[i + 1] = ID(Actra[i])
         i += 1
     EndWhile
-
-    OGlyphSS(".glyph.setActors", PapyrusUtil.SliceStringArray(SceneSuite, 0, L))
-    Faction StatusFaction = Game.GetFormFromFile(0x00006190, "OSA.esm") as Faction
-
-    Bool Approved = True
-
-    i = 0
-    While (i < L)
-        If (_oGlobal.CheckActra(SceneSuite[0], Actra[i], StatusFaction))
-            i += 1
-        else
-            Approved = False
-            i + 99
-        EndIf
-    EndWhile
-
     
+    OGlyphSS(".glyph.setActors", PapyrusUtil.SliceStringArray(SceneSuite, 0, L))
+    (Quest.GetQuest("0SA") as _oOmni).PrepActra(SceneSuite, Actra)
 
-
-    If (Approved)
-        (Quest.GetQuest("0SA") as _oOmni).PrepActra(SceneSuite, Actra)
-    Endif
-
-    Return Approved
+    Return true
 EndFunction
 
 String[] Function SceneFlags(String[] SceneSuite)
@@ -296,16 +293,20 @@ EndFunction
 ; Checks to see if the actor is allowed to participate.
 ; This does not include the OSABusyFaction check due to form dependancy
 Bool Function IsAllowed(Actor Actra, Bool Creature = False) Global
-    If (!Creature)
-        If (!OUtils.ischild(actra))
-            If (Actra.HasKeywordString("ActorTypeNPC"))
-                ;If (!Actra.HasKeywordString("ActorTypeCreature"))
-                    Return True
-                ;EndIf
-            EndIf
-        EndIf
+    If OUtils.IsChild(actra)
+        Return false
     EndIf
-    Return False
+
+    If !Actra.HasKeywordString("ActorTypeNPC")
+        Return false
+    EndIf
+
+    If Actra.IsGhost()
+        Debug.MessageBox(Actra.GetDisplayName() + " is flagged as a ghost. If you think is this a bug open the console, select them and type 'setghost 0'.")
+        Return false
+    EndIf
+
+    Return true
 EndFunction
 
 Function SetModule(String[] SceneSuite, String ModuleID, String SceneID = "AUTO", String SceneLoc = "") Global
