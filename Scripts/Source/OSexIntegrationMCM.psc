@@ -1203,6 +1203,8 @@ Function ExportSettings()
 	
 	ShowMessage("$ostim_message_export", false)
 	
+	osexintegrationmain.Console("Saving Ostim settings.")
+
 	; Sex settings export.
 	JMap.SetInt(OstimSettingsFile, "SetEndOnOrgasm", Main.EndOnDomOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetEndOnSubOrgasm", Main.EndOnSubOrgasm as Int)
@@ -1355,16 +1357,20 @@ Function ExportSettings()
 
 	; Save to file.
 	JMap.SetInt(OstimSettingsFile, "OStimAPIVersion", outils.getostim().getapiversion())
-	osexintegrationmain.Console("Saving Ostim settings.")
+	osexintegrationmain.Console("Saved Ostim settings.")
 	Jvalue.WriteToFile(OstimSettingsFile, JContainers.UserDirectory() + "OstimMCMSettings.json")
 	
+	OData.ExportSettings()
+
 	; Force page reset to show updated changes.
 	ForcePageReset()
 EndFunction
 
 Function ImportSettings(bool default = false)
+	osexintegrationmain.Console("Loading Ostim settings.")
+
 	; Import from file.
-		int OstimSettingsFile
+	int OstimSettingsFile
 	if !default
 		int OstimSettingsFileAlt
 
@@ -1546,7 +1552,9 @@ Function ImportSettings(bool default = false)
 		endif
 	endif
 
-	osexintegrationmain.Console("Loading Ostim settings.")
+	OData.ImportSettings()
+
+	osexintegrationmain.Console("Loaded Ostim settings.")
 	; Force page reset to show updated changes.
 	ForcePageReset()
 EndFunction
@@ -1709,6 +1717,11 @@ Function DrawGenderRolesPage()
 		UnequipStrapOnIfInWayFlags = OPTION_FLAG_DISABLED
 	EndIf
 	AddToggleOptionST("OID_UnequipStrapOnIfInWay", "$ostim_unequip_strap_on_if_in_way", Main.UnequipStrapOnIfInWay, UnequipStrapOnIfInWayFlags)
+
+	SetCursorPosition(11)
+	AddMenuOptionST("OID_DefaultStrapOn", "$ostim_default_strap_on", OData.GetEquipObjectName(0x1, "strapon"))
+	SetCursorPosition(13)
+	AddMenuOptionST("OID_PlayerStrapOn", "$ostim_player_strap_on", OData.GetEquipObjectName(0x7, "strapon"))
 EndFunction
 
 State OID_ForceGayAnims
@@ -1805,6 +1818,42 @@ State OID_UnequipStrapOnIfInWay
 	EndEvent
 EndState
 
+State OID_DefaultStrapOn
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_strap_on")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x1, "strapon")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x1, "strapon", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x1, "strapon")
+	EndEvent
+EndState
+
+State OID_PlayerStrapOn
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_player_strap_on")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x7, "strapon")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x7, "strapon", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x7, "strapon")
+	EndEvent
+EndState
+
 
 ; ██╗   ██╗███╗   ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗███╗   ██╗ ██████╗ 
 ; ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝ 
@@ -1828,6 +1877,14 @@ Function DrawExpressionPage()
 	AddSliderOptionST("OID_ExpressionDurationMin", "$ostim_expression_duration_min", Main.ExpressionDurationMin / 1000.0, "{2} s")
 	SetCursorPosition(2)
 	AddSliderOptionST("OID_ExpressionDurationMax", "$ostim_expression_duration_max", Main.ExpressionDurationMax / 1000.0, "{2} s")
+
+
+	SetCursorPosition(1)
+	AddMenuOptionST("OID_DefaultTongueMale", "$ostim_default_tongue_male", OData.GetEquipObjectName(0x0, "tongue"))
+	SetCursorPosition(3)
+	AddMenuOptionST("OID_DefaultTongueFemale", "$ostim_default_tongue_female", OData.GetEquipObjectName(0x1, "tongue"))
+	SetCursorPosition(5)
+	AddMenuOptionST("OID_PlayerTongue", "$ostim_player_tongue", OData.GetEquipObjectName(0x7, "tongue"))
 EndFunction
 
 State OID_ExpressionDurationMin
@@ -1867,3 +1924,88 @@ State OID_ExpressionDurationMax
 		SetSliderOptionValueST(Main.ExpressionDurationMax / 1000.0, "{2} s")
 	EndEvent
 EndState
+
+State OID_DefaultTongueMale
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_tongue_male")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x0, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x0, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x0, "tongue")
+	EndEvent
+EndState
+
+State OID_DefaultTongueFemale
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_tongue_female")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x1, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x1, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x1, "tongue")
+	EndEvent
+EndState
+
+State OID_PlayerTongue
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_player_tongue")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x7, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x7, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x7, "tongue")
+	EndEvent
+EndState
+
+
+; ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗   ██╗
+; ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝╚██╗ ██╔╝
+; ██║   ██║   ██║   ██║██║     ██║   ██║    ╚████╔╝ 
+; ██║   ██║   ██║   ██║██║     ██║   ██║     ╚██╔╝
+; ╚██████╔╝   ██║   ██║███████╗██║   ██║      ██║
+;  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚═╝   ╚═╝      ╚═╝
+
+string[] EquipObjectPairs
+
+Function OpenEquipObjectMenu(int FormID, string Type)
+	EquipObjectPairs = OData.GetEquipObjectPairs(FormID, Type)
+	SetMenuDialogOptions(OData.ToEquipObjectNames(EquipObjectPairs))
+	SetMenuDialogStartIndex(0)
+	SetMenuDialogDefaultIndex(0)
+EndFunction
+
+Function SetEquipObjectID(int FormID, string Type, int Index)
+	OData.SetEquipObjectID(FormID, Type, EquipObjectPairs[Index * 2])
+	SetMenuOptionValueST(EquipObjectPairs[Index * 2 + 1])
+EndFunction
+
+Function SetEquipObjectIDToDefault(int FormID, string Type)
+	string ID = "default"
+	If FormID < 2
+		ID = "random"
+	EndIf
+	OData.SetEquipObjectID(FormID, Type, ID)
+	SetMenuOptionValueST(ID)
+EndFunction
