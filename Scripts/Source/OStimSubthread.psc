@@ -44,9 +44,6 @@ actor ThirdActor
 actor[] Actors
 actor AggressiveActor
 
-float[] Offsets
-float[] RMHeights
-
 ObjectReference CurrentFurniture
 int FurnitureType
 
@@ -134,22 +131,13 @@ bool Function StartSubthreadScene(actor dom, actor sub = none, actor zThirdActor
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 		Actors[2] = ThirdActor
-
-		Offsets = new float[3]
-		RMHeights = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
-
-		Offsets = new float[2]
-		RMHeights = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
-
-		Offsets = new float[1]
-		RMHeights = new float[1]
 	EndIf
 
 	Aggressive = isAggressive
@@ -167,18 +155,6 @@ bool Function StartSubthreadScene(actor dom, actor sub = none, actor zThirdActor
 		i -= 1
 
 		bool isFemale = OStim.AppearsFemale(Actors[i])
-
-		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
-			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
-		Else
-			Offsets[i] = 0
-		EndIf
-
-		If nioverride.HasNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-			RMHeights[i] = nioverride.GetNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-		Else
-			RMHeights[i] = 1
-		EndIf
 
 		Actors[i].AddToFaction(OStim.OStimExcitementFaction)
 	EndWhile
@@ -229,7 +205,7 @@ Event OnUpdate()
 	OSA.SetModule(CurrentScene, "0Sex", CurrentAnimation, "")
 	OSA.StimStart(CurrentScene)
 
-	OSANative.StartScene(Password, Actors)
+	OSANative.StartScene(Password, CurrentFurniture, Actors)
 	OSANative.ChangeAnimation(Password, CurrentAnimation)
 	OSANative.UpdateSpeed(Password, OMetadata.GetDefaultSpeed(CurrentAnimation))
 
@@ -240,8 +216,6 @@ Event OnUpdate()
 
 		CurrentFurniture.BlockActivation(true)
 	EndIf
-
-	OSANative.UpdateForScene(CurrentAnimation, Actors, RMHeights, Offsets)
 
 	if !AIRunning && UseAI
 		AIRunning = True
@@ -348,10 +322,6 @@ Function EndAnimation()
 			Actors[i].DispelSpell(actra)
 			Actors[i].DispelSpell(actro)
 		endif
-
-		If Offsets[i] != 0
-			RestoreOffset(Actors[i], Offsets[i])
-		EndIf
 
 		Actors[i].RemoveFromFaction(OStim.OStimExcitementFaction)
 		Actors[i].SetScale(1.0)
@@ -547,8 +517,6 @@ Function WarpToAnimation(String Animation)
 
 	OSANative.ChangeAnimation(Password, CurrentAnimation)
 	OSANative.UpdateSpeed(Password, CurrentSpeed as int)
-
-	OSANative.UpdateForScene(CurrentAnimation, Actors, RMHeights, Offsets)
 EndFunction
 
 

@@ -7,12 +7,14 @@
 		],
 		"strippingSlots":[
 			30,
+			31,
 			44,
 			55
 		]
 	},
 	"target":{
 		"stimulation":0.4,
+		"fullStrip":true,
 		"requirements":[
 			"testicles"
 		],

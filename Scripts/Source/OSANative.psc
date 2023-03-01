@@ -39,12 +39,6 @@ actor[] Function RemoveActorsWithGender(actor[] actors, int gender) Global Nativ
 
 form[] Function GetEquippedAmmo(actor act) Global Native
 
-Function UpdateForScene(string id, Actor[] actors, float[] rmheights, float[] offsets) Global Native
-
-Function UpdateExpression(string id, int position, Actor act) Global Native
-
-float Function PlayExpressionEvent(string id, int position, Actor act, string eventName) Global Native
-
 Function ScaleActorInner(Actor act, float scale, float scaleHeight) Global
 	bool IsFemale = act.GetActorBase().GetSex() == 1
 
@@ -187,15 +181,15 @@ form[] Function RemoveFormsBelowValue(form[] forms, int goldvalue) Global Native
 ; ███████║╚██████╗███████╗██║ ╚████║███████╗       ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗██║██║ ╚████║╚██████╔╝
 ; ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
-Function StartScene(int stageId, Actor[] actors) Global Native
+Function StartScene(int StageId, ObjectReference Furniture, Actor[] Actors) Global Native
 
 Function EndScene(int stageId) Global Native
 
 Function ChangeAnimation(int stageId, string animation) Global Native
 
-Function AddThirdActor(int stageId, Actor actor) Global Native
+Function AddActor(int stageId, Actor Act) Global Native
 
-Function RemoveThirdActor(int stageId) Global Native
+Function RemoveActor(int stageId) Global Native
 
 Function UpdateSpeed(int stageId, int speed) Global Native
 

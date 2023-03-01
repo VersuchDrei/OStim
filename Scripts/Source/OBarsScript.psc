@@ -157,7 +157,7 @@ Event OstimStart(String eventName, String strArg, Float numArg, Form sender)
 
 	While OStim.AnimationRunning()
 		While Orgasming
-			Utility.Wait(0.3)
+			Utility.Wait(0.2)
 		EndWhile
 
 		If (OStim.AutoHideBars && (OStim.GetTimeSinceLastPlayerInteraction() > 15.0)) ; fade out if needed
@@ -172,11 +172,9 @@ Event OstimStart(String eventName, String strArg, Float numArg, Form sender)
     		EndIf
     	EndIf
 
-    	
     	SetBarFullnessProper()
         
-
-		Utility.wait(1)
+		Utility.wait(0.1)
 	EndWhile
 
 

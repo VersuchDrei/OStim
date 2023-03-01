@@ -77,7 +77,7 @@ Bool function GetNPCDataBool(actor npc, string keys) Global
 EndFunction
 
 Bool Function IntArrayContainsValue(Int[] Arr, Int Val) Global
-	return Arr.Find(Val) != -1
+	return Arr.Find(Val) >= 0
 EndFunction
 
 Bool Function StringArrayContainsValue(String[] Arr, String Val) Global

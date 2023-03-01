@@ -8,3 +8,15 @@ ScriptName OData
 int Function GetUndressingSlotMask() Global Native
 
 Function SetUndressingSlotMask(int Mask) Global Native
+
+string[] Function GetEquipObjectPairs(int FormID, string Type) Global Native
+
+string[] Function ToEquipObjectNames(string[] Pairs) Global Native
+
+string Function GetEquipObjectName(int FormID, string Type) Global Native
+
+Function SetEquipObjectID(int FormID, string Type, string ID) Global Native
+
+Function ExportSettings() Global Native
+
+Function ImportSettings() Global Native

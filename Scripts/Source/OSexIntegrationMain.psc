@@ -70,8 +70,6 @@ Bool Property EnableActorSpeedControl Auto
 
 Bool Property ResetPosAfterSceneEnd Auto
 
-Bool Property AllowUnlimitedSpanking Auto
-
 Int Property SubLightPos Auto
 Int Property DomLightPos Auto
 Int Property SubLightBrightness Auto
@@ -97,25 +95,6 @@ Float SpeedUpSpeed
 
 Int Property CustomTimescale Auto
 
-GlobalVariable Property OStimMaleSexExcitementMult Auto
-float Property MaleSexExcitementMult
-	float Function Get()
-		Return OStimMaleSexExcitementMult.value
-	EndFunction
-	Function Set(float value)
-		OStimMaleSexExcitementMult.value = value
-	EndFunction
-EndProperty
-
-GlobalVariable Property OStimFemaleSexExcitementMult Auto
-float Property FemaleSexExcitementMult
-	float Function Get()
-		Return OStimFemaleSexExcitementMult.value
-	EndFunction
-	Function Set(float value)
-		OStimFemaleSexExcitementMult.value = value
-	EndFunction
-EndProperty
 Int Property KeyMap Auto
 
 int property FreecamKey auto 
@@ -129,13 +108,7 @@ Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
 
 Bool Property UseAIControl Auto
-Bool Property OnlyGayAnimsInGayScenes auto
 Bool Property PauseAI Auto
-
-Bool Property PlayerAlwaysSubStraight auto ;mcm
-Bool Property PlayerAlwaysSubGay Auto
-Bool Property PlayerAlwaysDomStraight Auto 
-Bool Property PlayerAlwaysDomGay auto
 
 Bool Property UseAINPConNPC Auto
 Bool Property UseAIPlayerAggressor Auto
@@ -181,6 +154,49 @@ Bool Property Installed auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; EXCITEMENT SETTINGS  ----------------------------------------------------------------------------
+
+GlobalVariable Property OStimMaleSexExcitementMult Auto
+float Property MaleSexExcitementMult
+	float Function Get()
+		Return OStimMaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimMaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFemaleSexExcitementMult Auto
+float Property FemaleSexExcitementMult
+	float Function Get()
+		Return OStimFemaleSexExcitementMult.value
+	EndFunction
+	Function Set(float value)
+		OStimFemaleSexExcitementMult.value = value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExcitementDecayRate Auto
+float Property ExcitementDecayRate
+	float Function Get()
+		Return OStimExcitementDecayRate.value
+	EndFunction
+	Function Set(float Value)
+		OStimExcitementDecayRate.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExcitementDecayGracePeriod Auto
+int Property ExcitementDecayGracePeriod
+	int Function Get()
+		Return OStimExcitementDecayGracePeriod.value as int
+	EndFunction
+	Function Set(int Value)
+		OStimExcitementDecayGracePeriod.value = Value
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; UNDRESSING SETTINGS  ----------------------------------------------------------------------------
@@ -302,6 +318,58 @@ bool Property AutoClimaxAnimations
 EndProperty
 
 ; -------------------------------------------------------------------------------------------------
+; GENDER ROLE SETTINGS  ---------------------------------------------------------------------------
+
+Bool Property PlayerAlwaysSubStraight auto ;mcm
+Bool Property PlayerAlwaysSubGay Auto
+Bool Property PlayerAlwaysDomStraight Auto 
+Bool Property PlayerAlwaysDomGay auto
+
+Bool Property OnlyGayAnimsInGayScenes auto
+
+GlobalVariable Property OStimEquipStrapOnIfNeeded Auto
+bool Property EquipStrapOnIfNeeded
+	bool Function Get()
+		Return OStimEquipStrapOnIfNeeded.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimEquipStrapOnIfNeeded.value = 1
+		Else
+			OStimEquipStrapOnIfNeeded.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUnequipStrapOnIfNotNeeded Auto
+bool Property UnequipStrapOnIfNotNeeded
+	bool Function Get()
+		Return OStimUnequipStrapOnIfNotNeeded.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUnequipStrapOnIfNotNeeded.value = 1
+		Else
+			OStimUnequipStrapOnIfNotNeeded.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimUnequipStrapOnIfInWay Auto
+bool Property UnequipStrapOnIfInWay
+	bool Function Get()
+		Return OStimUnequipStrapOnIfInWay.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUnequipStrapOnIfInWay.value = 1
+		Else
+			OStimUnequipStrapOnIfInWay.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+; -------------------------------------------------------------------------------------------------
 ; ALIGNMENT SETTINGS  -----------------------------------------------------------------------------
 
 GlobalVariable Property OStimDisableScaling Auto
@@ -416,6 +484,39 @@ Message Property OStimFurnitureSelectionMessage Auto
 GlobalVariable[] Property OStimFurnitureSelectionButtons Auto
 
 ; -------------------------------------------------------------------------------------------------
+; EXPRESSION SETTINGS  ----------------------------------------------------------------------------
+
+GlobalVariable Property OStimExpressionDurationMin Auto
+int Property ExpressionDurationMin
+	int Function Get()
+		Return OStimExpressionDurationMin.value As int
+	EndFunction
+	Function Set(int Value)
+		If ExpressionDurationMax < Value
+			OStimExpressionDurationMin.value = OStimExpressionDurationMax.value
+			OStimExpressionDurationMax.value = Value
+		Else
+			OStimExpressionDurationMin.value = Value
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimExpressionDurationMax Auto
+int Property ExpressionDurationMax
+	int Function Get()
+		Return OStimExpressionDurationMax.value As int
+	EndFunction
+	Function Set(int Value)
+		If ExpressionDurationMin > Value
+			OStimExpressionDurationMax.value = OStimExpressionDurationMin.value
+			OStimExpressionDurationMin.value = Value
+		Else
+			OStimExpressionDurationMax.value = Value
+		EndIf
+	EndFunction
+EndProperty
+
+; -------------------------------------------------------------------------------------------------
 ; SCRIPTWIDE VARIABLES ----------------------------------------------------------------------------
 
 
@@ -424,8 +525,6 @@ Actor SubActor
 Actor ThirdActor
 
 Actor[] Actors
-float[] Offsets
-float[] RMHeights
 
 String diasa
 
@@ -442,7 +541,6 @@ String CurrentSceneID
 
 Bool AnimSpeedAtMax
 Int SpankCount
-Int SpankMax
 
 _oOmni OSAOmni
 _oControl OControl
@@ -562,31 +660,31 @@ EndEvent
 */;
 Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zUndressSub = False, Bool zAnimateUndress = False, String zStartingAnimation = "", Actor zThirdActor = None, ObjectReference Bed = None, Bool Aggressive = False, Actor AggressingActor = None)
 	if !installed 
-		debug.Notification("OStim not ready or installation failed")
+		debug.Notification("OStim not ready or installation failed.")
 		return false
 	endif
 
 	; If Player isn't involved, it's an NPC scene, so start it on a subthread instead
 	If PlayerRef != Dom && PlayerRef != Sub && PlayerRef != zThirdActor
 		if !GetUnusedSubthread().StartSubthreadScene(Dom, Sub, zThirdActor = zThirdActor, startingAnimation = zStartingAnimation, furnitureObj = Bed, withAI = true, isAggressive = Aggressive, aggressingActor = AggressingActor)
-			Debug.Notification("OStim: Thread overload, please report this on discord")
-			return False
+			Debug.Notification("OStim: Thread overload, please report this on Discord.")
+			return false
 		endif 
-		return True
+		return true
 	EndIf
 
-	If (SceneRunning)
+	If SceneRunning
 		Debug.Notification("OSA scene already running")
-		Return False
+		Return false
 	EndIf
 
-	If IsActorActive(dom) || (sub && IsActorActive(sub))
-		Debug.Notification("One of the actors is already in a OSA scene")
-		Return False
+	If IsActorActive(Dom) || Sub && IsActorActive(Sub) || ThirdActor && IsActorActive(ThirdActor)
+		Debug.Notification("At least one of the actors is already in an OSA scene.")
+		Return false
 	EndIf
 	If !dom.Is3DLoaded()
-		console("Dom actor is not loaded")
-		return False
+		console("Dom actor is not loaded.")
+		return false
 	EndIf
 
 	; Default OSex gender order
@@ -602,7 +700,7 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	UndressSub = zUndressSub
 	StartingAnimation = zStartingAnimation
 	ThirdActor = zThirdActor
-	PauseAI = False
+	PauseAI = false
 
 	If zThirdActor
 		If AppearsFemale(ThirdActor) && !AppearsFemale(SubActor)
@@ -643,41 +741,23 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 		Actors[2] = ThirdActor
-
-		Offsets = new float[3]
-		RMHeights = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
-
-		Offsets = new float[2]
-		RMHeights = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
+	EndIf
 
-		Offsets = new float[1]
-		RMHeights = new float[1]
+	If !OSA.CheckActors(Actors)
+		Debug.Notification("At least one of the actors is invalid.")
+		Return false
 	EndIf
 
 	int i = Actors.Length
 	While i
 		i -= 1
-
-		bool isFemale = AppearsFemale(Actors[i])
-
-		If nioverride.HasNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")
-			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, isFemale, "NPC", "internal")[2]
-		Else
-			Offsets[i] = 0
-		EndIf
-
-		If nioverride.HasNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-			RMHeights[i] = nioverride.GetNodeTransformScale(Actors[i], False, isFemale, "NPC", "RSMPlugin")
-		Else
-			RMHeights[i] = 1
-		EndIf
 
 		Actors[i].AddToFaction(OStimExcitementFaction)
 	EndWhile
@@ -782,7 +862,6 @@ Event OnUpdate() ;OStim main logic loop
 	DomTimesOrgasm = 0
 	ThirdTimesOrgasm = 0
 	MostRecentOrgasmedActor = None
-	SpankMax = osanative.RandomInt(1, 6)
 	FirstAnimate = true
 	MostRecentOSexInteractionTime = Utility.GetCurrentRealTime()
 
@@ -893,19 +972,14 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	OSANative.StartScene(Password, Actors)
+	OSANative.StartScene(Password, CurrentFurniture, Actors)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
+	RegisterForModEvent("0SAO" + Password + "_ActraJoin", "ActraJoin")
+	RegisterForModEvent("0SAO" + Password + "_ActraRemove", "ActraRemove")
 
-	
-	int AEvent = ModEvent.Create(EventName)
-	Modevent.PushString(AEvent, EventName)
-	ModEvent.PushString(AEvent, OMetadata.GetAnimationId(StartingAnimation, 0))
-	ModEvent.PushFloat(AEvent, 0.0)
-	ModEvent.PushForm(AEvent, self)
-	ModEvent.Send(AEvent)
-
+	SendModEvent(EventName, StartingAnimation, OMetadata.GetDefaultSpeed(StartingAnimation))
 
 	StartTime = Utility.GetCurrentRealTime()
 
@@ -956,7 +1030,6 @@ Event OnUpdate() ;OStim main logic loop
 		FadeFromBlack()
 	EndIf
 
-	Rescale()
 	If CurrentFurniture && ResetClutter
 		OFurniture.ResetClutter(CurrentFurniture, ResetClutterRadius * 100)
 	EndIf
@@ -1002,6 +1075,14 @@ Event OnUpdate() ;OStim main logic loop
 			EndIf
 		EndIf
 
+		i = 3
+		While i < Actors.Length
+			If GetActorExcitement(Actors[i])
+				Orgasm(Actors[i])
+			EndIf
+			i += 1
+		EndWhile
+
 		LoopTimeTotal = Utility.GetCurrentRealTime() - LoopStartTime
 	EndWhile
 
@@ -1011,10 +1092,6 @@ Event OnUpdate() ;OStim main logic loop
 	i = Actors.Length
 	While i
 		i -= 1
-
-		If Offsets[i] != 0
-			OUtils.RestoreOffset(Actors[i], Offsets[i])
-		EndIf
 
 		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
@@ -1667,16 +1744,6 @@ Int Function GetSpankCount() ;
 	Return SpankCount
 EndFunction
 
-Int Function GetMaxSpanksAllowed()  
-	{maximum number of spankings before it deals damage}
-	Return SpankMax
-EndFunction
-
-Function SetSpankMax(Int Max) 
-	{maximum number of spankings before it deals damage}
-	SpankMax = Max
-EndFunction
-
 Function SetSpankCount(Int Count) 
 	{num of spankings so far this scene}
 	SpankCount = Count
@@ -1990,112 +2057,72 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 	endif
 endEvent
 
+Event ActraJoin(string eventName, string actorID, float arg, Form ActraInc)
+	Actor newActor = ActraInc as Actor
+	OSANative.AddActor(Password, newActor)
+	Actors = PapyrusUtil.PushActor(Actors, newActor)
+	newActor.AddToFaction(OStimExcitementFaction)
+
+	If Actors.Length == 3
+		ThirdActor = newActor
+		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
+		RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
+		SendModEvent("ostim_thirdactor_join")
+	EndIf
+
+	newActor.SendModEvent("ostim_actor_join", "", Actors.Length - 1)
+
+	Console("actor joined")
+EndEvent
+
+Event ActraRemove(string eventName, string actraIX, float arg, Form actraInc)
+	OSANative.RemoveActor(Password)
+	int newSize = Actors.Length - 1
+	Actor oldActor = Actors[newSize]
+	oldActor.RemoveFromFaction(OStimExcitementFaction)
+	Actors = PapyrusUtil.ResizeActorArray(Actors, newSize)
+
+	If Actors.Length == 2
+		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
+		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
+		ThirdActor = none
+		SendModEvent("ostim_thirdactor_leave")
+	EndIf
+
+	oldActor.SendModEvent("ostim_actor_leave", "", Actors.Length)
+
+	Console("actor left")
+EndEvent
+
 Function OnAnimationChange(string newScene, int newSpeed)
 	
 	Console("Changing animation...")
 
 	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 	
-	bool sceneChange = false 
-
-	if newScene != CurrentSceneID
-		sceneChange = true 
-	endif 
+	bool sceneChange = newScene != CurrentSceneID
 	CurrentSceneID = newScene
 		
 	OSANative.ChangeAnimation(Password, CurrentSceneID)
+
+	CurrentSpeed = newSpeed
+	OSANative.UpdateSpeed(Password, CurrentSpeed)
 
 	If OMetadata.GetMaxSpeed(CurrentSceneID) == 0 && !OMetadata.IsTransition(CurrentSceneID)
 		LastHubSceneID = CurrentSceneID
 		Console("On new hub animation")
 	EndIf
 
-	CurrentSpeed = newSpeed
-	OSANative.UpdateSpeed(Password, CurrentSpeed)
-
 	CurrAnimClass = OSANative.GetAnimClass(CurrentSceneID)
 
-	Int CorrectActorCount = OMetadata.GetActorCount(CurrentSceneID)
-
-	If (!ThirdActor && (CorrectActorCount == 3)) ; no third actor, but there should be
-		Console("Third actor has joined scene ")
-
-		Actor[] NearbyActors = MiscUtil.ScanCellNPCs(Actors[0], Radius = 64.0) ;epic hackjob time
-		int max = OControl.ActraInRange.Length
-		int i = 0
-
-		While (i < max)
-			Actor Act = OControl.ActraInRange[i]
-
-			If (Act) && !IsActorInvolved(Act) && (IsActorActive(Act))
-				ThirdActor = Act
-				OSANative.AddThirdActor(Password, ThirdActor)
-				i = max
-			Endif
-			i += 1
-		EndWhile
-
-		If ThirdActor
-			Console("Third actor: + " + ThirdActor.GetDisplayName() + " has joined the scene")
-
-			ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
-			RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
-
-			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
-
-			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
-			RMHeights = PapyrusUtil.PushFloat(RMHeights, 1)
-			bool isFemale = AppearsFemale(Actors[2])
-			
-			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
-				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
-			EndIf
-
-			If nioverride.HasNodeTransformScale(Actors[2], False, isFemale, "NPC", "RSMPlugin")
-				RMHeights[2] = nioverride.GetNodeTransformScale(Actors[2], false, isFemale, "NPC", "RSMPlugin")
-			EndIf
-
-			ThirdActor.AddToFaction(OStimExcitementFaction)
-
-			SendModEvent("ostim_thirdactor_join")
-		Else
-			Console("Warning - Third Actor not found")
-		EndIf
-	ElseIf (ThirdActor && (CorrectActorCount == 2)) ; third actor, but there should not be.
-		Console("Third actor has left the scene")
-
-		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
-		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
-
-		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
-
-		If Offsets[2] != 0
-			OUtils.RestoreOffset(Actors[2], Offsets[2])
-		EndIf
-
-		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
-
-		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
-		RMHeights = PapyrusUtil.ResizeFloatArray(RMHeights, 2)
-
-		If !DisableScaling
-			ThirdActor.SetScale(1.0)
-		EndIf
-
-		ThirdActor = none
-		OSANative.RemoveThirdActor(Password)
-
-		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
-	EndIf
+	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 
 	if sceneChange
-		Rescale()
-		
 		SendModEvent("ostim_scenechanged")
 
 		SendModEvent("ostim_scenechanged_" + CurrAnimClass) ;register to scenes by class
 		SendModEvent("ostim_scenechanged_" + CurrentSceneID) ;register to scenes by scene
-	endif 
+	endif
 
 	Console("Current scene ID: " + CurrentSceneID)
 
@@ -2103,16 +2130,7 @@ Function OnAnimationChange(string newScene, int newSpeed)
 EndFunction
 
 Function OnSpank()
-	If (AllowUnlimitedSpanking)
-		SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)		
-	Else
-		If (SpankCount < SpankMax)
-			SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)
-		Else
-
-			SubActor.DamageActorValue("health", 5.0)
-		EndIf
-	EndIf
+	SetActorExcitement(SubActor, GetActorExcitement(SubActor) + 5)	
 
 	SpankCount += 1
 	SendModEvent("ostim_spank")
@@ -2143,10 +2161,6 @@ Function RestoreScales()
 		i -= 1
 		Actors[i].SetScale(1.0)
 	EndWhile
-EndFunction
-
-Function Rescale()
-	OSANative.UpdateForScene(CurrentSceneID, Actors, RMHeights, Offsets)
 EndFunction
 
 ;
@@ -2221,7 +2235,7 @@ Function Climax(Actor Act)
 	EndIf
 
 	If (Act == DomActor)
-		SetCurrentAnimationSpeed(1)
+		SetCurrentAnimationSpeed(OMetadata.GetDefaultSpeed(CurrentSceneID))
 	EndIf
 
 	While StallOrgasm
@@ -2312,7 +2326,7 @@ Function UnMuteFaceData(Actor Act)
 
 	int i = Actors.Find(Act)
 	If i >= 0
-		OSANative.UpdateExpression(CurrentSceneID, i, Act)
+		OActor.ClearExpression(Act)
 	EndIf
 EndFunction
 
@@ -2517,10 +2531,10 @@ Function SendExpressionEvent(Actor Act, string EventName)
 		Return
 	EndIf
 
-	float Duration = OSANative.PlayExpressionEvent(CurrentSceneID, Position, Act, EventName)
+	float Duration = OActor.PlayExpression(Act, EventName)
 	If Duration != -1
 		Utility.Wait(Duration)
-		OSANative.UpdateExpression(CurrentSceneID, Position, Act)
+		OActor.ClearExpression(Act)
 	EndIf
 EndFunction
 
@@ -2677,7 +2691,6 @@ Function SetDefaultSettings()
 	EnableThirdBar = True
 	HideBarsInNPCScenes = True
 	EnableActorSpeedControl = True
-	AllowUnlimitedSpanking = False
 	ResetPosAfterSceneEnd = true 
 
 	PlayerAlwaysSubStraight = false
@@ -2708,6 +2721,8 @@ Function SetDefaultSettings()
 
 	MaleSexExcitementMult = 1.0
 	FemaleSexExcitementMult = 1.0
+	ExcitementDecayRate = 0.5
+	ExcitementDecayGracePeriod = 5000
 
 	SoundFormNumberWhitelist = new int[1]
 	SoundFormNumberWhitelist[0] = 9999 ;initializing to avoid array-related bugs
@@ -2722,6 +2737,9 @@ UseFreeCam
 	FurnitureSearchDistance = 15
 	ResetClutter = True
 	ResetClutterRadius = 5
+
+	ExpressionDurationMin = 1000
+	ExpressionDurationMAx = 3000
 
 	DisableStimulationCalculation = false
 	SlowMoOnOrgasm = True
@@ -3321,10 +3339,6 @@ Function OnLoadGame()
 
 EndFunction
 
-Function UnsetOffset(int Index)
-	Offsets[Index] = 0
-EndFunction
-
 
 ; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
 ; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
@@ -3382,6 +3396,14 @@ bool Property UseBed
 	EndFunction
 	Function Set(bool Value)
 		UseFurniture = Value
+	EndFunction
+EndProperty
+
+bool Property AllowUnlimitedSpanking
+	bool Function Get()
+		Return true
+	EndFunction
+	Function Set(bool Value)
 	EndFunction
 EndProperty
 
@@ -3484,4 +3506,15 @@ Bool Function IsNPCScene()
 	; NPC scenes no longer run on main thread ever. They will always run in subthreads
 	; Some addons might still use this function, so we'll keep it here for now
 	return False
+EndFunction
+
+Function Rescale()
+	; C++ handles scaling
+EndFunction
+
+Int Function GetMaxSpanksAllowed()  
+	Return 0
+EndFunction
+
+Function SetSpankMax(Int Max) 
 EndFunction

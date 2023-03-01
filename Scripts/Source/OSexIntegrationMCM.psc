@@ -2,8 +2,6 @@ ScriptName OsexIntegrationMCM Extends SKI_ConfigBase
 
 ; sex settings
 Int SetActorSpeedControl
-Int SetMaleSexExcitementMult
-Int SetFemaleSexExcitementMult
 Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
@@ -12,7 +10,6 @@ Int SetScaling
 Int SetSchlongBending
 int SetUseIntroScenes
 int SetResetPosition
-int SetOnlyGayAnimsInGayScenes
 
 ; clothes settings
 Int SetAlwaysUndressAtStart
@@ -25,10 +22,6 @@ int[] SlotSets
 int UndressingSlotMask
 
 ; actor role settings
-Int setPlayerAlwaysDomStraight
-Int setPlayerAlwaysSubStraight
-Int setPlayerAlwaysDomGay
-Int setPlayerAlwaysSubGay
 
 ; bar settings
 Int SetSubBar
@@ -163,13 +156,6 @@ int GVORColorblind = 0x73D0
 int GVORStationaryMode = 0x73D1
 int GVORNakadashi = 0x73D4
 
-string ONights = "ONights.esp"
-int GVONFreqMult = 0x000D65
-int GVONStopWhenFound = 0x000D64
-
-int SetONStopWhenFound
-int SetONFreqMult
-
 string OCrime = "ocrime.esp"
 int SetOCBounty
 string SUOCBounty = "ocrime.bounty"
@@ -227,13 +213,26 @@ Function Init()
 
 	playerref = game.getplayer()
 
-	string[] pagearr = PapyrusUtil.StringArray(0)
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_configuration")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_undress")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_addons")
-	pagearr = PapyrusUtil.PushString(pagearr, "$ostim_page_about")
+	SetupPages()
+EndFunction
 
-	Pages = pagearr
+int Function GetVersion()
+	Return 3
+EndFunction
+
+Event OnVersionUpdate(int version)
+	SetupPages()
+EndEvent
+
+Function SetupPages()
+	Pages = new string[7]
+	Pages[0] = "$ostim_page_configuration"
+	Pages[1] = "$ostim_page_excitement"
+	Pages[2] = "$ostim_page_gender_roles"
+	Pages[3] = "$ostim_page_undress"
+	Pages[4] = "$ostim_page_expression"
+	Pages[5] = "$ostim_page_addons"
+	Pages[6] = "$ostim_page_about"
 EndFunction
 
 Event OnConfigRegister()
@@ -258,7 +257,13 @@ Event OnPageReset(String Page)
 
 	If (Page == "")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
-	ElseIf (Page == "$ostim_page_configuration")
+		Return
+	Else
+		UnloadCustomContent()
+		SetInfoText(" ")
+	EndIf
+
+	If (Page == "$ostim_page_configuration")
 		If (!Main)
 			Init()
 			If (!Main.EndOnDomOrgasm)
@@ -267,11 +272,10 @@ Event OnPageReset(String Page)
 			Debug.MessageBox("$ostim_message_main_not_initialized")
 		EndIf
 
-		UnloadCustomContent()
 		SetInfoText(" ")
 		Main.playTickBig()
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetThanks = AddTextOption("$ostim_thanks", "")
+		SetThanks = AddTextOption("$ostim_configuration", "")
 		SetCursorPosition(1)
 		AddTextOption("$ostim_config_text", "")
 		SetCursorPosition(2)
@@ -279,8 +283,6 @@ Event OnPageReset(String Page)
 		;=============================================================================================
 		AddColoredHeader("$ostim_header_sex_scenes")
 		SetActorSpeedControl = AddToggleOption("$ostim_speed_control", Main.EnableActorSpeedControl)
-		SetMaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_male", Main.MaleSexExcitementMult, "{2} x")
-		SetFemaleSexExcitementMult = AddSliderOption("$ostim_excitement_mult_female", Main.FemaleSexExcitementMult, "{2} x")
 		SetClipinglessFirstPerson = AddToggleOption("$ostim_clippingless", Main.EnableImprovedCamSupport)
 		SetCustomTimescale = AddSliderOption("$ostim_timescale", Main.CustomTimescale, "{0}")
 		SetUseFades = AddToggleOption("$ostim_use_fades", Main.UseFades)
@@ -292,14 +294,6 @@ Event OnPageReset(String Page)
 		SetSchlongBending = AddToggleOption("$ostim_schlong_bending", Main.DisableSchlongBending)
 		SetUseIntroScenes = AddToggleOption("$ostim_use_intro_scenes", Main.UseIntroScenes)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
-		AddEmptyOption()
-
-		AddColoredHeader("$ostim_header_player_roles")
-		SetOnlyGayAnimsInGayScenes = AddToggleOption("$ostim_force_gay_anims", Main.OnlyGayAnimsInGayScenes)
-		setPlayerAlwaysDomStraight = AddToggleOption("$ostim_always_dom_straight", Main.PlayerAlwaysDomStraight)
-		setPlayerAlwaysSubStraight = AddToggleOption("$ostim_always_sub_straight", Main.PlayerAlwaysSubStraight)
-		setPlayerAlwaysDomGay = AddToggleOption("$ostim_always_dom_gay", Main.PlayerAlwaysDomGay)
-		setPlayerAlwaysSubGay = AddToggleOption("$ostim_always_sub_gay", Main.PlayerAlwaysSubGay)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_orgasms")
@@ -410,14 +404,7 @@ Event OnPageReset(String Page)
 			SetORLeft = AddKeyMapOption("$ostim_addon_or_left_key", GetExternalInt(oromance, GVORLeft))
 			SetORRight = AddKeyMapOption("$ostim_addon_or_right_key", GetExternalInt(oromance, GVORRight))
 			SetORNakadashi = AddToggleOption("$ostim_addon_or_nakadashi", GetExternalBool(ORomance, GVORNakadashi))
-		endif 
-
-		if main.IsModLoaded(ONights)
-			AddColoredHeader("ONights")
-			SetONStopWhenFound = AddToggleOption("$ostim_addon_on_stop", GetExternalBool(ONights, GVONStopWhenFound))
-			SetONFreqMult = AddSliderOption("$ostim_addon_on_freq_mult", GetExternalFloat(ONights, GVONFreqMult), "{2} x")
-			
-		endif 
+		endif
 
 		if main.IsModLoaded(OSearch)
 			AddColoredHeader("OSearch")
@@ -450,7 +437,10 @@ Event OnPageReset(String Page)
 			SetOANudityBroadcast = AddToggleOption("$ostim_addon_oa_nudity_bc", StorageUtil.GetIntValue(none, SUOANudityBroadcast))
 
 		endif
-
+	ElseIf Page == "$ostim_page_excitement"
+		DrawExcitementPage()
+	ElseIf Page == "$ostim_page_gender_roles"
+		DrawGenderRolesPage()
 	ElseIf (Page == "$ostim_page_undress")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
 		Main.PlayTickBig()
@@ -476,25 +466,32 @@ Event OnPageReset(String Page)
 		AddColoredHeader("")
 
 		DrawSlotPage()
+
+	ElseIf Page == "$ostim_page_expression"
+		DrawExpressionPage()
 	ElseIf (Page == "$ostim_page_about")
 		UnloadCustomContent()
 		SetInfoText(" ")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 
-		AddTextOption("OStim ", "-")
+		AddTextOption("OStimNG ", "-")
 		
 		AddTextOption("", "")
 		AddColoredHeader("$ostim_authors")
+		AddTextOption("OStimNG ", "$ostim_by{Aietos, Kannonfodder}")
+		AddTextOption("- ", "$ostim_and{VersuchDrei}")
 		AddTextOption("OStim ", "$ostim_by{Sairion}")
-		AddTextOption("OSA + OSex", "$ostim_by{CE0}")
+		AddTextOption("OSA ", "$ostim_by{CE0}")
+		AddTextOption("OpenSex ", "$ostim_by{Ace Animations}")
 
 		SetCursorPosition(1)
-		AddTextOption("OSA Overhaul & API", "")
+		AddTextOption("Powered By Sswaye's Reshade", "")
 
 		AddTextOption("", "")
 		AddColoredHeader("$ostim_links")
-		AddTextOption("discord.gg/RECvhVaRcU", "")
+		AddTextOption("discord.gg/ostim", "")
+		AddTextOption("https://github.com/VersuchDrei/OStim", "")
 
 		Main.PlayDing()
 	EndIf
@@ -564,9 +561,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetORStationary
 			SetExternalBool(oromance, GVORStationaryMode, !GetExternalBool(oromance, GVORStationaryMode))
 			SetToggleOptionValue(SetORStationary, GetExternalBool(oromance, GVORStationaryMode))
-		elseif option == SetONStopWhenFound
-			SetExternalBool(ONights, GVONStopWhenFound, !GetExternalBool(ONights, GVONStopWhenFound))
-			SetToggleOptionValue(SetONStopWhenFound, GetExternalBool(ONights, GVONStopWhenFound))
 		elseif option == SetOSAllowSex
 			StorageUtil.SetIntValue(none, SUOSAllowSex, (!(StorageUtil.GetIntValue(none, SUOSAllowSex) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowSex, StorageUtil.GetIntValue(none, SUOSAllowSex))
@@ -703,21 +697,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetOnlyLightInDark)
 		Main.LowLightLevelLightsOnly = !Main.LowLightLevelLightsOnly
 		SetToggleOptionValue(Option, Main.LowLightLevelLightsOnly)
-	ElseIf (Option == SetPlayerAlwaysSubStraight)
-		Main.PlayerAlwaysSubStraight = !Main.PlayerAlwaysSubStraight
-		SetToggleOptionValue(Option, Main.PlayerAlwaysSubStraight)
-	ElseIf (Option == SetPlayerAlwaysSubGay)
-		Main.PlayerAlwaysSubGay = !Main.PlayerAlwaysSubGay
-		SetToggleOptionValue(Option, Main.PlayerAlwaysSubGay)
-	ElseIf (Option == SetPlayerAlwaysDomStraight)
-		Main.PlayerAlwaysDomStraight = !Main.PlayerAlwaysDomStraight
-		SetToggleOptionValue(Option, Main.PlayerAlwaysDomStraight)
-	ElseIf (Option == SetPlayerAlwaysDomGay)
-		Main.PlayerAlwaysDomGay = !Main.PlayerAlwaysDomGay
-		SetToggleOptionValue(Option, Main.PlayerAlwaysDomGay)
-	ElseIf (Option == SetOnlyGayAnimsInGayScenes)
-		Main.OnlyGayAnimsInGayScenes = !Main.OnlyGayAnimsInGayScenes
-		SetToggleOptionValue(Option, Main.OnlyGayAnimsInGayScenes)
 	ElseIf (Option == ExportSettings)
 		If ShowMessage("$ostim_message_export_confirm", true)
 			ExportSettings()
@@ -776,14 +755,10 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_or_right_key")
 		elseif (option == SetORNakadashi)
 			SetInfoText("$ostim_tooltip_or_nakadashi")
-		ElseIf (Option == SetONFreqMult)
-			SetInfoText("$ostim_tooltip_on_freq_mult")
 		ElseIf (Option == SetOCBounty)
 			SetInfoText("$ostim_tooltip_oc_bounty")
 		ElseIf (Option == SetOPFreq)
 			SetInfoText("$ostim_tooltip_op_freq")
-		Elseif (Option == SetONStopWhenFound)
-			SetInfoText("$ostim_tooltip_on_stop")
 		Elseif (Option == SetOARequireLowArousalBeforeEnd)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
@@ -900,10 +875,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_control_toggle_key")
 	ElseIf (Option == SetOnlyLightInDark)
 		SetInfoText("$ostim_tooltip_dark_light")
-	ElseIf (Option == SetMaleSexExcitementMult)
-		SetInfoText("$ostim_tooltip_excitement_mult_male")
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		SetInfoText("$ostim_tooltip_excitement_mult_female")
 	ElseIf (Option == SetKeymap)
 		SetInfoText("$ostim_tooltip_main_key")
 	ElseIf (Option == SetKeyUp)
@@ -918,16 +889,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_pullout_key")
 	ElseIf (Option == SetThanks)
 		SetInfoText("$ostim_tooltip_thanks")
-	ElseIf (Option == SetPlayerAlwaysSubStraight)
-		SetInfoText("$ostim_tooltip_always_sub_straight")
-	ElseIf (Option == SetPlayerAlwaysSubGay)
-		SetInfoText("$ostim_tooltip_always_sub_gay")
-	ElseIf (Option == SetPlayerAlwaysDomStraight)
-		SetInfoText("$ostim_tooltip_always_dom_straight")
-	ElseIf (Option == SetPlayerAlwaysDomGay)
-		SetInfoText("$ostim_tooltip_always_dom_gay")
-	ElseIf (Option == SetOnlyGayAnimsInGayScenes)
-		SetInfoText("$ostim_tooltip_force_gay_anims")
 	ElseIf (Option == ExportSettings)
 		SetInfoText("$ostim_tooltip_export")
 	ElseIf (Option == ImportSettings)
@@ -999,17 +960,7 @@ Event OnOptionSliderOpen(Int Option)
 		Return
 	EndIf
 
-	If (Option == SetMaleSexExcitementMult)
-		SetSliderDialogStartValue(Main.MaleSexExcitementMult)
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 3.0)
-		SetSliderDialogInterval(0.1)
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		SetSliderDialogStartValue(Main.FemaleSexExcitementMult)
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 3.0)
-		SetSliderDialogInterval(0.1)
-	ElseIf (Option == SetFurnitureSearchDistance)
+	If (Option == SetFurnitureSearchDistance)
 		SetSliderDialogStartValue(Main.FurnitureSearchDistance)
 		SetSliderDialogDefaultValue(15.0)
 		SetSliderDialogRange(1, 30)
@@ -1054,11 +1005,6 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(0.0)
 		SetSliderDialogRange(-100, 150)
 		SetSliderDialogInterval(1)
-	elseif (option == SetONFreqMult)
-		SetSliderDialogStartValue(GetExternalFloat(ONights, GVONFreqMult))
-		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.1, 5.0)
-		SetSliderDialogInterval(0.1)
 	elseif (option == SetOCBounty)
 		SetSliderDialogStartValue(StorageUtil.GetIntValue(none, SUOCBounty))
 		SetSliderDialogDefaultValue(200)
@@ -1084,18 +1030,9 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 		Return
 	EndIf
 
-	If (Option == SetMaleSexExcitementMult)
-		Main.MaleSexExcitementMult = Value
-		SetSliderOptionValue(SetMaleSexExcitementMult, Value, "{2} x")
-	ElseIf (Option == SetFemaleSexExcitementMult)
-		Main.FemaleSexExcitementMult = Value
-		SetSliderOptionValue(SetFemaleSexExcitementMult, Value, "{2} x")
-	Elseif (option == SetORDifficulty)
+	if (option == SetORDifficulty)
 		SetExternalInt(oromance, GVORDifficulty, value as int)
 		SetSliderOptionValue(SetORDifficulty, Value as int, "{0}")
-	Elseif (option == SetONFreqMult)
-		SetExternalFloat(ONights, GVONFreqMult, value)
-		SetSliderOptionValue(SetONFreqMult, Value, "{2} x")
 	Elseif (option == SetOCBounty)
 		StorageUtil.SetIntValue(none, SUOCBounty, value as int)
 		SetSliderOptionValue(SetOCBounty, Value, "{0} Gold")
@@ -1266,6 +1203,8 @@ Function ExportSettings()
 	
 	ShowMessage("$ostim_message_export", false)
 	
+	osexintegrationmain.Console("Saving Ostim settings.")
+
 	; Sex settings export.
 	JMap.SetInt(OstimSettingsFile, "SetEndOnOrgasm", Main.EndOnDomOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetEndOnSubOrgasm", Main.EndOnSubOrgasm as Int)
@@ -1334,6 +1273,10 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetResetClutterRadius", Main.ResetClutterRadius)
 	JMap.SetInt(OstimSettingsFile, "SetBedRealignment", Main.BedRealignment as Int)
 
+	; Expressions
+	JMap.SetInt(OstimSettingsFile, "SetExpressionDurationMin", Main.ExpressionDurationMin)
+	JMap.SetInt(OstimSettingsFile, "SetExpressionDurationMax", Main.ExpressionDurationMax)
+
 	; Ai/Control settings export.
 	JMap.SetInt(OstimSettingsFile, "SetAIControl", Main.UseAIControl as Int)
 	JMap.SetInt(OstimSettingsFile, "SetForceAIIfAttacking", Main.UseAIPlayerAggressor as Int)
@@ -1382,15 +1325,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "savedORomance", 0)
 	endif
 
-	if main.IsModLoaded(ONights)
-		osexintegrationmain.Console("Saving Onights settings.")
-		JMap.setInt(OstimSettingsFile, "savedOnights", 1)
-		JMap.setInt(OstimSettingsFile, "SetONStopWhenFound", GetExternalBool(ONights, GVONStopWhenFound) as int)
-		JMap.setFlt(OstimSettingsFile, "SetONFreqMult", GetExternalFloat(ONights, GVONFreqMult))
-	Else
-		JMap.setInt(OstimSettingsFile, "savedOnights settings.", 0)
-	endif
-
 	if main.IsModLoaded(OSearch)
 		osexintegrationmain.Console("Saving OSearch settings.")
 		JMap.setInt(OstimSettingsFile, "savedOSearch", 1)
@@ -1423,16 +1357,20 @@ Function ExportSettings()
 
 	; Save to file.
 	JMap.SetInt(OstimSettingsFile, "OStimAPIVersion", outils.getostim().getapiversion())
-	osexintegrationmain.Console("Saving Ostim settings.")
+	osexintegrationmain.Console("Saved Ostim settings.")
 	Jvalue.WriteToFile(OstimSettingsFile, JContainers.UserDirectory() + "OstimMCMSettings.json")
 	
+	OData.ExportSettings()
+
 	; Force page reset to show updated changes.
 	ForcePageReset()
 EndFunction
 
 Function ImportSettings(bool default = false)
+	osexintegrationmain.Console("Loading Ostim settings.")
+
 	; Import from file.
-		int OstimSettingsFile
+	int OstimSettingsFile
 	if !default
 		int OstimSettingsFileAlt
 
@@ -1547,6 +1485,10 @@ Function ImportSettings(bool default = false)
 	Main.ResetClutterRadius = JMap.GetInt(OstimSettingsFile, "SetResetClutterRadius", 5)
 	Main.BedRealignment = JMap.GetInt(OstimSettingsFile, "SetBedRealignment")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
+
+	; Expressions
+	Main.ExpressionDurationMin = JMap.GetInt(OstimSettingsFile, "SetExpressionDurationMin", 1000)
+	Main.ExpressionDurationMin = JMap.GetInt(OstimSettingsFile, "SetExpressionDurationMin", 3000)
 	
 	;Orgasm settings
 	Main.SlowMoOnOrgasm = JMap.GetInt(OstimSettingsFile, "SetSlowMoOrgasms", 1)
@@ -1588,12 +1530,6 @@ Function ImportSettings(bool default = false)
 			SetExternalBool(ORomance, GVORNakadashi, JMap.getInt(OstimSettingsFile, "SetORNakadashi") as bool)
 		endif
 
-		if main.IsModLoaded(ONights) && JMap.getInt(OstimSettingsFile, "savedONights") == 1
-			osexintegrationmain.Console("Loading ONights settings.")
-			SetExternalBool(ONights, GVONStopWhenFound, JMap.getInt(OstimSettingsFile, "SetONStopWhenFound") as bool)
-			SetExternalFloat(ONights, GVONFreqMult, JMap.getFlt(OstimSettingsFile, "SetONFreqMult"))
-		endif
-
 		if main.IsModLoaded(OSearch) && JMap.getInt(OstimSettingsFile, "savedOSearch") == 1
 			osexintegrationmain.Console("Loading OSearch settings.")
 			 StorageUtil.SetIntValue(none, SUOSKey, JMap.getInt(OstimSettingsFile, "SetOSKey"))
@@ -1616,7 +1552,9 @@ Function ImportSettings(bool default = false)
 		endif
 	endif
 
-	osexintegrationmain.Console("Loading Ostim settings.")
+	OData.ImportSettings()
+
+	osexintegrationmain.Console("Loaded Ostim settings.")
 	; Force page reset to show updated changes.
 	ForcePageReset()
 EndFunction
@@ -1645,4 +1583,429 @@ Function resetOsaKeysToDefaults()
 
 	OSAControl.osaEndKey = osaEndKeyDefault
 	SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
+EndFunction
+
+
+; ███████╗██╗  ██╗ ██████╗██╗████████╗███████╗███╗   ███╗███████╗███╗   ██╗████████╗
+; ██╔════╝╚██╗██╔╝██╔════╝██║╚══██╔══╝██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+; █████╗   ╚███╔╝ ██║     ██║   ██║   █████╗  ██╔████╔██║█████╗  ██╔██╗ ██║   ██║   
+; ██╔══╝   ██╔██╗ ██║     ██║   ██║   ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   
+; ███████╗██╔╝ ██╗╚██████╗██║   ██║   ███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
+; ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝   ╚═╝   ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
+
+Function DrawExcitementPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddSliderOptionST("OID_MaleExcitementMult", "$ostim_excitement_mult_male", Main.MaleSexExcitementMult, "{1} x")
+	SetCursorPosition(2)
+	AddSliderOptionST("OID_FemaleExcitementMult", "$ostim_excitement_mult_female", Main.FemaleSexExcitementMult, "{1} x")
+
+	SetCursorPosition(1)
+	AddSliderOptionST("OID_ExcitementDecayRate", "$ostim_excitement_decay_rate", Main.ExcitementDecayRate, "{2} /s")
+	SetCursorPosition(3)
+	AddSliderOptionST("OID_ExcitementDecayGracePeriod", "$ostim_excitement_decay_grace_period", Main.ExcitementDecayGracePeriod / 1000, "{1} s")
+EndFunction
+
+State OID_MaleExcitementMult
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_mult_male")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.MaleSexExcitementMult)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 3.0)
+		SetSliderDialogInterval(0.1)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.MaleSexExcitementMult = Value
+		SetSliderOptionValueST(Value, "{1} x")
+	EndEvent
+EndState
+
+State OID_FemaleExcitementMult
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_mult_female")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.FemaleSexExcitementMult)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 3.0)
+		SetSliderDialogInterval(0.1)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.FemaleSexExcitementMult = Value
+		SetSliderOptionValueST(Value, "{1} x")
+	EndEvent
+EndState
+
+State OID_ExcitementDecayRate
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_decay_rate")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExcitementDecayRate)
+		SetSliderDialogDefaultValue(0.5)
+		SetSliderDialogRange(0.1, 5.0)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExcitementDecayRate = Value
+		SetSliderOptionValueST(Value, "{2} /s")
+	EndEvent
+EndState
+
+State OID_ExcitementDecayGracePeriod
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_excitement_decay_grace_period")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExcitementDecayGracePeriod / 1000)
+		SetSliderDialogDefaultValue(5)
+		SetSliderDialogRange(0.0, 20.0)
+		SetSliderDialogInterval(0.5)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExcitementDecayGracePeriod = (Value * 1000) as int
+		SetSliderOptionValueST(Value, "{1} s")
+	EndEvent
+EndState
+
+
+;  ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██████╗     ██████╗  ██████╗ ██╗     ███████╗███████╗
+; ██╔════╝ ██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗    ██╔══██╗██╔═══██╗██║     ██╔════╝██╔════╝
+; ██║  ███╗█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝    ██████╔╝██║   ██║██║     █████╗  ███████╗
+; ██║   ██║██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗    ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║
+; ╚██████╔╝███████╗██║ ╚████║██████╔╝███████╗██║  ██║    ██║  ██║╚██████╔╝███████╗███████╗███████║
+;  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
+
+Function DrawGenderRolesPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddColoredHeader("$ostim_header_animation_settings")
+	SetCursorPosition(2)
+	AddToggleOptionST("OID_ForceGayAnims", "$ostim_force_gay_anims", Main.OnlyGayAnimsInGayScenes)
+
+	SetCursorPosition(6)
+	AddColoredHeader("$ostim_header_player_roles")
+	SetCursorPosition(8)
+	AddToggleOptionST("OID_PlayerAlwaysDomStraight", "$ostim_always_dom_straight", Main.PlayerAlwaysDomStraight)
+	SetCursorPosition(10)
+	AddToggleOptionST("OID_PlayerAlwaysSubStraight", "$ostim_always_sub_straight", Main.PlayerAlwaysSubStraight)
+	SetCursorPosition(12)
+	AddToggleOptionST("OID_PlayerAlwaysDomGay", "$ostim_always_dom_gay", Main.PlayerAlwaysDomGay)
+	SetCursorPosition(14)
+	AddToggleOptionST("OID_PlayerAlwaysSubGay", "$ostim_always_sub_gay", Main.PlayerAlwaysSubGay)
+
+
+	SetCursorPosition(1)
+	AddColoredHeader("$ostim_header_strap_ons")
+	SetCursorPosition(3)
+	AddToggleOptionST("OID_EquipStrapOnIfNeeded", "$ostim_equip_strap_on_if_needed", Main.EquipStrapOnIfNeeded)
+	SetCursorPosition(5)
+	AddToggleOptionST("OID_UnequipStrapOnIfNotNeeded", "$ostim_unequip_strap_on_if_not_needed", Main.UnequipStrapOnIfNotNeeded)
+	SetCursorPosition(7)
+	int UnequipStrapOnIfInWayFlags = OPTION_FLAG_NONE
+	If Main.UnequipStrapOnIfNotNeeded
+		UnequipStrapOnIfInWayFlags = OPTION_FLAG_DISABLED
+	EndIf
+	AddToggleOptionST("OID_UnequipStrapOnIfInWay", "$ostim_unequip_strap_on_if_in_way", Main.UnequipStrapOnIfInWay, UnequipStrapOnIfInWayFlags)
+
+	SetCursorPosition(11)
+	AddMenuOptionST("OID_DefaultStrapOn", "$ostim_default_strap_on", OData.GetEquipObjectName(0x1, "strapon"))
+	SetCursorPosition(13)
+	AddMenuOptionST("OID_PlayerStrapOn", "$ostim_player_strap_on", OData.GetEquipObjectName(0x7, "strapon"))
+EndFunction
+
+State OID_ForceGayAnims
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_force_gay_anims")
+	EndEvent
+
+	Event OnSelectST()
+		Main.OnlyGayAnimsInGayScenes = !Main.OnlyGayAnimsInGayScenes
+		SetToggleOptionValueST(Main.OnlyGayAnimsInGayScenes)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysDomStraight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_dom_straight")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysDomStraight = !Main.PlayerAlwaysDomStraight
+		SetToggleOptionValueST(Main.PlayerAlwaysDomStraight)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysSubStraight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_sub_straight")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysSubStraight = !Main.PlayerAlwaysSubStraight
+		SetToggleOptionValueST(Main.PlayerAlwaysSubStraight)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysDomGay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_dom_gay")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysDomGay = !Main.PlayerAlwaysDomGay
+		SetToggleOptionValueST(Main.PlayerAlwaysDomGay)
+	EndEvent
+EndState
+
+State OID_PlayerAlwaysSubGay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_always_sub_gay")
+	EndEvent
+
+	Event OnSelectST()
+		Main.PlayerAlwaysSubGay = !Main.PlayerAlwaysSubGay
+		SetToggleOptionValueST(Main.PlayerAlwaysSubGay)
+	EndEvent
+EndState
+
+State OID_EquipStrapOnIfNeeded
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_equip_strap_on_if_needed")
+	EndEvent
+
+	Event OnSelectST()
+		Main.EquipStrapOnIfNeeded = !Main.EquipStrapOnIfNeeded
+		SetToggleOptionValueST(Main.EquipStrapOnIfNeeded)
+	EndEvent
+EndState
+
+State OID_UnequipStrapOnIfNotNeeded
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_unequip_strap_on_if_not_needed")
+	EndEvent
+
+	Event OnSelectST()
+		Main.UnequipStrapOnIfNotNeeded = !Main.UnequipStrapOnIfNotNeeded
+		SetToggleOptionValueST(Main.UnequipStrapOnIfNotNeeded)
+
+		int UnequipStrapOnIfInWayFlags = OPTION_FLAG_NONE
+		If Main.UnequipStrapOnIfNotNeeded
+			UnequipStrapOnIfInWayFlags = OPTION_FLAG_DISABLED
+		EndIf
+		SetOptionFlagsST(UnequipStrapOnIfInWayFlags, false, "OID_UnequipStrapOnIfInWay")
+	EndEvent
+EndState
+
+State OID_UnequipStrapOnIfInWay
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_unequip_strap_on_if_in_way")
+	EndEvent
+
+	Event OnSelectST()
+		Main.UnequipStrapOnIfInWay = !Main.UnequipStrapOnIfInWay
+		SetToggleOptionValueST(Main.UnequipStrapOnIfInWay)
+	EndEvent
+EndState
+
+State OID_DefaultStrapOn
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_strap_on")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x1, "strapon")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x1, "strapon", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x1, "strapon")
+	EndEvent
+EndState
+
+State OID_PlayerStrapOn
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_player_strap_on")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x7, "strapon")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x7, "strapon", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x7, "strapon")
+	EndEvent
+EndState
+
+
+; ██╗   ██╗███╗   ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗███╗   ██╗ ██████╗ 
+; ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝ 
+; ██║   ██║██╔██╗ ██║██║  ██║██████╔╝█████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗
+; ██║   ██║██║╚██╗██║██║  ██║██╔══██╗██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║
+; ╚██████╔╝██║ ╚████║██████╔╝██║  ██║███████╗███████║███████║██║██║ ╚████║╚██████╔╝
+;  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+
+
+
+; ███████╗██╗  ██╗██████╗ ██████╗ ███████╗███████╗███████╗██╗ ██████╗ ███╗   ██╗███████╗
+; ██╔════╝╚██╗██╔╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║██╔═══██╗████╗  ██║██╔════╝
+; █████╗   ╚███╔╝ ██████╔╝██████╔╝█████╗  ███████╗███████╗██║██║   ██║██╔██╗ ██║███████╗
+; ██╔══╝   ██╔██╗ ██╔═══╝ ██╔══██╗██╔══╝  ╚════██║╚════██║██║██║   ██║██║╚██╗██║╚════██║
+; ███████╗██╔╝ ██╗██║     ██║  ██║███████╗███████║███████║██║╚██████╔╝██║ ╚████║███████║
+; ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
+Function DrawExpressionPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddSliderOptionST("OID_ExpressionDurationMin", "$ostim_expression_duration_min", Main.ExpressionDurationMin / 1000.0, "{2} s")
+	SetCursorPosition(2)
+	AddSliderOptionST("OID_ExpressionDurationMax", "$ostim_expression_duration_max", Main.ExpressionDurationMax / 1000.0, "{2} s")
+
+
+	SetCursorPosition(1)
+	AddMenuOptionST("OID_DefaultTongueMale", "$ostim_default_tongue_male", OData.GetEquipObjectName(0x0, "tongue"))
+	SetCursorPosition(3)
+	AddMenuOptionST("OID_DefaultTongueFemale", "$ostim_default_tongue_female", OData.GetEquipObjectName(0x1, "tongue"))
+	SetCursorPosition(5)
+	AddMenuOptionST("OID_PlayerTongue", "$ostim_player_tongue", OData.GetEquipObjectName(0x7, "tongue"))
+EndFunction
+
+State OID_ExpressionDurationMin
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_expression_duration_min")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExpressionDurationMin / 1000.0)
+		SetSliderDialogDefaultValue(1)
+		SetSliderDialogRange(0.1, 10)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExpressionDurationMin = (Value * 1000) as int
+		SetSliderOptionValueST(Main.ExpressionDurationMin / 1000.0, "{2} s")
+		SetSliderOptionValueST(Main.ExpressionDurationMax / 1000.0, "{2} s", false, "OID_ExpressionDurationMax")
+	EndEvent
+EndState
+
+State OID_ExpressionDurationMax
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_expression_duration_max")
+	EndEvent
+
+	Event OnSliderOpenST()
+		SetSliderDialogStartValue(Main.ExpressionDurationMax / 1000.0)
+		SetSliderDialogDefaultValue(3)
+		SetSliderDialogRange(0.1, 10)
+		SetSliderDialogInterval(0.05)
+	EndEvent
+
+	Event OnSliderAcceptST(float Value)
+		Main.ExpressionDurationMax = (Value * 1000) as int
+		SetSliderOptionValueST(Main.ExpressionDurationMin / 1000.0, "{2} s", false, "OID_ExpressionDurationMin")
+		SetSliderOptionValueST(Main.ExpressionDurationMax / 1000.0, "{2} s")
+	EndEvent
+EndState
+
+State OID_DefaultTongueMale
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_tongue_male")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x0, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x0, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x0, "tongue")
+	EndEvent
+EndState
+
+State OID_DefaultTongueFemale
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_default_tongue_female")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x1, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x1, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x1, "tongue")
+	EndEvent
+EndState
+
+State OID_PlayerTongue
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_player_tongue")
+	EndEvent
+
+	Event OnMenuOpenST()
+		OpenEquipObjectMenu(0x7, "tongue")
+	EndEvent
+
+	Event OnMenuAcceptST(int Index)
+		SetEquipObjectID(0x7, "tongue", Index)
+	EndEvent
+
+	Event OnDefaultST()
+		SetEquipObjectIDToDefault(0x7, "tongue")
+	EndEvent
+EndState
+
+
+; ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗   ██╗
+; ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝╚██╗ ██╔╝
+; ██║   ██║   ██║   ██║██║     ██║   ██║    ╚████╔╝ 
+; ██║   ██║   ██║   ██║██║     ██║   ██║     ╚██╔╝
+; ╚██████╔╝   ██║   ██║███████╗██║   ██║      ██║
+;  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚═╝   ╚═╝      ╚═╝
+
+string[] EquipObjectPairs
+
+Function OpenEquipObjectMenu(int FormID, string Type)
+	EquipObjectPairs = OData.GetEquipObjectPairs(FormID, Type)
+	SetMenuDialogOptions(OData.ToEquipObjectNames(EquipObjectPairs))
+	SetMenuDialogStartIndex(0)
+	SetMenuDialogDefaultIndex(0)
+EndFunction
+
+Function SetEquipObjectID(int FormID, string Type, int Index)
+	OData.SetEquipObjectID(FormID, Type, EquipObjectPairs[Index * 2])
+	SetMenuOptionValueST(EquipObjectPairs[Index * 2 + 1])
+EndFunction
+
+Function SetEquipObjectIDToDefault(int FormID, string Type)
+	string ID = "default"
+	If FormID < 2
+		ID = "random"
+	EndIf
+	OData.SetEquipObjectID(FormID, Type, ID)
+	SetMenuOptionValueST(ID)
 EndFunction

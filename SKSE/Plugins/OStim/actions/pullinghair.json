@@ -15,7 +15,8 @@
 		"requirements":[
 		],
 		"strippingSlots":[
-			30
+			30,
+			31
 		]
 	},
 	"performer":{

@@ -7,12 +7,19 @@
 		],
 		"strippingSlots":[
 			30,
+			31,
 			44,
 			55
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"mouth"
+			]
+		}
 	},
 	"target":{
 		"stimulation":1.4,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],

@@ -1,6 +1,7 @@
 {
 	"actor":{
 		"stimulation":0.75,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],
@@ -16,9 +17,15 @@
 		"maxStimulation":50,
 		"strippingSlots":[
 			30,
+			31,
 			44,
 			55
-		]
+		],
+		"stringLists":{
+			"cum":[
+				"face"
+			]
+		}
 	},
 	"performer":{
 		"floats":{

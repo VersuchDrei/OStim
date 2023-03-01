@@ -10,6 +10,7 @@
 	},
 	"target":{
 		"stimulation":0.9,
+		"fullStrip":true,
 		"requirements":[
 			"penis"
 		],
