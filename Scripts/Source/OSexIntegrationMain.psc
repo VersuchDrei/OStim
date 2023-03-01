@@ -2235,7 +2235,7 @@ Function Climax(Actor Act)
 	EndIf
 
 	If (Act == DomActor)
-		SetCurrentAnimationSpeed(1)
+		SetCurrentAnimationSpeed(OMetadata.GetDefaultSpeed(CurrentSceneID))
 	EndIf
 
 	While StallOrgasm
