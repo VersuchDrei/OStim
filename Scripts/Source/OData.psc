@@ -9,9 +9,9 @@ int Function GetUndressingSlotMask() Global Native
 
 Function SetUndressingSlotMask(int Mask) Global Native
 
-string[] Function GetEquipObjectPairs(int FormID, string Type) Global Native
+string[] Function PairsToNames(string[] Pairs) Global Native
 
-string[] Function ToEquipObjectNames(string[] Pairs) Global Native
+string[] Function GetEquipObjectPairs(int FormID, string Type) Global Native
 
 string Function GetEquipObjectName(int FormID, string Type) Global Native
 

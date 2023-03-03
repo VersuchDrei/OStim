@@ -1991,7 +1991,7 @@ string[] EquipObjectPairs
 
 Function OpenEquipObjectMenu(int FormID, string Type)
 	EquipObjectPairs = OData.GetEquipObjectPairs(FormID, Type)
-	SetMenuDialogOptions(OData.ToEquipObjectNames(EquipObjectPairs))
+	SetMenuDialogOptions(OData.PairsToNames(EquipObjectPairs))
 	SetMenuDialogStartIndex(0)
 	SetMenuDialogDefaultIndex(0)
 EndFunction
