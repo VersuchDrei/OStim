@@ -26,15 +26,16 @@ EndFunction
 * * do NOT ever call this, the .dll caches if the offset is currently removed or not
 * * if you bring that out of sync shit goes sideways
 */;
-Function UpdateHeelOffset(Actor Act, float Offset, bool Remove, bool IsFemale) Global
+Function UpdateHeelOffset(Actor Act, float Offset, bool Add, bool Remove, bool IsFemale) Global
+	If Add
+		nioverride.RemoveNodeTransformPosition(Act, false, IsFemale, "NPC", "OStim")
+	EndIf
 	If Remove
 		float[] Pos = new float[3]
 		Pos[0] = 0
 		Pos[1] = 0
 		Pos[2] = -Offset
 		nioverride.AddNodeTransformPosition(Act, false, IsFemale, "NPC", "OStim", Pos)
-	Else
-		nioverride.RemoveNodeTransformPosition(Act, false, IsFemale, "NPC", "OStim")
 	EndIf
 	nioverride.UpdateNodeTransform(Act, false, IsFemale, "NPC")
 EndFunction

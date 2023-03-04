@@ -1985,15 +1985,10 @@ EndFunction
 
 
 Event OnAnimate(String EventName, String SceneId, Float Speed, Form Sender)
-	If Speed == -1
-		Debug.MessageBox("fuck me")
-	EndIf
-
 	;Console("Event received")
 	If (CurrentSceneId != SceneId) || CurrentSpeed != Speed || FirstAnimate
 		FirstAnimate = false
 
-		CurrentAnimation = OMetadata.GetAnimationId(SceneId, Speed As int)
 		OnAnimationChange(SceneId, Speed As int)
 
 		SendModEvent("ostim_animationchanged")
@@ -2095,18 +2090,14 @@ Event ActraRemove(string eventName, string actraIX, float arg, Form actraInc)
 EndEvent
 
 Function OnAnimationChange(string newScene, int newSpeed)
+	OSANative.ChangeAnimation(Password, newScene)
+	OSANative.UpdateSpeed(Password, newSpeed)
 	
 	Console("Changing animation...")
-
-	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 	
 	bool sceneChange = newScene != CurrentSceneID
 	CurrentSceneID = newScene
-		
-	OSANative.ChangeAnimation(Password, CurrentSceneID)
-
 	CurrentSpeed = newSpeed
-	OSANative.UpdateSpeed(Password, CurrentSpeed)
 
 	If OMetadata.GetMaxSpeed(CurrentSceneID) == 0 && !OMetadata.IsTransition(CurrentSceneID)
 		LastHubSceneID = CurrentSceneID
@@ -2115,6 +2106,7 @@ Function OnAnimationChange(string newScene, int newSpeed)
 
 	CurrAnimClass = OSANative.GetAnimClass(CurrentSceneID)
 
+	CurrentAnimation = OMetadata.GetAnimationId(newScene, newSpeed)
 	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 
 	if sceneChange
