@@ -189,7 +189,6 @@ actor newActra = actraInc as actor
 	oso.processActraAll(newActra, actorID)
     newActra.SetFactionRank(oso.OFaction[0], 1) 
     newActra.SetFactionRank(oso.OFaction[1], stageID as int) 
-    _oGlobal.packageSquelch(newActra, oso.OPackage)
 int L = totalActra
 	actra[L] = newActra
 	actraIndex[L] = actorID

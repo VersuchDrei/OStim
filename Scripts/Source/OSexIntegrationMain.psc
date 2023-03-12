@@ -118,8 +118,6 @@ Bool Property UseAIMasturbation Auto
 
 Bool Property MuteOSA Auto
 
-Bool Property UseFreeCam Auto
-
 Bool Property UseRumble Auto
 Bool Property UseScreenShake Auto
 
@@ -130,10 +128,6 @@ bool Property SkipEndingFadein Auto
 Bool Property EndAfterActorHit Auto
 
 Bool Property GetInBedAfterBedScene Auto
-
-Int Property FreecamFOV Auto
-Int Property DefaultFOV Auto
-Int Property FreecamSpeed Auto
 
 Int Property BedRealignment Auto
 
@@ -154,6 +148,43 @@ Bool Property Installed auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; CAMERA SETTINGS  --------------------------------------------------------------------------------
+
+GlobalVariable Property OStimUseFreeCam Auto
+bool Property UseFreeCam
+	bool Function Get()
+		Return OStimUseFreeCam.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimUseFreeCam.value = 1
+		Else
+			OStimUseFreeCam.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFreeCamFOV Auto
+int Property FreecamFOV
+	int Function Get()
+		Return OStimFreeCamFOV.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimFreeCamFOV.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimFreeCamSpeed Auto
+float Property FreecamSpeed
+	float Function Get()
+		Return OStimFreeCamSpeed.value
+	EndFunction
+	Function Set(float Value)
+		OStimFreeCamSpeed.value = Value
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; EXCITEMENT SETTINGS  ----------------------------------------------------------------------------
@@ -865,7 +896,6 @@ Event OnUpdate() ;OStim main logic loop
 	FirstAnimate = true
 	MostRecentOSexInteractionTime = Utility.GetCurrentRealTime()
 
-	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
 	; OBarsScript already registers for the ostim_orgasm event and is attached to the same quest
 	; so this registration will not work, but renaming the listener to OstimOrgasm will, as that is what OBarsScript registered it to
 	; if we ever split the scripts up on different quests we have to register for the event here again
@@ -1615,22 +1645,6 @@ String[] Function GetScene()
 	Return CurrScene
 EndFunction
 
-Function Realign()
-	AllowVehicleReset()
-	Utility.Wait(0.1)
-	int i = Actors.Length
-	While i
-		i -= 1
-		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actors[i])) + "_AlignStage")
-	EndWhile
-EndFunction
-
-Function AlternateRealign() ; may work better than the above function, or worse. Try testing.
-	AllowVehicleReset()
-	Utility.Wait(0.1)
-	OSA.StimStart(CurrScene)
-EndFunction
-
 Function AllowVehicleReset()
 	Console("Allowing vehicle reset...")
 	int i = Actors.Length
@@ -1661,14 +1675,10 @@ Function ToggleFreeCam(Bool On = True)
 		endif 
 		;OSANative.EnableFreeCam()
 		consoleUtil.ExecuteCommand("tfc")
-		OSANative.SetFreeCamSpeed(FreecamSpeed)
-		OSANative.SetFOV(FreecamFOV)
 		Console("Enabling freecam")
 	Else
 		;OSANative.DisableFreeCam()
 		consoleUtil.ExecuteCommand("tfc")
-		OSANative.SetFreeCamSpeed()
-		OSANative.SetFOV(DefaultFOV)
 		if EnableImprovedCamSupport
 			game.ForceFirstPerson()
 			Utility.Wait(0.034)
@@ -2110,7 +2120,7 @@ Function OnAnimationChange(string newScene, int newSpeed)
 	CurrentOID = ODatabase.GetObjectOArray(ODatabase.GetAnimationWithAnimID(ODatabase.GetDatabaseOArray(), CurrentAnimation), 0)
 
 	if sceneChange
-		SendModEvent("ostim_scenechanged")
+		SendModEvent("ostim_scenechanged", CurrentSceneID)
 
 		SendModEvent("ostim_scenechanged_" + CurrAnimClass) ;register to scenes by class
 		SendModEvent("ostim_scenechanged_" + CurrentSceneID) ;register to scenes by scene
@@ -2324,82 +2334,6 @@ EndFunction
 
 Bool Function FaceDataIsMuted(Actor Act)
 	Return Act.IsInFaction(OstimNoFacialExpressionsFaction)
-EndFunction
-
-Event OnMoDom(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockDomFaceCommands
-		Return
-	EndIf
-	OnMo(DomActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnMoSub(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockSubFaceCommands
-		Return
-	EndIf
-	OnMo(SubActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnMoThird(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockthirdFaceCommands
-		Return
-	EndIf
-	OnMo(ThirdActor, zType as Int, zAmount as Int)
-EndEvent
-
-Function OnMo(Actor Act, Int zType, Int zAmount) ; eye related face blending
-	_oGlobal.BlendMo(Act, zAmount, MfgConsoleFunc.GetModifier(Act, zType), zType, 3)
-EndFunction
-
-Event OnPhDom(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockDomFaceCommands
-		Return
-	EndIf
-	OnPh(DomActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnPhSub(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockSubFaceCommands
-		Return
-	EndIf
-	OnPh(SubActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnPhThird(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockThirdFaceCommands
-		Return
-	EndIf
-	OnPh(ThirdActor, zType as Int, zAmount as Int)
-EndEvent
-
-Function OnPh(Actor Act, Int zType, Int zAmount) ;mouth related face blending
-	_oGlobal.BlendPh(Act, zAmount, MfgConsoleFunc.GetPhoneme(Act, zType), zType, 3)
-EndFunction
-
-Event OnExDom(String EventName, String zType, Float zAmount, Form Sender)
-	if blockDomFaceCommands
-		return
-	endif
-	OnEx(DomActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnExSub(String EventName, String zType, Float zAmount, Form Sender)
-	if blockSubFaceCommands
-		return
-	endif
-	OnEx(SubActor, zType as Int, zAmount as Int)
-EndEvent
-
-Event OnExThird(String EventName, String zType, Float zAmount, Form Sender)
-	If BlockthirdFaceCommands
-		Return
-	EndIf
-	OnEx(ThirdActor, zType as Int, zAmount as Int)
-EndEvent
-
-Function OnEx(Actor Act, Int zType, Int zAmount) ;expression related face blending
-	MfgConsoleFunc.SetPhonemeModifier(Act, 2, zType, zAmount)
-	Act.SetExpressionOverride(zType, zAmount)
 EndFunction
 
 
@@ -2781,7 +2715,6 @@ UseFreeCam
 	MuteOSA = False
 
 	FreecamFOV = 45
-	DefaultFOV = 85
 	FreecamSpeed = 3
 
 	Int[] Slots = new Int[1]
@@ -3341,6 +3274,14 @@ EndFunction
 
 ; all of these are only here to not break old addons, don't use them in new addons, use whatever they're calling instead
 
+Int Property DefaultFOV
+	int Function Get()
+		Return 85
+	EndFunction
+	Function Set(int Value)
+	EndFunction
+EndProperty
+
 Bool Property UseStrongerUnequipMethod
 	bool Function Get()
 		Return false
@@ -3367,7 +3308,7 @@ EndProperty
 
 Bool Property UseNativeFunctions
 	bool Function Get()
-		Return false
+		Return true
 	EndFunction
 	Function Set(bool Value)
 	EndFunction
@@ -3509,4 +3450,10 @@ Int Function GetMaxSpanksAllowed()
 EndFunction
 
 Function SetSpankMax(Int Max) 
+EndFunction
+
+Function Realign()
+EndFunction
+
+Function AlternateRealign()
 EndFunction

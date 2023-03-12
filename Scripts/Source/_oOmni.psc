@@ -277,7 +277,6 @@ Function PrepActra(String[] sceneSuite, Actor[] Actra)
         ProcessActraAll(Actra[i], SceneSuite[i + 1])
         Actra[i].SetFactionRank(OFaction[0], 1)
         Actra[i].SetFactionRank(OFaction[1], StageID)
-        _oGlobal.PackageSquelch(Actra[i], OPackage)
         i += 1
     EndWhile
 
@@ -367,7 +366,6 @@ Function ActraReadyByKey(Actor[] Actra, String StageID, Int Index, Bool Solo = F
         ProcessActraAll(Actra[i], DataPush[2 + i])
         Actra[i].SetFactionRank(OFaction[0], 1)
         Actra[i].SetFactionRank(OFaction[1], StageIDint)
-        _oGlobal.PackageSquelch(Actra[i], OPackage)
         i += 1
     EndWhile
 

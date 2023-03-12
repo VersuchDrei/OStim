@@ -61,80 +61,11 @@ EndFunction
 ; ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝    ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝
 ; Functions that prepare the actors to perform in the scene and counter functions.
 
-
-; Performs a series of random skyrim locks on the actors so they don't repel each other during a scene.
-Function ActorLock(Actor Actra, Actor Player) Global
-    If (Player == Actra)
-        If !OSANative.IsFreeCam()
-            Game.ForceThirdPerson()
-        EndIf
-        Game.SetPlayerAIDriven()
-        Game.DisablePlayerControls(False, False, False, False, False, False, True, False, 0)
-    Else
-        Actra.SetRestrained(True)
-        Actra.SetDontMove(True)
-    EndIf
-    Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", True)
-EndFunction
-
-; Disables all locking stuff used in OSA,
-; also reverts their footIK to normal and puts them back into an idle animation
-Function ActorUnlock(Actor Actra, Actor Player) Global
-    If (Player == Actra)
-        Game.SetPlayerAIDriven(False)
-        Game.EnablePlayerControls()
-    Else
-        Actra.SetRestrained(False)
-        Actra.SetDontMove(False)
-    EndIf
-
-    Actra.StopTranslation()
-    Actra.SetVehicle(None)
-    Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", False)
-    Debug.SendAnimationEvent(Actra, "IdleForceDefaultState")
-EndFunction
-
-Function ActorSmoothUnlock(Actor Actra, Actor Player, Float Xp, Float Yp) Global
-    If (Player == Actra)
-        Game.SetPlayerAIDriven(False)
-        Game.EnablePlayerControls()
-    Else
-        Actra.SetRestrained(False)
-        Actra.SetDontMove(False)
-    EndIf
-
-    Actra.StopTranslation()
-    Actra.SetVehicle(None)
-    ;Actra.SetPosition(Xp, Yp, Actra.z)
-    ;Actra.SplineTranslateTo(Xp, Yp, Actra.z, Actra.GetAngleX(), Actra.GetAngleY(), Actra.GetAngleZ(), 1.0, 70, 0)
-    Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", False)
-    Debug.SendAnimationEvent(Actra, "IdleForceDefaultState")
-EndFunction
-
-; Overwrites the Actor's package with a DoNothing package.
-Function PackageSquelch(Actor Actra, Package[] OPackage) Global 
-    ;OStim: package overrides are broken in SE I think?
-    ActorUtil.AddPackageOverride(Actra, OPackage[0], 100, 1)
-    Actra.EvaluatePackage()
-EndFunction
-
-; Reverse the above squelch package override.
-Function PackageClean(Actor Actra, Package[] OPackage) Global
-    ActorUtil.RemovePackageOverride(Actra, OPackage[0])
-    Actra.EvaluatePackage()
-EndFunction
-
 ; Cleans all factions used by OSA from an Actor.
 Function FactionClean(Actor Actra, Faction[] OFaction) Global
     Actra.RemoveFromFaction(OFaction[0])
     Actra.RemoveFromFaction(OFaction[1])
     Actra.RemoveFromFaction(OFaction[2])
-EndFunction
-
-Function SheathWep(Actor Actra, Actor Player) Global
-    If (Actra == Player && Actra.IsWeaponDrawn())
-        Actra.SheatheWeapon()
-    EndIf
 EndFunction
 
 
@@ -164,21 +95,6 @@ Float[] Function GetStageLocArray(ObjectReference Actra) Global
     Loc[4] = Actra.GetAngleY()
     Loc[5] = Actra.GetAngleZ()
     Return Loc
-EndFunction
-
-Function EnforceAngle(Actor Actra, Float[] Loc) Global
-    If (Math.Abs(Actra.GetAngleZ() - Loc[5]) > 0.5)
-        Actra.SetAngle(Loc[3], Loc[4], Loc[5])
-    EndIf
-EndFunction
-
-Function EnforcePosition(Actor Actra, ObjectReference StageSpot, Float[] Loc) Global
-    If (Actra.GetDistance(stageSpot) > 0.5)
-        Actra.SetPosition(Loc[0], Loc[1], Loc[2])
-        Actra.SetVehicle(StageSpot)
-    EndIf
-    Actra.SplineTranslateTo(Loc[0], Loc[1], Loc[2], Loc[3], Loc[4], Loc[5], 1.0, 10000, 0.0001)
-    Actra.SetVehicle(stageSpot)
 EndFunction
 
 String[] Function SendActraDetails(Actor Actra, String FormID, _oOmni OSO) Global
@@ -485,39 +401,6 @@ EndFunction
 ; ██║ ╚═╝ ██║██║     ╚██████╔╝    ██████║      ███████║╚██████╗██║  ██║███████╗███████╗
 ; ╚═╝     ╚═╝╚═╝      ╚═════╝     ╚═════╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ; Softly blend adjusts for MFG console & Node Scale.
-
-
-; Blends MFG Modifier.
-Function BlendMo(Actor Actra, Int zGoal, Int zCur, Int zMode, Int zSpeed) Global
-    zGoal = PapyrusUtil.ClampInt(zGoal, 0, 100)
-    zCur = PapyrusUtil.ClampInt(zCur, 0, 100)
-    zSpeed = PapyrusUtil.SignInt(zGoal < zCur, zSpeed)
-    If (zSpeed != 0)
-        While (zCur != zGoal)
-            zCur += zSpeed
-            If (zSpeed > 0 && zCur > zGoal || zSpeed < 0 && zCur < zGoal)
-                zCur = zGoal
-            EndIf
-            MfgConsoleFunc.SetModifier(Actra, zMode, zCur)
-        EndWhile
-    EndIf
-EndFunction
-
-; Blends MFG Phonome.
-Function BlendPh(Actor Actra, Int zGoal, Int zCur, Int zMode, Int zSpeed) Global
-    zGoal = PapyrusUtil.ClampInt(zGoal, 0, 100)
-    zCur = PapyrusUtil.ClampInt(zCur, 0, 100)
-    zSpeed = PapyrusUtil.SignInt(zGoal < zCur, zSpeed)
-    If (zSpeed != 0)
-        While (zCur != zGoal)
-            zCur += zSpeed
-            If (zSpeed > 0 && zCur > zGoal || zSpeed < 0 && zCur < zGoal)
-                zCur = zGoal
-            EndIf
-            MfgConsoleFunc.SetPhoneme(Actra, zMode, zCur)
-        EndWhile
-    EndIf
-EndFunction
 
 ; Blends NiNode Scale.
 Function BlendSc(Actor Actra, float zGoal, float zCur, String zNode, float zSpeed) Global

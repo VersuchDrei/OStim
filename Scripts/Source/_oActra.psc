@@ -39,8 +39,6 @@ ObjectReference PosObj
 Bool FirstScale = True
 
 Event OnEffectStart (Actor TarAct, Actor Spot)
-	Aligned = False
-
 	Actra = TarAct
 	FormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actra))
 	Glyph = OSO.Glyph
@@ -55,11 +53,7 @@ Event OnEffectStart (Actor TarAct, Actor Spot)
 	OAE[1] = StageID
 	PosObj = OSO.GlobalPosition[StageID as Int]
 
-	_oGlobal.SheathWep(Actra, PlayerRef)
-	_oGlobal.ActorLock(Actra, PlayerRef)
 	_oGlobal.ActraReveal(Actra, FormID, StageID)
-
-	Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", True)
 
 	If (Actra == PlayerRef)
 		UI.SetBool("HUD Menu", "_root.HUDMovieBaseInstance._visible", False)
@@ -82,8 +76,6 @@ Function RegisterEvents()
 	RegisterForModEvent("0SAA" + FormID + "_FormBind", "OnFormBind")
 
 	RegisterForModEvent("0SAA" + FormID + "_Animate", "OnAnimate")
-	RegisterForModEvent("0SAA" + FormID + "_AlignStage", "OnAlignStage")
-	RegisterForModEvent("0SAA" + FormID + "_AllowAlignStage", "ResetAlignStage")
 	
 	RegisterForModEvent("0SAA" + FormID + "_BlendSc", "OnBlendSc")
 	RegisterForModEvent("0SAA" + FormID + "_SnapSc", "OnSnapSc")
@@ -125,7 +117,7 @@ Event OnCenterActro(String EventName, String NewStageID, Float NumArg, Form Send
 	OSO.OSpell[1].cast(Actra, Actra)
 EndEvent
 
-Event OnHit(ObjectReference Aggressor, Form Source, Projectile Projectile, bool PowerAttack, bool SneakAttack, bool BashAttack, bool HitBlocked)
+Event OnHit(ObjectReference Aggressor, Form Source, Projectile Proj, bool PowerAttack, bool SneakAttack, bool BashAttack, bool HitBlocked)
 	SendModEvent("ostim_actorhit")
 EndEvent
 
@@ -150,26 +142,9 @@ EndEvent
 Bool LoadEnd = False
 Function CompleteEnd()
 	If (Actra != None) ; Shield is in place so I'm not sure how a none Actor can get by.
-	;	If (Actra.Is3DLoaded()) ; NEW SHIELD START IF 3D, ISN"T LOADED DO NOTHING
-	; Sairion: going to ignore the above.... skipping the below code makes actors get stuck so...
-	; hopefully whatever reason was had for skipping this wasn't important!
 			_oGlobal.ActorLight(Actra, "Remove", OSO.OLightSP, OSO.OLightME)
 			Debug.SendAnimationEvent(Actra, "SOSFlaccid")
 			_oGlobal.FactionClean(Actra, OSO.OFaction)
-			MfgConsoleFunc.ResetPhonemeModifier(Actra)
-			_oGlobal.PackageClean(Actra, OSO.OPackage)
-			Actra.ClearExpressionOverride()
-			Actra.SetAnimationVariableBool("bHumanoidFootIKDisable", False)
-			If (LoadEnd)
-				_oGlobal.ActorUnlock(Actra, PlayerRef)
-			Else
-				ObjectReference LastPoint = Actra.PlaceAtMe(OSO.OBlankStatic)
-				LastPoint.MoveToNode(Actra, "NPC COM [COM ]")
-				_oGlobal.ActorSmoothUnlock(Actra, PlayerRef, LastPoint.X, LastPoint.Y)
-				LastPoint.Delete()
-				LastPoint = None
-			EndIf
-	;	EndIf ; NEW SHIELD END
 	EndIf ; Conclude Shield
 EndFunction
 
@@ -186,47 +161,7 @@ Event OnNoFuse(String EventName, String Huh, Float NumArg, Form Sender)
 	Actra.SetVehicle(None)
 EndEvent
 
-Bool Property Aligned Auto
-
 Event AllowAlignStage()
-	Aligned = False
-EndEvent
-
-Event OnAlignStage()
-	If (Aligned)
-		Return
-	EndIf
-
-	Actra.StopTranslation()
-
-	; This is the section I'd like to be able to remove and have the TranslateTo handle the rotations
-	; You can see when it does the hard setSangle that the camera gets unsmoothly set to the new location
-	; and that the game sound gets cut and restarted. Not an ideal transtion
-
-	If (Math.Abs(Actra.GetAngleZ() - PosObj.getAngleZ()) > 0.5)
-		Actra.SetAngle(0, 0, PosObj.getAngleZ())
-	EndIf
-
-	;The below translateTo does not seem to rotate the player, only setting their position x,y,z
-	;The postObj.getAngleZ() only seems to rotate NPCs however If this could somehow effect the player it would
-	;make this whole thing much bette / smoother
-
-	;Actra.TranslateTo(PosObj.x, PosObj.y, PosObj.z, 0, 0, PosObj.getAngleZ(), 150.0, 0)
-	Actra.MoveTo(PosObj)
-	Actra.SetVehicle(PosObj)
-	; NPCs will try to clip out of furniture after ~2 seconds, the only way to prevent that is to have them still translating during that time
-	; so we just rotate them very slowly for a tiny amount over the first 10 seconds
-	; EDIT: for some users after the end of the ten seconds actors start clipping out of alignment again, so we just rotate them for ~2.7 hours instead
-	Actra.TranslateTo(PosObj.GetPositionX(), PosObj.GetPositionY(), PosObj.GetPositionZ(), PosObj.GetAngleX(), PosObj.GetAngleY(), PosObj.GetAngleZ() + 1, 500, 0.0001)
-	SendModEvent("ostim_setvehicle")
-	Aligned = True
-
-	If Actra == PlayerRef
-		OsexIntegrationMain OStim = OUtils.GetOstim()
-		If OStim.UseFreeCam
-			OStim.ToggleFreeCam(true)
-		EndIf
-	EndIf
 EndEvent
 
 Event OnTranslationComplete()
@@ -272,7 +207,7 @@ Event OnSound(String EventName, String Fi, Float Ix, Form Sender)
 EndEvent
 
 Event OnAnimate(String EventName, String zAnimation, Float NumArg, Form Sender)
-	Debug.SendAnimationEvent(Actra, zAnimation)
+	;Debug.SendAnimationEvent(Actra, zAnimation)
 	;Debug.SendAnimationEvent(Actra, "sosfasterect")
 
 	;OsexIntegrationMain.console("Animation for " + actra.getdisplayname() + ": " + zAnimation + " (stage id " + StageID + ")")
