@@ -2885,6 +2885,7 @@ float[] Function GetCustomActionPerformerFloatList(string Id, int Index, string 
 ;/* CustomActionPerformerFloatListContainsAny
 * * checks if the custom float list record defined for the action performer contains any of a list of values
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, an array of values to check for
@@ -2896,6 +2897,7 @@ bool Function CustomActionPerformerFloatListContainsAny(string Id, int Index, st
 ;/* CustomActionPerformerFloatListContainsAnyCSV
 * * same as CustomActionPerformerFloatListContainsAny, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, a csv-string of values to check for
@@ -2907,6 +2909,7 @@ bool Function CustomActionPerformerFloatListContainsAnyCSV(string Id, int Index,
 ;/* CustomActionPerformerFloatListContainsAll
 * * checks if the custom float list record defined for the action performer contains all of a list of values
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, an array of values to check for
@@ -2918,6 +2921,7 @@ bool Function CustomActionPerformerFloatListContainsAll(string Id, int Index, st
 ;/* CustomActionPerformerFloatListContainsAllCSV
 * * same as CustomActionPerformerFloatListContainsAll, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, a csv-string of values to check for
@@ -2929,6 +2933,7 @@ bool Function CustomActionPerformerFloatListContainsAllCSV(string Id, int Index,
 ;/* GetCustomActionPerformerFloatListOverlap
 * * returns all entries of a custom float list defined for the action performer that overlap with the list
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, an array of all the values to check for
@@ -2940,6 +2945,7 @@ float[] Function GetCustomActionPerformerFloatListOverlap(string Id, int Index, 
 ;/* GetCustomActionPerformerFloatListOverlapCSV
 * * same as GetCustomActionPerformerFloatListOverlap, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom float list
 * * @param: Values, a csv-string of values to check for
@@ -2973,6 +2979,7 @@ string[] Function GetCustomActionPerformerStringList(string Id, int Index, strin
 ;/* CustomActionPerformerStringListContainsAny
 * * checks if the custom string list record defined for the action performer contains any of a list of values
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, an array of values to check for
@@ -2984,6 +2991,7 @@ bool Function CustomActionPerformerStringListContainsAny(string Id, int Index, s
 ;/* CustomActionPerformerStringListContainsAnyCSV
 * * same as CustomActionPerformerStringListContainsAny, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, a csv-string of values to check for
@@ -2995,6 +3003,7 @@ bool Function CustomActionPerformerStringListContainsAnyCSV(string Id, int Index
 ;/* CustomActionPerformerStringListContainsAll
 * * checks if the custom string list record defined for the action performer contains all of a list of values
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, an array of values to check for
@@ -3006,6 +3015,7 @@ bool Function CustomActionPerformerStringListContainsAll(string Id, int Index, s
 ;/* CustomActionPerformerStringListContainsAllCSV
 * * same as CustomActionPerformerStringListContainsAll, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, a csv-string of values to check for
@@ -3017,6 +3027,7 @@ bool Function CustomActionPerformerStringListContainsAllCSV(string Id, int Index
 ;/* GetCustomActionPerformerStringListOverlap
 * * returns all entries of a custom string list defined for the action performer that overlap with the list
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, an array of all the values to check for
@@ -3028,6 +3039,7 @@ string[] Function GetCustomActionPerformerStringListOverlap(string Id, int Index
 ;/* GetCustomActionPerformerFloatListOverlapCSV
 * * same as GetCustomActionPerformerStringListOverlap, except values are passed as a csv-string
 * *
+* * @param: Id, the id of the scene
 * * @param: Index, the index of the action in the scene
 * * @param: Record, the record identifier for the custom string list
 * * @param: Values, a csv-string of values to check for
@@ -3036,6 +3048,112 @@ string[] Function GetCustomActionPerformerStringListOverlap(string Id, int Index
 */;
 string[] Function GetCustomActionPerformerStringListOverlapCSV(string Id, int Index, string Record, string Values) Global Native
 
+
+;  ██████╗██╗   ██╗███████╗████████╗ ██████╗ ███╗   ███╗    ███████╗ ██████╗███████╗███╗   ██╗███████╗     █████╗  ██████╗████████╗ ██████╗ ██████╗     ██████╗  █████╗ ████████╗ █████╗ 
+; ██╔════╝██║   ██║██╔════╝╚══██╔══╝██╔═══██╗████╗ ████║    ██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝    ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗
+; ██║     ██║   ██║███████╗   ██║   ██║   ██║██╔████╔██║    ███████╗██║     █████╗  ██╔██╗ ██║█████╗      ███████║██║        ██║   ██║   ██║██████╔╝    ██║  ██║███████║   ██║   ███████║
+; ██║     ██║   ██║╚════██║   ██║   ██║   ██║██║╚██╔╝██║    ╚════██║██║     ██╔══╝  ██║╚██╗██║██╔══╝      ██╔══██║██║        ██║   ██║   ██║██╔══██╗    ██║  ██║██╔══██║   ██║   ██╔══██║
+; ╚██████╗╚██████╔╝███████║   ██║   ╚██████╔╝██║ ╚═╝ ██║    ███████║╚██████╗███████╗██║ ╚████║███████╗    ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║    ██████╔╝██║  ██║   ██║   ██║  ██║
+;  ╚═════╝ ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝    ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+
+; scene actors do not directly have custom data, these functions refer to all action custom data ralated to the scene actor
+
+;/* GetCustomSceneActorIntMin
+* * gets the minimum custom int that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom int
+* * @param: Fallback, a fallback value to return if no custom int was defined
+* *
+* * @return: the minimum of all custom ints defined for the scene actor, or the fallback, if none was defined
+*/;
+int Function GetCustomSceneActorIntMin(string Id, int Position, string Record, int Fallback = 0) Global Native
+
+;/* GetCustomSceneActorIntMax
+* * gets the maximum custom int that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom int
+* * @param: Fallback, a fallback value to return if no custom int was defined
+* *
+* * @return: the maximum of all custom ints defined for the scene actor, or the fallback, if none was defined
+*/;
+int Function GetCustomSceneActorIntMax(string Id, int Position, string Record, int Fallback = 0) Global Native
+
+;/* GetCustomSceneActorIntSum
+* * gets the sum of all custom ints that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom int
+* * @param: StartValue, the start value for the sum
+* *
+* * @return: the sum of all custom ints defined for the scene actor
+*/;
+int Function GetCustomSceneActorIntSum(string Id, int Position, string Record, int StartValue = 0) Global Native
+
+;/* GetCustomSceneActorIntProduct
+* * gets the product of all custom ints that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom int
+* * @param: StartValue, the start value for the product
+* *
+* * @return: the product of all custom ints defined for the scene actor
+*/;
+int Function GetCustomSceneActorIntProduct(string Id, int Position, string Record, int StartValue = 1) Global Native
+
+
+;/* GetCustomSceneActorIntMin
+* * gets the minimum custom float that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom float
+* * @param: Fallback, a fallback value to return if no custom float was defined
+* *
+* * @return: the minimum of all custom floats defined for the scene actor, or the fallback, if none was defined
+*/;
+float Function GetCustomSceneActorFloatMin(string Id, int Position, string Record, float Fallback = 0.0) Global Native
+
+;/* GetCustomSceneActorIntMax
+* * gets the maximum custom float that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom float
+* * @param: Fallback, a fallback value to return if no custom float was defined
+* *
+* * @return: the maximum of all custom floats defined for the scene actor, or the fallback, if none was defined
+*/;
+float Function GetCustomSceneActorFloatMax(string Id, int Position, string Record, float Fallback = 0.0) Global Native
+
+;/* GetCustomSceneActorFloatSum
+* * gets the sum of all custom floats that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom float
+* * @param: StartValue, the start value for the sum
+* *
+* * @return: the sum of all custom floats defined for the scene actor
+*/;
+float Function GetCustomSceneActorFloatSum(string Id, int Position, string Record, float StartValue = 0.0) Global Native
+
+;/* GetCustomSceneActorFloatProduct
+* * gets the product of all custom floats that any action has defined for this scene actor
+* *
+* * @param: Id, the id of the scene
+* * @param: Position, the index of the scene actor
+* * @param: Record, the record identifier for the custom float
+* * @param: StartValue, the start value for the product
+* *
+* * @return: the product of all custom floats defined for the scene actor
+*/;
+float Function GetCustomSceneActorFloatProduct(string Id, int Position, string Record, float StartValue = 1.0) Global Native
 
 ; ██████╗ ███████╗██████╗ ██████╗ ███████╗ ██████╗ █████╗ ████████╗███████╗██████╗ 
 ; ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
