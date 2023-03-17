@@ -2901,6 +2901,10 @@ Event OnKeyDown(Int KeyPress)
 		Return
 	EndIf
 
+	if(KeyPress == 38)
+		OAlign.ToggleMenu()
+	endIf
+
 
 	If (KeyPress == KeyMap)
 		Actor Target = Game.GetCurrentCrosshairRef() as Actor
@@ -3208,6 +3212,8 @@ Function OnLoadGame()
 		If KeyMap != 1
 			RegisterForKey(KeyMap)
 		EndIf
+
+		RegisterForKey(38) ; TODO: Move to MCM
 
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
