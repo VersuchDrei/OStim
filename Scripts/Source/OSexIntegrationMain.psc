@@ -1107,7 +1107,7 @@ Event OnUpdate() ;OStim main logic loop
 
 		i = 3
 		While i < Actors.Length
-			If GetActorExcitement(Actors[i])
+			If GetActorExcitement(Actors[i]) >= 100.0
 				Orgasm(Actors[i])
 			EndIf
 			i += 1

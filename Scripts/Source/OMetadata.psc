@@ -2105,6 +2105,17 @@ bool Function HasCustomActionActorFloatList(string Id, int Index, string Record)
 */;
 float[] Function GetCustomActionActorFloatList(string Id, int Index, string Record) Global Native
 
+;/* CustomActionActorFloatListContains
+* * checks if the custom float list record defined for the action actor contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom float list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom float list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionActorFloatListContains(string Id, int Index, string Record, float Value) Global Native
+
 ;/* CustomActionActorFloatListContainsAny
 * * checks if the custom float list record defined for the action actor contains any of a list of values
 * *
@@ -2192,6 +2203,17 @@ bool Function HasCustomActionActorStringList(string Id, int Index, string Record
 * * @return: an array with all custom strings in the list, empty if none was defined
 */;
 string[] Function GetCustomActionActorStringList(string Id, int Index, string Record) Global Native
+
+;/* CustomActionActorStringListContains
+* * checks if the custom string list record defined for the action actor contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom string list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom string list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionActorStringListContains(string Id, int Index, string Record, string Value) Global Native
 
 ;/* CustomActionActorStringListContainsAny
 * * checks if the custom string list record defined for the action actor contains any of a list of values
@@ -2494,6 +2516,17 @@ bool Function HasCustomActionTargetFloatList(string Id, int Index, string Record
 */;
 float[] Function GetCustomActionTargetFloatList(string Id, int Index, string Record) Global Native
 
+;/* CustomActionTargetFloatListContains
+* * checks if the custom float list record defined for the action target contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom float list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom float list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionTargetFloatListContains(string Id, int Index, string Record, float Value) Global Native
+
 ;/* CustomActionTargetFloatListContainsAny
 * * checks if the custom float list record defined for the action target contains any of a list of values
 * *
@@ -2581,6 +2614,17 @@ bool Function HasCustomActionTargetStringList(string Id, int Index, string Recor
 * * @return: an array with all custom strings in the list, empty if none was defined
 */;
 string[] Function GetCustomActionTargetStringList(string Id, int Index, string Record) Global Native
+
+;/* CustomActionTargetStringListContains
+* * checks if the custom string list record defined for the action target contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom string list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom string list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionTargetStringListContains(string Id, int Index, string Record, string Value) Global Native
 
 ;/* CustomActionTargetStringListContainsAny
 * * checks if the custom string list record defined for the action target contains any of a list of values
@@ -2882,6 +2926,17 @@ bool Function HasCustomActionPerformerFloatList(string Id, int Index, string Rec
 */;
 float[] Function GetCustomActionPerformerFloatList(string Id, int Index, string Record) Global Native
 
+;/* CustomActionPerformerFloatListContains
+* * checks if the custom float list record defined for the action performer contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom float list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom float list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionPerformerFloatListContains(string Id, int Index, string Record, float Value) Global Native
+
 ;/* CustomActionPerformerFloatListContainsAny
 * * checks if the custom float list record defined for the action performer contains any of a list of values
 * *
@@ -2975,6 +3030,17 @@ bool Function HasCustomActionPerformerStringList(string Id, int Index, string Re
 * * @return: an array with all custom strings in the list, empty if none was defined
 */;
 string[] Function GetCustomActionPerformerStringList(string Id, int Index, string Record) Global Native
+
+;/* CustomActionPerformerStringListContains
+* * checks if the custom string list record defined for the action performer contains a value
+* *
+* * @param: Index, the index of the action in the scene
+* * @param: Record, the record identifier for the custom string list
+* * @param: Value, the value to check for
+* *
+* * @return: true if the custom string list contains the given value, false if not or none was defined
+*/;
+bool Function CustomActionPerformerStringListContains(string Id, int Index, string Record, string Value) Global Native
 
 ;/* CustomActionPerformerStringListContainsAny
 * * checks if the custom string list record defined for the action performer contains any of a list of values
