@@ -38,6 +38,7 @@ int Property FURNITURE_TYPE_TABLE = 4 AutoReadOnly
 int Property FURNITURE_TYPE_SHELF = 5 AutoReadOnly
 int Property FURNITURE_TYPE_WALL = 6 AutoReadOnly
 int Property FURNITURE_TYPE_COOKING_POT = 7 AutoReadOnly
+int Property FURNITURE_TYPE_CANCEL = 8 AutoReadOnly
 
 string[] Property FURNITURE_TYPE_STRINGS Auto
 
@@ -95,17 +96,8 @@ Float SpeedUpSpeed
 
 Int Property CustomTimescale Auto
 
-Int Property KeyMap Auto
-
-int property FreecamKey auto 
-
 string[] scenemetadata
 string[] oldscenemetadata
-
-Int Property SpeedUpKey Auto
-Int Property SpeedDownKey Auto
-Int Property PullOutKey Auto
-Int Property ControlToggleKey Auto
 
 Bool Property UseAIControl Auto
 Bool Property PauseAI Auto
@@ -148,6 +140,28 @@ Bool Property Installed auto
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
+
+; -------------------------------------------------------------------------------------------------
+; CONTROLS SETTINGS  ------------------------------------------------------------------------------
+
+Int Property KeyMap Auto
+
+int property FreecamKey auto 
+
+Int Property SpeedUpKey Auto
+Int Property SpeedDownKey Auto
+Int Property PullOutKey Auto
+Int Property ControlToggleKey Auto
+
+GlobalVariable Property OStimKeyAlignment Auto
+int Property KeyAlignment
+	int Function Get()
+		Return OStimKeyAlignment.value As int
+	EndFunction
+	Function Set(int Value)
+		OStimKeyAlignment.value = Value
+	EndFunction
+EndProperty
 
 ; -------------------------------------------------------------------------------------------------
 ; CAMERA SETTINGS  --------------------------------------------------------------------------------
@@ -441,6 +455,48 @@ bool Property UseIntroScenes
 			OStimUseIntroScenes.value = 1
 		Else
 			OStimUseIntroScenes.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupBySex Auto
+bool Property AlignmentGroupBySex
+	bool Function Get()
+		Return OStimAlignmentGroupBySex.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupBySex.value = 1
+		Else
+			OStimAlignmentGroupBySex.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupByHeight Auto
+bool Property AlignmentGroupByHeight
+	bool Function Get()
+		Return OStimAlignmentGroupByHeight.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupByHeight.value = 1
+		Else
+			OStimAlignmentGroupByHeight.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupByHeels Auto
+bool Property AlignmentGroupByHeels
+	bool Function Get()
+		Return OStimAlignmentGroupByHeels.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupByHeels.value = 1
+		Else
+			OStimAlignmentGroupByHeels.value = 0
 		EndIf
 	EndFunction
 EndProperty
@@ -854,6 +910,51 @@ Event OnUpdate() ;OStim main logic loop
 		FadeToBlack()
 	EndIf
 
+	If FurnitureType == FURNITURE_TYPE_NONE && UseFurniture
+		If StartingAnimation == ""
+			SelectFurniture()
+
+			If FurnitureType == FURNITURE_TYPE_CANCEL
+				If (UseFades)
+					FadeFromBlack()
+				EndIf
+				SceneRunning = False
+				Return
+			EndIf
+		Else
+			CurrentFurniture = FindBed(Actors[0])
+			If CurrentFurniture && (!SelectFurniture || OStimBedConfirmationMessage.Show() == 0)
+				FurnitureType == FURNITURE_TYPE_BED
+			Else
+				CurrentFurniture = None
+			EndIf
+		EndIf
+	EndIf
+
+	string SceneTag = "idle"
+	If UseIntroScenes
+		SceneTag = "intro"
+	EndIf
+
+	If (StartingAnimation == "")
+		If FurnitureType == FURNITURE_TYPE_NONE
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BED
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
+		Else
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
+		EndIf
+	EndIf
+
+	If StartingAnimation == ""
+		If (UseFades)
+			FadeFromBlack()
+		EndIf
+		Debug.Notification("No valid starting animation found.")
+		SceneRunning = False
+		Return
+	EndIf
+
 
 	If (SubActor)
 		If (SubActor.GetParentCell() != DomActor.GetParentCell())
@@ -912,20 +1013,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	If FurnitureType == FURNITURE_TYPE_NONE && UseFurniture
-		If StartingAnimation == ""
-			SelectFurniture()
-		Else
-			CurrentFurniture = FindBed(Actors[0])
-			If CurrentFurniture && (!SelectFurniture || OStimBedConfirmationMessage.Show() == 0)
-				FurnitureType == FURNITURE_TYPE_BED
-			Else
-				CurrentFurniture = None
-			EndIf
-		EndIf
-	EndIf
-
-
 	float[] domCoords
 	float[] subCoords
 
@@ -936,11 +1023,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	string SceneTag = "idle"
-	If UseIntroScenes
-		SceneTag = "intro"
-	EndIf
-
 	If FurnitureType == FURNITURE_TYPE_NONE
 		If (SubActor && SubActor != PlayerRef)
 			SubActor.MoveTo(DomActor)
@@ -949,20 +1031,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	Else
 		CurrentFurniture.BlockActivation(true)
-	EndIf
-
-	If (StartingAnimation == "")
-		If FurnitureType == FURNITURE_TYPE_NONE
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
-		ElseIf FurnitureType == FURNITURE_TYPE_BED
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
-		Else
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
-		EndIf
-	EndIf
-
-	If (StartingAnimation == "")
-		StartingAnimation = "AUTO"
 	EndIf
 
 	o = "_root.WidgetContainer." + OSAOmni.Glyph + ".widget"
@@ -1218,21 +1286,12 @@ Event OnUpdate() ;OStim main logic loop
 EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
-
-	string Type = "malemasturbation"
-	If IsFemale(Masturbator)
-		Type = "femalemasturbation"
+	If !SoloAnimsInstalled()
+		Debug.Notification("No solo animations installed")
+		Return
 	EndIf
 
-	Actor[] Solo = new Actor[1]
-	Solo[0] = Masturbator
-
-	string Id = OLibrary.GetRandomSceneWithAction(Solo, Type)
-	If Id != ""
-		StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = Id, Bed = MBed)
-	Else
-		console("No masturbation animation was not found.")
-	EndIf
+	StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, Bed = MBed)
 EndFunction
 
 
