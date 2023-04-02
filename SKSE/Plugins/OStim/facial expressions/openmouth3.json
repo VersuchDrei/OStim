@@ -14,7 +14,7 @@
 			},
             {
 				"type": 5,
-				"baseValue": 30
+				"baseValue": 60
 			}
 		]
 	},
@@ -30,7 +30,7 @@
 			},
             {
 				"type": 5,
-				"baseValue": 30
+				"baseValue": 60
 			}
 		]
 	}
