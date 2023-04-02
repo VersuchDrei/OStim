@@ -224,14 +224,15 @@ Event OnVersionUpdate(int version)
 EndEvent
 
 Function SetupPages()
-	Pages = new string[7]
+	Pages = new string[8]
 	Pages[0] = "$ostim_page_configuration"
 	Pages[1] = "$ostim_page_excitement"
 	Pages[2] = "$ostim_page_gender_roles"
 	Pages[3] = "$ostim_page_undress"
 	Pages[4] = "$ostim_page_expression"
-	Pages[5] = "$ostim_page_addons"
-	Pages[6] = "$ostim_page_about"
+	Pages[5] = "$ostim_page_alignment"
+	Pages[6] = "$ostim_page_addons"
+	Pages[7] = "$ostim_page_about"
 EndFunction
 
 Event OnConfigRegister()

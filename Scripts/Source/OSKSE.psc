@@ -39,3 +39,17 @@ Function UpdateHeelOffset(Actor Act, float Offset, bool Add, bool Remove, bool I
 	EndIf
 	nioverride.UpdateNodeTransform(Act, false, IsFemale, "NPC")
 EndFunction
+
+Function ToggleImprovedCamera(bool On) Global
+	If On
+		int POVKey = Input.GetMappedKey("Toggle POV")
+		Input.HoldKey(POVKey)
+		Utility.Wait(0.025)
+		Input.ReleaseKey(POVKey)
+		Utility.Wait(0.05)
+	Else
+		Game.ForceFirstPerson()
+		Utility.Wait(0.034)
+		Game.ForceThirdPerson()
+	EndIf
+EndFunction

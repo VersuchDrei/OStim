@@ -1,7 +1,8 @@
 {
 	"actionActors": [
 		"kissing",
-		"kissingfeet"
+		"kissingfeet",
+		"kissingneck"
 	],
 	"actionTargets": [
 		"kissing"

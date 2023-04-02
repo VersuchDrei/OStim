@@ -65,8 +65,6 @@ Bool Property AutoHideBars Auto
 Bool Property MatchBarColorToGender auto
 Bool Property HideBarsInNPCScenes auto
 
-Bool Property EnableImprovedCamSupport Auto
-
 Bool Property EnableActorSpeedControl Auto
 
 Bool Property ResetPosAfterSceneEnd Auto
@@ -197,6 +195,20 @@ float Property FreecamSpeed
 	EndFunction
 	Function Set(float Value)
 		OStimFreeCamSpeed.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimImprovedCamSupport Auto
+bool Property EnableImprovedCamSupport
+	bool Function Get()
+		Return OStimImprovedCamSupport.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimImprovedCamSupport.value = 1
+		Else
+			OStimImprovedCamSupport.value = 0
+		EndIf
 	EndFunction
 EndProperty
 
@@ -1115,13 +1127,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	; this is now done in _oActra after the player has been moved to the stage, so that you no longer have to search for your furniture scenes
-	;If (UseFreeCam) && IsPlayerInvolved()
-	;	Utility.Wait(0) ; is waiting for the next frame, to make sure controls are reenabled before toggling free cam
-	;	ToggleFreeCam(True)
-	;EndIf
-
-
 	SendModEvent("ostim_start")
 	
 	If (UseFades)
@@ -1205,10 +1210,6 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	ODatabase.Unload()
-
-	If (OSANative.IsFreeCam())
-		ToggleFreeCam(False)
-	EndIf
 
 	If ResetPosAfterSceneEnd && !ForceCloseOStimThread
 		DomActor.StopTranslation()
@@ -1711,42 +1712,6 @@ Function AllowVehicleReset()
 		i -= 1
 		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actors[i])) + "_AllowAlignStage")
 	EndWhile
-EndFunction
-
-Function ToggleFreeCam(Bool On = True)
-	outils.lock("mtx_tfc")
-
-	If (!OSANative.IsFreeCam())
-		int cstate = game.GetCameraState()
-		If (cstate == 0) || ((cstate == 9))
-			game.ForceThirdPerson()
-			
-			if EnableImprovedCamSupport
-				; Improved cam hack
-				int povkey = input.GetMappedKey("Toggle POV")
-
-				input.HoldKey(povkey)
-				Utility.Wait(0.025)
-				input.ReleaseKey(povkey)
-
-				Utility.Wait(0.05)
-			endif 
-		endif 
-		;OSANative.EnableFreeCam()
-		consoleUtil.ExecuteCommand("tfc")
-		Console("Enabling freecam")
-	Else
-		;OSANative.DisableFreeCam()
-		consoleUtil.ExecuteCommand("tfc")
-		if EnableImprovedCamSupport
-			game.ForceFirstPerson()
-			Utility.Wait(0.034)
-			game.ForceThirdPerson()
-		endif 
-		Console("Disabling freecam")
-	EndIf
-
-	OSANative.Unlock("mtx_tfc")
 EndFunction
 
 bool NavMenuHidden
@@ -2986,7 +2951,7 @@ Event OnKeyDown(Int KeyPress)
 		EndIf
 	elseif (KeyPress == freecamkey)
 		if animationrunning()
-			ToggleFreeCam()
+			OSANative.ToggleFlyCam()
 			return
 		endif 
 	EndIf
@@ -3521,4 +3486,8 @@ Function Realign()
 EndFunction
 
 Function AlternateRealign()
+EndFunction
+
+Function ToggleFreeCam(Bool On = True)
+	OSANative.ToggleFlyCam()
 EndFunction
