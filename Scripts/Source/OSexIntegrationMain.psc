@@ -38,6 +38,7 @@ int Property FURNITURE_TYPE_TABLE = 4 AutoReadOnly
 int Property FURNITURE_TYPE_SHELF = 5 AutoReadOnly
 int Property FURNITURE_TYPE_WALL = 6 AutoReadOnly
 int Property FURNITURE_TYPE_COOKING_POT = 7 AutoReadOnly
+int Property FURNITURE_TYPE_CANCEL = 8 AutoReadOnly
 
 string[] Property FURNITURE_TYPE_STRINGS Auto
 
@@ -63,8 +64,6 @@ Bool Property EnableThirdBar Auto
 Bool Property AutoHideBars Auto
 Bool Property MatchBarColorToGender auto
 Bool Property HideBarsInNPCScenes auto
-
-Bool Property EnableImprovedCamSupport Auto
 
 Bool Property EnableActorSpeedControl Auto
 
@@ -95,17 +94,8 @@ Float SpeedUpSpeed
 
 Int Property CustomTimescale Auto
 
-Int Property KeyMap Auto
-
-int property FreecamKey auto 
-
 string[] scenemetadata
 string[] oldscenemetadata
-
-Int Property SpeedUpKey Auto
-Int Property SpeedDownKey Auto
-Int Property PullOutKey Auto
-Int Property ControlToggleKey Auto
 
 Bool Property UseAIControl Auto
 Bool Property PauseAI Auto
@@ -150,6 +140,111 @@ int Property InstalledVersion Auto
 bool property ShowTutorials auto
 
 ; -------------------------------------------------------------------------------------------------
+; CONTROLS SETTINGS  ------------------------------------------------------------------------------
+
+GlobalVariable Property OStimKeySceneStart Auto
+int Property KeyMap
+	int Function Get()
+		Return OStimKeySceneStart.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySceneStart.value As int)
+		OStimKeySceneStart.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeySpeedUp Auto
+Int Property SpeedUpKey
+	int Function Get()
+		Return OStimKeySpeedUp.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySpeedUp.value As int)
+		OStimKeySpeedUp.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeySpeedDown Auto
+Int Property SpeedDownKey
+	int Function Get()
+		Return OStimKeySpeedDown.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySpeedDown.value As int)
+		OStimKeySpeedDown.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyPullOut Auto
+Int Property PullOutKey
+	int Function Get()
+		Return OStimKeyPullOut.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyPullOut.value As int)
+		OStimKeyPullOut.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyAutoMode Auto
+Int Property ControlToggleKey
+	int Function Get()
+		Return OStimKeyAutoMode.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyAutoMode.value As int)
+		OStimKeyAutoMode.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyFreeCam Auto
+int property FreecamKey
+	int Function Get()
+		Return OStimKeyFreeCam.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyFreeCam.value As int)
+		OStimKeyFreeCam.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyAlignment Auto
+int Property AlignmentKey
+	int Function Get()
+		Return OStimKeyAlignment.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyAlignment.value As int)
+		OStimKeyAlignment.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+	EndFunction
+EndProperty
+
+; -------------------------------------------------------------------------------------------------
 ; CAMERA SETTINGS  --------------------------------------------------------------------------------
 
 GlobalVariable Property OStimUseFreeCam Auto
@@ -183,6 +278,20 @@ float Property FreecamSpeed
 	EndFunction
 	Function Set(float Value)
 		OStimFreeCamSpeed.value = Value
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimImprovedCamSupport Auto
+bool Property EnableImprovedCamSupport
+	bool Function Get()
+		Return OStimImprovedCamSupport.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimImprovedCamSupport.value = 1
+		Else
+			OStimImprovedCamSupport.value = 0
+		EndIf
 	EndFunction
 EndProperty
 
@@ -441,6 +550,48 @@ bool Property UseIntroScenes
 			OStimUseIntroScenes.value = 1
 		Else
 			OStimUseIntroScenes.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupBySex Auto
+bool Property AlignmentGroupBySex
+	bool Function Get()
+		Return OStimAlignmentGroupBySex.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupBySex.value = 1
+		Else
+			OStimAlignmentGroupBySex.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupByHeight Auto
+bool Property AlignmentGroupByHeight
+	bool Function Get()
+		Return OStimAlignmentGroupByHeight.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupByHeight.value = 1
+		Else
+			OStimAlignmentGroupByHeight.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimAlignmentGroupByHeels Auto
+bool Property AlignmentGroupByHeels
+	bool Function Get()
+		Return OStimAlignmentGroupByHeels.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimAlignmentGroupByHeels.value = 1
+		Else
+			OStimAlignmentGroupByHeels.value = 0
 		EndIf
 	EndFunction
 EndProperty
@@ -854,6 +1005,51 @@ Event OnUpdate() ;OStim main logic loop
 		FadeToBlack()
 	EndIf
 
+	If FurnitureType == FURNITURE_TYPE_NONE && UseFurniture
+		If StartingAnimation == ""
+			SelectFurniture()
+
+			If FurnitureType == FURNITURE_TYPE_CANCEL
+				If (UseFades)
+					FadeFromBlack()
+				EndIf
+				SceneRunning = False
+				Return
+			EndIf
+		Else
+			CurrentFurniture = FindBed(Actors[0])
+			If CurrentFurniture && (!SelectFurniture || OStimBedConfirmationMessage.Show() == 0)
+				FurnitureType == FURNITURE_TYPE_BED
+			Else
+				CurrentFurniture = None
+			EndIf
+		EndIf
+	EndIf
+
+	string SceneTag = "idle"
+	If UseIntroScenes
+		SceneTag = "intro"
+	EndIf
+
+	If (StartingAnimation == "")
+		If FurnitureType == FURNITURE_TYPE_NONE
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
+		ElseIf FurnitureType == FURNITURE_TYPE_BED
+			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
+		Else
+			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
+		EndIf
+	EndIf
+
+	If StartingAnimation == ""
+		If (UseFades)
+			FadeFromBlack()
+		EndIf
+		Debug.Notification("No valid starting animation found.")
+		SceneRunning = False
+		Return
+	EndIf
+
 
 	If (SubActor)
 		If (SubActor.GetParentCell() != DomActor.GetParentCell())
@@ -912,20 +1108,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	If FurnitureType == FURNITURE_TYPE_NONE && UseFurniture
-		If StartingAnimation == ""
-			SelectFurniture()
-		Else
-			CurrentFurniture = FindBed(Actors[0])
-			If CurrentFurniture && (!SelectFurniture || OStimBedConfirmationMessage.Show() == 0)
-				FurnitureType == FURNITURE_TYPE_BED
-			Else
-				CurrentFurniture = None
-			EndIf
-		EndIf
-	EndIf
-
-
 	float[] domCoords
 	float[] subCoords
 
@@ -936,11 +1118,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	string SceneTag = "idle"
-	If UseIntroScenes
-		SceneTag = "intro"
-	EndIf
-
 	If FurnitureType == FURNITURE_TYPE_NONE
 		If (SubActor && SubActor != PlayerRef)
 			SubActor.MoveTo(DomActor)
@@ -949,20 +1126,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	Else
 		CurrentFurniture.BlockActivation(true)
-	EndIf
-
-	If (StartingAnimation == "")
-		If FurnitureType == FURNITURE_TYPE_NONE
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "standing"))
-		ElseIf FurnitureType == FURNITURE_TYPE_BED
-			StartingAnimation = OLibrary.GetRandomSceneWithAnySceneTagAndAnyMultiActorTagForAllCSV(Actors, SceneTag, OCSV.CreateCSVMatrix(Actors.Length, "allfours,kneeling,lyingback,lyingside,sitting"))
-		Else
-			StartingAnimation = OLibrary.GetRandomFurnitureSceneWithSceneTag(Actors, FURNITURE_TYPE_STRINGS[FurnitureType], SceneTag)
-		EndIf
-	EndIf
-
-	If (StartingAnimation == "")
-		StartingAnimation = "AUTO"
 	EndIf
 
 	o = "_root.WidgetContainer." + OSAOmni.Glyph + ".widget"
@@ -1046,13 +1209,6 @@ Event OnUpdate() ;OStim main logic loop
 			AIRunning = True
 		EndIf
 	EndIf
-
-	; this is now done in _oActra after the player has been moved to the stage, so that you no longer have to search for your furniture scenes
-	;If (UseFreeCam) && IsPlayerInvolved()
-	;	Utility.Wait(0) ; is waiting for the next frame, to make sure controls are reenabled before toggling free cam
-	;	ToggleFreeCam(True)
-	;EndIf
-
 
 	SendModEvent("ostim_start")
 	
@@ -1138,10 +1294,6 @@ Event OnUpdate() ;OStim main logic loop
 
 	ODatabase.Unload()
 
-	If (OSANative.IsFreeCam())
-		ToggleFreeCam(False)
-	EndIf
-
 	If ResetPosAfterSceneEnd && !ForceCloseOStimThread
 		DomActor.StopTranslation()
 		DomActor.SetPosition(domcoords[0], domcoords[1], domcoords[2])
@@ -1218,21 +1370,12 @@ Event OnUpdate() ;OStim main logic loop
 EndEvent
 
 Function Masturbate(Actor Masturbator, Bool zUndress = False, Bool zAnimUndress = False, ObjectReference MBed = None)
-
-	string Type = "malemasturbation"
-	If IsFemale(Masturbator)
-		Type = "femalemasturbation"
+	If !SoloAnimsInstalled()
+		Debug.Notification("No solo animations installed")
+		Return
 	EndIf
 
-	Actor[] Solo = new Actor[1]
-	Solo[0] = Masturbator
-
-	string Id = OLibrary.GetRandomSceneWithAction(Solo, Type)
-	If Id != ""
-		StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, zStartingAnimation = Id, Bed = MBed)
-	Else
-		console("No masturbation animation was not found.")
-	EndIf
+	StartScene(Masturbator, None, zUndressDom = zUndress, zAnimateUndress = zAnimUndress, Bed = MBed)
 EndFunction
 
 
@@ -1652,42 +1795,6 @@ Function AllowVehicleReset()
 		i -= 1
 		SendModEvent("0SAA" + _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(Actors[i])) + "_AllowAlignStage")
 	EndWhile
-EndFunction
-
-Function ToggleFreeCam(Bool On = True)
-	outils.lock("mtx_tfc")
-
-	If (!OSANative.IsFreeCam())
-		int cstate = game.GetCameraState()
-		If (cstate == 0) || ((cstate == 9))
-			game.ForceThirdPerson()
-			
-			if EnableImprovedCamSupport
-				; Improved cam hack
-				int povkey = input.GetMappedKey("Toggle POV")
-
-				input.HoldKey(povkey)
-				Utility.Wait(0.025)
-				input.ReleaseKey(povkey)
-
-				Utility.Wait(0.05)
-			endif 
-		endif 
-		;OSANative.EnableFreeCam()
-		consoleUtil.ExecuteCommand("tfc")
-		Console("Enabling freecam")
-	Else
-		;OSANative.DisableFreeCam()
-		consoleUtil.ExecuteCommand("tfc")
-		if EnableImprovedCamSupport
-			game.ForceFirstPerson()
-			Utility.Wait(0.034)
-			game.ForceThirdPerson()
-		endif 
-		Console("Disabling freecam")
-	EndIf
-
-	OSANative.Unlock("mtx_tfc")
 EndFunction
 
 bool NavMenuHidden
@@ -2711,6 +2818,7 @@ UseFreeCam
 	SpeedDownKey = 74
 	PullOutKey = 79
 	ControlToggleKey = 82
+	AlignmentKey = 38
 
 	MuteOSA = False
 
@@ -2727,12 +2835,6 @@ UseFreeCam
 	ShowTutorials = true 
 	
 	UseBrokenCosaveWorkaround = True
-	RemapStartKey(Keymap)
-	RegisterForKey(FreecamKey)
-	RemapSpeedDownKey(SpeedDownKey)
-	RemapSpeedUpKey(SpeedUpKey)
-	RemapPullOutKey(PullOutKey)
-	RemapControlToggleKey(ControlToggleKey)
 EndFunction
 
 Function RegisterOSexControlKey(Int zKey)
@@ -2797,56 +2899,6 @@ Function ResetState()
 	UI.InvokeInt("HUD Menu", o + ".com.endCommand", 56)
 EndFunction
 
-Function RemapStartKey(Int zKey)
-	UnregisterForKey(KeyMap)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	KeyMap = zKey
-EndFunction
-
-Function RemapFreecamKey(Int zKey)
-	UnregisterForKey(FreecamKey)
-	RegisterForKey(zKey)
-	FreecamKey = zKey
-EndFunction
-
-Function RemapControlToggleKey(Int zKey)
-	UnregisterForKey(ControlToggleKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	ControlToggleKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapSpeedUpKey(Int zKey)
-	UnregisterForKey(SpeedUpKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	speedUpKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapSpeedDownKey(Int zKey)
-	UnregisterForKey(SpeedDownKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	speedDownKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapPullOutKey(Int zKey)
-	UnregisterForKey(PullOutKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	PullOutKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
 Float ProfileTime 
 Function Profile(String Name = "")
 	{Call Profile() to start. Call Profile("any string") to pring out the time since profiler started in console. Most accurate at 60fps}
@@ -2901,6 +2953,10 @@ Event OnKeyDown(Int KeyPress)
 		Return
 	EndIf
 
+	if(KeyPress == AlignmentKey)
+		OAlign.ToggleMenu()
+	endIf
+
 
 	If (KeyPress == KeyMap)
 		Actor Target = Game.GetCurrentCrosshairRef() as Actor
@@ -2923,7 +2979,7 @@ Event OnKeyDown(Int KeyPress)
 		EndIf
 	elseif (KeyPress == freecamkey)
 		if animationrunning()
-			ToggleFreeCam()
+			OSANative.ToggleFlyCam()
 			return
 		endif 
 	EndIf
@@ -3209,6 +3265,11 @@ Function OnLoadGame()
 			RegisterForKey(KeyMap)
 		EndIf
 
+		If AlignmentKey != 1
+			RegisterForKey(AlignmentKey)
+		EndIf
+		
+
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
 		OControl.OPlayerControls()
@@ -3456,4 +3517,33 @@ Function Realign()
 EndFunction
 
 Function AlternateRealign()
+EndFunction
+
+Function ToggleFreeCam(Bool On = True)
+	OSANative.ToggleFlyCam()
+EndFunction
+
+Function RemapStartKey(Int zKey)
+	UnregisterForKey(KeyMap)
+	KeyMap = zKey
+EndFunction
+
+Function RemapFreecamKey(Int zKey)
+	FreecamKey = zKey
+EndFunction
+
+Function RemapControlToggleKey(Int zKey)
+	ControlToggleKey = zKey
+EndFunction
+
+Function RemapSpeedUpKey(Int zKey)
+	speedUpKey = zKey
+EndFunction
+
+Function RemapSpeedDownKey(Int zKey)
+	speedDownKey = zKey
+EndFunction
+
+Function RemapPullOutKey(Int zKey)
+	PullOutKey = zKey
 EndFunction
