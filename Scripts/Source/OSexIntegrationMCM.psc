@@ -6,8 +6,6 @@ Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
 Int SetUseScreenShake
-Int SetScaling
-Int SetSchlongBending
 int SetUseIntroScenes
 int SetResetPosition
 
@@ -48,12 +46,6 @@ Int SetOnlyLightInDark
 
 Int SetResetState
 
-; keymapping settings
-Int SetKeymap
-Int SetKeyUp
-Int SetKeyDown
-Int SetPullOut
-
 Int SetThanks
 
 ; light settings
@@ -93,7 +85,6 @@ Int SetUseFreeCam
 Int SetFreeCamFOV
 Int SetCameraSpeed
 Int SetForceFirstPerson
-int SetFreecamToggleKey
 
 Int SetUseCosaveWorkaround
 
@@ -112,17 +103,6 @@ string currPage
 actor playerref
 
 int SetUndressingAbout
-
-; OSA key bindings settings
-int SetOsaMainMenuKey
-int SetOsaUpKey
-int SetOsaDownKey
-int SetOsaLeftKey
-int SetOsaRightKey
-int SetOsaTogKey
-int SetOsaYesKey
-int SetOsaEndKey
-int SetOsaResetDefaultKeys
 
 Int osaMainMenuKeyDefault = 156 ; numpad ENTER
 Int osaUpKeyDefault = 72 ; numpad 8
@@ -216,7 +196,7 @@ Function Init()
 EndFunction
 
 int Function GetVersion()
-	Return 3
+	Return 4
 EndFunction
 
 Event OnVersionUpdate(int version)
@@ -224,15 +204,16 @@ Event OnVersionUpdate(int version)
 EndEvent
 
 Function SetupPages()
-	Pages = new string[8]
+	Pages = new string[9]
 	Pages[0] = "$ostim_page_configuration"
-	Pages[1] = "$ostim_page_excitement"
-	Pages[2] = "$ostim_page_gender_roles"
-	Pages[3] = "$ostim_page_undress"
-	Pages[4] = "$ostim_page_expression"
-	Pages[5] = "$ostim_page_alignment"
-	Pages[6] = "$ostim_page_addons"
-	Pages[7] = "$ostim_page_about"
+	Pages[1] = "$ostim_page_controls"
+	Pages[2] = "$ostim_page_excitement"
+	Pages[3] = "$ostim_page_gender_roles"
+	Pages[4] = "$ostim_page_undress"
+	Pages[5] = "$ostim_page_expression"
+	Pages[6] = "$ostim_page_alignment"
+	Pages[7] = "$ostim_page_addons"
+	Pages[8] = "$ostim_page_about"
 EndFunction
 
 Event OnConfigRegister()
@@ -290,8 +271,6 @@ Event OnPageReset(String Page)
 		SetUseRumble = AddToggleOption("$ostim_use_rumble", Main.UseRumble)
 		SetUseScreenShake = AddToggleOption("$ostim_screenshake", Main.UseScreenShake)
 		SetForceFirstPerson = AddToggleOption("$ostim_force_first", Main.ForceFirstPersonAfter)
-		SetScaling = AddToggleOption("$ostim_scaling", Main.DisableScaling)
-		SetSchlongBending = AddToggleOption("$ostim_schlong_bending", Main.DisableSchlongBending)
 		SetUseIntroScenes = AddToggleOption("$ostim_use_intro_scenes", Main.UseIntroScenes)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
 		AddEmptyOption()
@@ -347,27 +326,6 @@ Event OnPageReset(String Page)
 		SetUseFreeCam = AddToggleOption("$ostim_freecam", Main.UseFreeCam)
 		SetFreeCamFOV = AddSliderOption("$ostim_freecam_fov", Main.FreecamFOV, "{0}")
 		SetCameraSpeed = AddSliderOption("$ostim_freecam_speed", Main.FreecamSpeed, "{1}")
-		AddEmptyOption()
-
-		AddColoredHeader("$ostim_header_keys")
-		SetKeymap = AddKeyMapOption("$ostim_main_key", Main.KeyMap)
-		SetKeyup = AddKeyMapOption("$ostim_speed_up_key", Main.SpeedUpKey)
-		SetKeydown = AddKeyMapOption("$ostim_speed_down_key", Main.SpeedDownKey)
-		SetPullOut = AddKeyMapOption("$ostim_pullout_key", Main.PullOutKey)
-		SetControlToggle = AddKeyMapOption("$ostim_control_toggle_key", Main.ControlToggleKey)
-		SetFreecamToggleKey = AddKeyMapOption("$ostim_tfc_key", Main.FreecamKey)
-		AddEmptyOption()
-
-		AddColoredHeader("$ostim_header_osa_keys")
-		SetOsaMainMenuKey = AddKeyMapOption("$ostim_osaKeys_mainMenu", OSAControl.osaMainMenuKey)
-		SetOsaUpKey = AddKeyMapOption("$ostim_osaKeys_up", OSAControl.osaUpKey)
-		SetOsaDownKey = AddKeyMapOption("$ostim_osaKeys_down", OSAControl.osaDownKey)
-		SetOsaLeftKey = AddKeyMapOption("$ostim_osaKeys_left", OSAControl.osaLeftKey)
-		SetOsaRightKey = AddKeyMapOption("$ostim_osaKeys_right", OSAControl.osaRightKey)
-		SetOsaTogKey = AddKeyMapOption("$ostim_osaKeys_tog", OSAControl.osaTogKey)
-		SetOsaYesKey = AddKeyMapOption("$ostim_osaKeys_yes", OSAControl.osaYesKey)
-		SetOsaEndKey = AddKeyMapOption("$ostim_osaKeys_end", OSAControl.osaEndKey)
-		SetOsaResetDefaultKeys = AddToggleOption("$ostim_osaKeys_reset", false)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_lights")
@@ -436,6 +394,8 @@ Event OnPageReset(String Page)
 			SetOANudityBroadcast = AddToggleOption("$ostim_addon_oa_nudity_bc", StorageUtil.GetIntValue(none, SUOANudityBroadcast))
 
 		endif
+	ElseIf Page == "$ostim_page_controls"
+		DrawControlsPage()
 	ElseIf Page == "$ostim_page_excitement"
 		DrawExcitementPage()
 	ElseIf Page == "$ostim_page_gender_roles"
@@ -468,6 +428,8 @@ Event OnPageReset(String Page)
 
 	ElseIf Page == "$ostim_page_expression"
 		DrawExpressionPage()
+	ElseIf Page == "$ostim_page_alignment"
+		DrawAlignmentPage()
 	ElseIf (Page == "$ostim_page_about")
 		UnloadCustomContent()
 		SetInfoText(" ")
@@ -615,12 +577,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
-	ElseIf (Option == SetScaling)
-		Main.DisableScaling = !Main.DisableScaling
-		SetToggleOptionValue(Option, Main.DisableScaling)
-	ElseIf (Option == SetSchlongBending)
-		Main.DisableSchlongBending = !Main.DisableSchlongBending
-		SetToggleOptionValue(Option, Main.DisableSchlongBending)
 	ElseIf (Option == SetUseIntroScenes)
 		Main.UseIntroScenes = !Main.UseIntroScenes
 		SetToggleOptionValue(Option, Main.UseIntroScenes)
@@ -708,9 +664,6 @@ Event OnOptionSelect(Int Option)
 		If ShowMessage("$ostim_message_import_confirm")
 			ImportSettings(true)
 		EndIf
-	ElseIf (Option == SetOsaResetDefaultKeys)
-		resetOsaKeysToDefaults()
-		ShowMessage("$ostim_message_reset_osa_keys", false)
 	EndIf
 EndEvent
 
@@ -792,10 +745,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_ai_masturbation")
 	ElseIf (Option == SetUseFades)
 		SetInfoText("$ostim_tooltip_fades")
-	ElseIf (Option == SetScaling)
-		SetInfoText("$ostim_tooltip_scaling")
-	ElseIf (Option == SetSchlongBending)
-		SetInfoText("$ostim_tooltip_schlong_bending")
 	ElseIf (Option == SetUseIntroScenes)
 		SetInfoText("$ostim_tooltip_use_intro_scenes")
 	ElseIf (Option == SetUseCosaveWorkaround)
@@ -866,24 +815,12 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_dom_brightness")
 	ElseIf (Option == SetSubLightBrightness)
 		SetInfoText("$ostim_tooltip_sub_brightness")
-	ElseIf (Option == SetFreecamToggleKey)
-		SetInfoText("$ostim_tooltip_tfc_key")
-	ElseIf (Option == SetControlToggle)
-		SetInfoText("$ostim_tooltip_control_toggle_key")
 	ElseIf (Option == SetOnlyLightInDark)
 		SetInfoText("$ostim_tooltip_dark_light")
-	ElseIf (Option == SetKeymap)
-		SetInfoText("$ostim_tooltip_main_key")
-	ElseIf (Option == SetKeyUp)
-		SetInfoText("$ostim_tooltip_speed_up_key")
-	ElseIf (Option == SetKeyDown)
-		SetInfoText("$ostim_tooltip_speed_down_key")
 	ElseIf (Option == SetUseScreenShake)
 		SetInfoText("$ostim_tooltip_screen_shake")
 	ElseIf (Option == SetBedRealignment)
 		SetInfoText("$ostim_tooltip_bed_realignment")
-	ElseIf (Option == SetPullOut)
-		SetInfoText("$ostim_tooltip_pullout_key")
 	ElseIf (Option == SetThanks)
 		SetInfoText("$ostim_tooltip_thanks")
 	ElseIf (Option == ExportSettings)
@@ -892,22 +829,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_import")
 	ElseIf (Option == ImportDefaultSettings)
 		SetInfoText("$ostim_tooltip_import_default")
-	ElseIf (Option == SetOsaMainMenuKey)
-		SetInfoText("$ostim_tooltip_osa_main_menu")
-	ElseIf (Option == SetOsaUpKey)
-		SetInfoText("$ostim_tooltip_osa_up")
-	ElseIf (Option == SetOsaDownKey)
-		SetInfoText("$ostim_tooltip_osa_down")
-	ElseIf (Option == SetOsaLeftKey)
-		SetInfoText("$ostim_tooltip_osa_left")
-	ElseIf (Option == SetOsaRightKey)
-		SetInfoText("$ostim_tooltip_osa_right")
-	ElseIf (Option == SetOsaTogKey)
-		SetInfoText("$ostim_tooltip_osa_tog")
-	ElseIf (Option == SetOsaYesKey)
-		SetInfoText("$ostim_tooltip_osa_yes")
-	ElseIf (Option == SetOsaEndKey)
-		SetInfoText("$ostim_tooltip_osa_end")
 	EndIf
 EndEvent
 
@@ -1054,25 +975,7 @@ EndEvent
 
 Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, String ConflictName)
 	Main.PlayTickBig()
-	If (Option == Setkeymap)
-		Main.RemapStartKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetKeyUp)
-		Main.RemapSpeedUpKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetKeyDown)
-		Main.RemapSpeedDownKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetPullOut)
-		Main.RemapPulloutKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetControlToggle)
-		Main.RemapControlToggleKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetFreecamToggleKey)
-		Main.RemapFreecamKey(KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	Elseif (Option == SetORKey)
+	If (Option == SetORKey)
 		SetExternalInt(oromance, gvorkey, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
 	Elseif (Option == SetORLeft)
@@ -1087,30 +990,6 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
 	Elseif (Option == SetORRight)
 		SetExternalInt(oromance, GVORRight, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetOsaMainMenuKey)
-		OSAControl.osaMainMenuKey = keyCode
-		SetKeyMapOptionValue(SetOsaMainMenuKey, OSAControl.osaMainMenuKey)
-	ElseIf (Option == SetOsaUpKey)
-		OSAControl.osaUpKey = keyCode
-		SetKeyMapOptionValue(SetOsaUpKey, OSAControl.osaUpKey)
-	ElseIf (Option == SetOsaDownKey)
-		OSAControl.osaDownKey = keyCode
-		SetKeyMapOptionValue(SetOsaDownKey, OSAControl.osaDownKey)
-	ElseIf (Option == SetOsaLeftKey)
-		OSAControl.osaLeftKey = keyCode
-		SetKeyMapOptionValue(SetOsaLeftKey, OSAControl.osaLeftKey)
-	ElseIf (Option == SetOsaRightKey)
-		OSAControl.osaRightKey = keyCode
-		SetKeyMapOptionValue(SetOsaRightKey, OSAControl.osaRightKey)
-	ElseIf (Option == SetOsaTogKey)
-		OSAControl.osaTogKey = keyCode
-		SetKeyMapOptionValue(SetOsaTogKey, OSAControl.osaTogKey)
-	ElseIf (Option == SetOsaYesKey)
-		OSAControl.osaYesKey = keyCode
-		SetKeyMapOptionValue(SetOsaYesKey, OSAControl.osaYesKey)
-	ElseIf (Option == SetOsaEndKey)
-		OSAControl.osaEndKey = keyCode
-		SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
 	Endif
 EndEvent
 
@@ -1546,31 +1425,255 @@ Function ImportSettings(bool default = false)
 	ForcePageReset()
 EndFunction
 
-Function resetOsaKeysToDefaults()
-	OSAControl.osaMainMenuKey = osaMainMenuKeyDefault
-	SetKeyMapOptionValue(SetOsaMainMenuKey, OSAControl.osaMainMenuKey)
 
-	OSAControl.osaUpKey = osaUpKeyDefault
-	SetKeyMapOptionValue(SetOsaUpKey, OSAControl.osaUpKey)
+;  ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     ███████╗
+; ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     ██╔════╝
+; ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     ███████╗
+; ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     ╚════██║
+; ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗███████║
+;  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
 
-	OSAControl.osaDownKey = osaDownKeyDefault
-	SetKeyMapOptionValue(SetOsaDownKey, OSAControl.osaDownKey)
+Function DrawControlsPage()
+	SetCursorFillMode(LEFT_TO_RIGHT)
+	SetCursorPosition(0)
+	AddColoredHeader("$ostim_header_ostim_keys")
+	SetCursorPosition(2)
+	AddKeyMapOptionST("OID_KeyMain", "$ostim_main_key", Main.KeyMap)
+	SetCursorPosition(4)
+	AddKeyMapOptionST("OID_KeySpeedUp", "$ostim_speed_up_key", Main.SpeedUpKey)
+	SetCursorPosition(6)
+	AddKeyMapOptionST("OID_KeySpeedDown", "$ostim_speed_down_key", Main.SpeedDownKey)
+	SetCursorPosition(8)
+	AddKeyMapOptionST("OID_KeyPullOut", "$ostim_pullout_key", Main.PullOutKey)
+	SetCursorPosition(10)
+	AddKeyMapOptionST("OID_KeyControlToggle", "$ostim_control_toggle_key", Main.ControlToggleKey)
+	SetCursorPosition(12)
+	AddKeyMapOptionST("OID_KeyFreeCamToggle", "$ostim_tfc_key", Main.FreecamKey)
+	SetCursorPosition(14)
+	AddKeyMapOptionST("OID_KeyAlignmentMenu", "$ostim_key_alignment_menu", Main.AlignmentKey)
 
-	OSAControl.osaLeftKey = osaLeftKeyDefault
-	SetKeyMapOptionValue(SetOsaLeftKey, OSAControl.osaLeftKey)
-
-	OSAControl.osaRightKey = osaRightKeyDefault
-	SetKeyMapOptionValue(SetOsaRightKey, OSAControl.osaRightKey)
-
-	OSAControl.osaTogKey = osaTogKeyDefault
-	SetKeyMapOptionValue(SetOsaTogKey, OSAControl.osaTogKey)
-
-	OSAControl.osaYesKey = osaYesKeyDefault
-	SetKeyMapOptionValue(SetOsaYesKey, OSAControl.osaYesKey)
-
-	OSAControl.osaEndKey = osaEndKeyDefault
-	SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
+	SetCursorPosition(1)
+	AddColoredHeader("$ostim_header_osa_keys")
+	SetCursorPosition(3)
+	AddKeyMapOptionST("OID_OSA_KeyMainMenu", "$ostim_osaKeys_mainMenu", OSAControl.osaMainMenuKey)
+	SetCursorPosition(5)
+	AddKeyMapOptionST("OID_OSA_KeyUp", "$ostim_osaKeys_up", OSAControl.osaUpKey)
+	SetCursorPosition(7)
+	AddKeyMapOptionST("OID_OSA_KeyDown", "$ostim_osaKeys_down", OSAControl.osaDownKey)
+	SetCursorPosition(9)
+	AddKeyMapOptionST("OID_OSA_KeyLeft", "$ostim_osaKeys_left", OSAControl.osaLeftKey)
+	SetCursorPosition(11)
+	AddKeyMapOptionST("OID_OSA_KeyRight", "$ostim_osaKeys_right", OSAControl.osaRightKey)
+	SetCursorPosition(13)
+	AddKeyMapOptionST("OID_OSA_KeyTog", "$ostim_osaKeys_tog", OSAControl.osaTogKey)
+	SetCursorPosition(15)
+	AddKeyMapOptionST("OID_OSA_KeyYes", "$ostim_osaKeys_yes", OSAControl.osaYesKey)
+	SetCursorPosition(17)
+	AddKeyMapOptionST("OID_OSA_KeyEnd", "$ostim_osaKeys_end", OSAControl.osaEndKey)
+	SetCursorPosition(19)
+	AddToggleOptionST("OID_OSA_ResetKeys", "$ostim_osaKeys_reset", false)
 EndFunction
+
+
+State OID_KeyMain
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_main_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.KeyMap = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeySpeedUp
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_speed_up_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.SpeedUpKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeySpeedDown
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_speed_down_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.SpeedDownKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeyPullOut
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_pullout_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.PullOutKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeyControlToggle
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_control_toggle_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.ControlToggleKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeyFreeCamToggle
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_tfc_key")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.FreecamKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_KeyAlignmentMenu
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_key_alignment_menu")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		Main.AlignmentKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+
+State OID_OSA_KeyMainMenu
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_main_menu")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaMainMenuKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyUp
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_up")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaUpKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyDown
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_down")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaDownKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyLeft
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_left")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaLeftKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyRight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_right")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaRightKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyTog
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_tog")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaTogKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyYes
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_yes")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaYesKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_KeyEnd
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_osa_end")
+	EndEvent
+
+	Event OnKeyMapChangeST(int KeyCode, string ConflictControl, string ConflictName)
+		OSAControl.osaEndKey = KeyCode
+		SetKeyMapOptionValueST(KeyCode)
+	EndEvent
+EndState
+
+State OID_OSA_ResetKeys
+	Event OnHighlightST()
+		SetInfoText("")
+	EndEvent
+
+	Event OnSelectST()
+		OSAControl.osaMainMenuKey = osaMainMenuKeyDefault
+		SetKeyMapOptionValueST(osaMainMenuKeyDefault, false, "OID_OSA_KeyMainMenu")
+
+		OSAControl.osaUpKey = osaUpKeyDefault
+		SetKeyMapOptionValueST(osaUpKeyDefault, false, "OID_OSA_KeyUp")
+
+		OSAControl.osaDownKey = osaDownKeyDefault
+		SetKeyMapOptionValueST(osaDownKeyDefault, false, "OID_OSA_KeyDown")
+
+		OSAControl.osaLeftKey = osaLeftKeyDefault
+		SetKeyMapOptionValueST(osaLeftKeyDefault, false, "OID_OSA_KeyLeft")
+
+		OSAControl.osaRightKey = osaRightKeyDefault
+		SetKeyMapOptionValueST(osaRightKeyDefault, false, "OID_OSA_KeyRight")
+
+		OSAControl.osaTogKey = osaTogKeyDefault
+		SetKeyMapOptionValueST(osaTogKeyDefault, false, "OID_OSA_KeyTog")
+
+		OSAControl.osaYesKey = osaYesKeyDefault
+		SetKeyMapOptionValueST(osaYesKeyDefault, false, "OID_OSA_KeyYes")
+
+		OSAControl.osaEndKey = osaEndKeyDefault
+		SetKeyMapOptionValueST(osaEndKeyDefault, false, "OID_OSA_KeyEnd")
+
+		ShowMessage("$ostim_message_reset_osa_keys", false)
+	EndEvent
+EndState
 
 
 ; ███████╗██╗  ██╗ ██████╗██╗████████╗███████╗███╗   ███╗███████╗███╗   ██╗████████╗
@@ -1963,6 +2066,96 @@ State OID_PlayerTongue
 
 	Event OnDefaultST()
 		SetEquipObjectIDToDefault(0x7, "tongue")
+	EndEvent
+EndState
+
+
+;  █████╗ ██╗     ██╗ ██████╗ ███╗   ██╗███╗   ███╗███████╗███╗   ██╗████████╗
+; ██╔══██╗██║     ██║██╔════╝ ████╗  ██║████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+; ███████║██║     ██║██║  ███╗██╔██╗ ██║██╔████╔██║█████╗  ██╔██╗ ██║   ██║ 
+; ██╔══██║██║     ██║██║   ██║██║╚██╗██║██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║ 
+; ██║  ██║███████╗██║╚██████╔╝██║ ╚████║██║ ╚═╝ ██║███████╗██║ ╚████║   ██║ 
+; ╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝ 
+
+Function DrawAlignmentPage()
+	SetCursorFillMode(TOP_TO_BOTTOM)
+	SetCursorPosition(0)
+	AddToggleOptionST("OID_DisableScaling", "$ostim_scaling", Main.DisableScaling)
+	SetCursorPosition(2)
+	AddToggleOptionST("OID_DisableSchlongBending", "$ostim_schlong_bending", Main.DisableSchlongBending)
+
+	SetCursorPosition(1)
+	AddHeaderOption("$ostim_header_alignment_menu")
+	SetCursorPosition(3)
+	AddToggleOptionST("OID_AlignmentGroupBySex", "$ostim_alignment_group_by_sex", Main.AlignmentGroupBySex)
+	SetCursorPosition(5)
+	int AlignmentGroupByHeightFlags = OPTION_FLAG_NONE
+	If !Main.DisableScaling
+		AlignmentGroupByHeightFlags = OPTION_FLAG_DISABLED
+	EndIf
+	AddToggleOptionST("OID_AlignmentGroupByHeight", "$ostim_alignment_group_by_height", Main.AlignmentGroupByHeight, AlignmentGroupByHeightFlags)
+	SetCursorPosition(7)
+	AddToggleOptionST("OID_AlignmentGroupByHeels", "$ostim_alignment_group_by_heels", Main.AlignmentGroupByHeels)
+EndFunction
+
+State OID_DisableScaling
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_scaling")
+	EndEvent
+
+	Event OnSelectST()
+		Main.DisableScaling = !Main.DisableScaling
+		SetToggleOptionValueST(Main.DisableScaling)
+
+		int AlignmentGroupByHeightFlags = OPTION_FLAG_NONE
+		If !Main.DisableScaling
+			AlignmentGroupByHeightFlags = OPTION_FLAG_DISABLED
+		EndIf
+		SetOptionFlagsST(AlignmentGroupByHeightFlags, false, "OID_AlignmentGroupByHeight")
+	EndEvent
+EndState
+
+State OID_DisableSchlongBending
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_schlong_bending")
+	EndEvent
+	
+	Event OnSelectST()
+		Main.DisableSchlongBending = !Main.DisableSchlongBending
+		SetToggleOptionValueST(Main.DisableSchlongBending)
+	EndEvent
+EndState
+
+State OID_AlignmentGroupBySex
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_alignment_group_by_sex")
+	EndEvent
+
+	Event OnSelectST()
+		Main.AlignmentGroupBySex = !Main.AlignmentGroupBySex
+		SetToggleOptionValueST(Main.AlignmentGroupBySex)
+	EndEvent
+EndState
+
+State OID_AlignmentGroupByHeight
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_alignment_group_by_height")
+	EndEvent
+
+	Event OnSelectST()
+		Main.AlignmentGroupByHeight = !Main.AlignmentGroupByHeight
+		SetToggleOptionValueST(Main.AlignmentGroupByHeight)
+	EndEvent
+EndState
+
+State OID_AlignmentGroupByHeels
+	Event OnHighlightST()
+		SetInfoText("$ostim_tooltip_alignment_group_by_heels")
+	EndEvent
+
+	Event OnSelectST()
+		Main.AlignmentGroupByHeels = !Main.AlignmentGroupByHeels
+		SetToggleOptionValueST(Main.AlignmentGroupByHeels)
 	EndEvent
 EndState
 

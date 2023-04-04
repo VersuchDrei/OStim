@@ -142,22 +142,105 @@ bool property ShowTutorials auto
 ; -------------------------------------------------------------------------------------------------
 ; CONTROLS SETTINGS  ------------------------------------------------------------------------------
 
-Int Property KeyMap Auto
+GlobalVariable Property OStimKeySceneStart Auto
+int Property KeyMap
+	int Function Get()
+		Return OStimKeySceneStart.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySceneStart.value As int)
+		OStimKeySceneStart.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+	EndFunction
+EndProperty
 
-int property FreecamKey auto 
+GlobalVariable Property OStimKeySpeedUp Auto
+Int Property SpeedUpKey
+	int Function Get()
+		Return OStimKeySpeedUp.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySpeedUp.value As int)
+		OStimKeySpeedUp.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
 
-Int Property SpeedUpKey Auto
-Int Property SpeedDownKey Auto
-Int Property PullOutKey Auto
-Int Property ControlToggleKey Auto
+GlobalVariable Property OStimKeySpeedDown Auto
+Int Property SpeedDownKey
+	int Function Get()
+		Return OStimKeySpeedDown.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeySpeedDown.value As int)
+		OStimKeySpeedDown.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyPullOut Auto
+Int Property PullOutKey
+	int Function Get()
+		Return OStimKeyPullOut.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyPullOut.value As int)
+		OStimKeyPullOut.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyAutoMode Auto
+Int Property ControlToggleKey
+	int Function Get()
+		Return OStimKeyAutoMode.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyAutoMode.value As int)
+		OStimKeyAutoMode.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+		LoadOSexControlKeys()
+	EndFunction
+EndProperty
+
+GlobalVariable Property OStimKeyFreeCam Auto
+int property FreecamKey
+	int Function Get()
+		Return OStimKeyFreeCam.value As int
+	EndFunction
+	Function Set(int Value)
+		UnregisterForKey(OStimKeyFreeCam.value As int)
+		OStimKeyFreeCam.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
+	EndFunction
+EndProperty
 
 GlobalVariable Property OStimKeyAlignment Auto
-int Property KeyAlignment
+int Property AlignmentKey
 	int Function Get()
 		Return OStimKeyAlignment.value As int
 	EndFunction
 	Function Set(int Value)
+		UnregisterForKey(OStimKeyAlignment.value As int)
 		OStimKeyAlignment.value = Value
+		If Value != 1
+			RegisterForKey(Value)
+		EndIf
 	EndFunction
 EndProperty
 
@@ -2735,6 +2818,7 @@ UseFreeCam
 	SpeedDownKey = 74
 	PullOutKey = 79
 	ControlToggleKey = 82
+	AlignmentKey = 38
 
 	MuteOSA = False
 
@@ -2751,12 +2835,6 @@ UseFreeCam
 	ShowTutorials = true 
 	
 	UseBrokenCosaveWorkaround = True
-	RemapStartKey(Keymap)
-	RegisterForKey(FreecamKey)
-	RemapSpeedDownKey(SpeedDownKey)
-	RemapSpeedUpKey(SpeedUpKey)
-	RemapPullOutKey(PullOutKey)
-	RemapControlToggleKey(ControlToggleKey)
 EndFunction
 
 Function RegisterOSexControlKey(Int zKey)
@@ -2821,56 +2899,6 @@ Function ResetState()
 	UI.InvokeInt("HUD Menu", o + ".com.endCommand", 56)
 EndFunction
 
-Function RemapStartKey(Int zKey)
-	UnregisterForKey(KeyMap)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	KeyMap = zKey
-EndFunction
-
-Function RemapFreecamKey(Int zKey)
-	UnregisterForKey(FreecamKey)
-	RegisterForKey(zKey)
-	FreecamKey = zKey
-EndFunction
-
-Function RemapControlToggleKey(Int zKey)
-	UnregisterForKey(ControlToggleKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	ControlToggleKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapSpeedUpKey(Int zKey)
-	UnregisterForKey(SpeedUpKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	speedUpKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapSpeedDownKey(Int zKey)
-	UnregisterForKey(SpeedDownKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	speedDownKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
-Function RemapPullOutKey(Int zKey)
-	UnregisterForKey(PullOutKey)
-	If zKey != 1
-		RegisterForKey(zKey)
-	EndIf
-	PullOutKey = zKey
-	LoadOSexControlKeys()
-EndFunction
-
 Float ProfileTime 
 Function Profile(String Name = "")
 	{Call Profile() to start. Call Profile("any string") to pring out the time since profiler started in console. Most accurate at 60fps}
@@ -2925,7 +2953,7 @@ Event OnKeyDown(Int KeyPress)
 		Return
 	EndIf
 
-	if(KeyPress == 38)
+	if(KeyPress == AlignmentKey)
 		OAlign.ToggleMenu()
 	endIf
 
@@ -3237,7 +3265,10 @@ Function OnLoadGame()
 			RegisterForKey(KeyMap)
 		EndIf
 
-		RegisterForKey(38) ; TODO: Move to MCM
+		If AlignmentKey != 1
+			RegisterForKey(AlignmentKey)
+		EndIf
+		
 
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
@@ -3490,4 +3521,29 @@ EndFunction
 
 Function ToggleFreeCam(Bool On = True)
 	OSANative.ToggleFlyCam()
+EndFunction
+
+Function RemapStartKey(Int zKey)
+	UnregisterForKey(KeyMap)
+	KeyMap = zKey
+EndFunction
+
+Function RemapFreecamKey(Int zKey)
+	FreecamKey = zKey
+EndFunction
+
+Function RemapControlToggleKey(Int zKey)
+	ControlToggleKey = zKey
+EndFunction
+
+Function RemapSpeedUpKey(Int zKey)
+	speedUpKey = zKey
+EndFunction
+
+Function RemapSpeedDownKey(Int zKey)
+	speedDownKey = zKey
+EndFunction
+
+Function RemapPullOutKey(Int zKey)
+	PullOutKey = zKey
 EndFunction
